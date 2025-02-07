@@ -1,0 +1,13 @@
+[project]
+name = "bookserver"
+version = "0.1.0"
+description = "Application to manage a users book library."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "inquirer>=3.4.0",
+    "requests",
+    "ruff",
+    "uvicorn",
+]
