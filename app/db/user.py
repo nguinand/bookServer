@@ -16,5 +16,7 @@ class User(Base):
     created_at = Column(TIMESTAMP, server_default="CURRENT_TIMESTAMP")
     last_login = Column(TIMESTAMP, nullable=True)
 
+    # A user can have multiple bookcases 1:N
     bookcases = relationship("Bookcase", back_populates="user")
+    # A user can rate multiple books 1:N
     ratings = relationship("UserBookAttributes", back_populates="user")

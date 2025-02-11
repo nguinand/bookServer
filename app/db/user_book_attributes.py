@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, ForeignKey, Text, TIMESTAMP, UniqueConst
 from sqlalchemy.orm import relationship
 from base import Base
 
-
+# Linking table
 class UserBookAttributes(Base):
     __tablename__ = "user_book_attributes"
 
@@ -20,6 +20,9 @@ class UserBookAttributes(Base):
         TIMESTAMP, server_default="CURRENT_TIMESTAMP", onupdate="CURRENT_TIMESTAMP"
     )
 
+    # A user can rate multiple books
+    # A book can be rated by multiple users
+    # 1:N
     user = relationship("User", back_populates="ratings")
     book = relationship("Book", back_populates="ratings")
 

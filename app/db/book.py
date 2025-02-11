@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Date, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from base import Base
-
+from book_authors import book_authors
 
 class Book(Base):
     __tablename__ = "books"
@@ -10,7 +10,6 @@ class Book(Base):
     google_books_id = Column(String(50), unique=True, nullable=False)
     title = Column(String(255), nullable=False)
     subtitle = Column(String(255), nullable=True)
-    author_id = Column(Integer, ForeignKey("authors.id"), nullable=False)
     publisher_id = Column(Integer, ForeignKey("publishers.id"), nullable=True)
     published_date = Column(Date, nullable=True)
     description = Column(Text, nullable=True)
@@ -23,5 +22,7 @@ class Book(Base):
     preview_link = Column(String(255), nullable=True)
     language = Column(String(10), nullable=True)
 
-    author = relationship("Author", back_populates="books")
     publisher = relationship("Publisher", back_populates="books")
+    
+    # A book can have multiple authors. N:N
+    authors = relationship("Author", secondary=book_authors, back_populates="books")
