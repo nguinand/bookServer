@@ -9,5 +9,6 @@ dependencies = [
     "inquirer>=3.4.0",
     "requests",
     "ruff",
+    "sqlalchemy>=2.0.38",
     "uvicorn",
 ]
