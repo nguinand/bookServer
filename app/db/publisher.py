@@ -9,6 +9,6 @@ class Publisher(Base):
     name = Column(String(255), unique=True, nullable=False)
 
     # A publisher can publish multiple books.
-    # A book belongs to one publisher. 
+    # A book belongs to one publisher.
     # 1:N
     books = relationship("Book", back_populates="publisher")

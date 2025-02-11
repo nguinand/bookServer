@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, ForeignKey, Text, TIMESTAMP, UniqueConst
 from sqlalchemy.orm import relationship
 from base import Base
 
+
 # Linking table
 class UserBookAttributes(Base):
     __tablename__ = "user_book_attributes"

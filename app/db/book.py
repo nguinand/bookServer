@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from base import Base
 from book_authors import book_authors
 
+
 class Book(Base):
     __tablename__ = "books"
 
@@ -23,6 +24,6 @@ class Book(Base):
     language = Column(String(10), nullable=True)
 
     publisher = relationship("Publisher", back_populates="books")
-    
+
     # A book can have multiple authors. N:N
     authors = relationship("Author", secondary=book_authors, back_populates="books")
