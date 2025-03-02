@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import List, Optional
+from typing import List
 from app.models.book import Book  # Import your Book model
 
 

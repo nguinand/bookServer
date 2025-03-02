@@ -1,6 +1,15 @@
 from decimal import Decimal
+from enum import Enum
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
+
+
+class CurrencyCode(str, Enum):
+    USD = "USD"
+    EUR = "EUR"
+    GBP = "GBP"
+    JPY = "JPY"
+    INR = "INR"
 
 
 # Unsure about naming
@@ -8,8 +17,8 @@ class Price(BaseModel):
     amount: Optional[Decimal] = Field(
         None, gt=0, description="The optional price amount."
     )
-    currencyCode: Optional[str] = Field(
-        None, description="Currency code following ISO 4217."
+    currencyCode: Optional[CurrencyCode] = Field(
+        None, description="Currency code following ISO 4217.", alias="currencyCode"
     )
 
     # Currency validation with Pydantic v2 field validator
@@ -27,3 +36,5 @@ class SaleInfo(BaseModel):
     saleability: Optional[str] = None
     is_ebook: Optional[bool] = Field(None, alias="isEbook")
     list_price: Optional[Price] = Field(None, alias="listPrice")
+    retail_price: Optional[Price] = Field(None, alias="retailPrice")
+    buy_link: Optional[str] = Field(None, alias="buyLink")

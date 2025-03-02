@@ -17,13 +17,15 @@ class Book(Base):
     page_count = Column(Integer, nullable=True)
     average_rating = Column(Float, nullable=True)
     ratings_count = Column(Integer, nullable=True)
-    isbn_10 = Column(String(20), nullable=True)
-    isbn_13 = Column(String(20), nullable=True)
     cover_image = Column(String(255), nullable=True)
     preview_link = Column(String(255), nullable=True)
+    info_link = Column(String(255), nullable=True)
     language = Column(String(10), nullable=True)
 
     publisher = relationship("Publisher", back_populates="books")
-
     # A book can have multiple authors. N:N
     authors = relationship("Author", secondary=book_authors, back_populates="books")
+    sale_info = relationship("BookSale", back_populates="book", uselist=False)
+    access_info = relationship("BookAccess", back_populates="book", uselist=False)
+    identifiers = relationship("BookIdentifier", back_populates="book")
+    genres = relationship("Genre", secondary="book_genres", back_populates="books")

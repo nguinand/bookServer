@@ -27,15 +27,15 @@ class Book(BaseModel):
                     "ratings_count": 312,
                     "image_links": {
                         "small_thumbnail": "http://example.com/small.jpg",
-                        "thumbnail": "http://example.com/large.jpg"
+                        "thumbnail": "http://example.com/large.jpg",
                     },
-                    "preview_link": "http://example.com/preview"
+                    "preview_link": "http://example.com/preview",
                 },
                 "sale_info": {
                     "country": "US",
                     "saleability": "FOR_SALE",
                     "is_ebook": True,
-                    "list_price": {"amount": "11.99", "currencyCode": "USD"}
+                    "list_price": {"amount": "11.99", "currencyCode": "USD"},
                 },
                 "access_info": {
                     "country": "US",
@@ -43,7 +43,7 @@ class Book(BaseModel):
                     "embeddable": True,
                     "publicDomain": False,
                     "epub": {"isAvailable": True},
-                    "pdf": {"isAvailable": False}
-                }
+                    "pdf": {"isAvailable": False},
+                },
             }
         }

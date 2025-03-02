@@ -9,7 +9,7 @@ class AccessInfo(BaseModel):
     publicDomain: Optional[bool] = Field(None, alias="publicDomain")
     epub: Optional[Dict[str, bool]] = None
     pdf: Optional[Dict[str, bool]] = None
-
+    web_reader_link: Optional[str] = Field(None, alias="webReaderLink")
 
     class Config:
         json_schema_extra = {

@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
+from app.models.identifiers import IndustryIdentifier
+
 
 class ImageLinks(BaseModel):
     small_thumbnail: Optional[str] = Field(None, alias="smallThumbnail")
@@ -20,9 +22,12 @@ class VolumeInfo(BaseModel):
     ratings_count: Optional[int] = Field(None, alias="ratingsCount")
     image_links: Optional[ImageLinks] = Field(None, alias="imageLinks")
     preview_link: Optional[str] = Field(None, alias="previewLink")
+    industryIdentifiers: Optional[List[IndustryIdentifier]] = Field(
+        None, alias="industryIdentifiers"
+    )
 
     class Config:
-        extra = "allow"
+        # extra = "allow"
         json_schema_extra = {
             "example": {
                 "title": "Harry Potter and the Sorcerer's Stone",
@@ -37,8 +42,8 @@ class VolumeInfo(BaseModel):
                 "ratingsCount": 312,
                 "imageLinks": {
                     "smallThumbnail": "http://example.com/small.jpg",
-                    "thumbnail": "http://example.com/large.jpg"
+                    "thumbnail": "http://example.com/large.jpg",
                 },
-                "previewLink": "http://example.com/preview"
+                "previewLink": "http://example.com/preview",
             }
         }
