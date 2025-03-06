@@ -30,12 +30,12 @@ def get_books(query: str, max_results: int = 10):
     books = []
     for item in data.get("items", []):
         book_data = {
-            "id": item["id"],
+            "google_books_id": item["id"],
             "volumeInfo": item.get("volumeInfo", {}),
-            "sale_info": item.get("saleInfo", {}),
-            "access_info": item.get("accessInfo", {}),
+            "saleInfo": item.get("saleInfo"),
+            "accessInfo": item.get("accessInfo", {}),
         }
-        print(data)
+
         try:
             books.append(Book(**book_data))
         except ValidationError as e:

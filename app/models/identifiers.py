@@ -9,12 +9,14 @@ class IdentifierType(str, Enum):
 
 
 class IndustryIdentifier(BaseModel):
-    type: str = Field(..., example="ISBN_13")
+    type: IdentifierType
     identifier: str = Field(..., example="9781781100486")
 
     @field_validator("identifier")
-    def validate_isbn(cls, value, values):
-        isbn_type = values.get("type")
+    @classmethod
+    def validate_isbn(cls, value, info):
+        """Validate ISBN-10 and ISBN-13 formats"""
+        isbn_type = info.data["type"]
 
         # Validate ISBN-10
         if isbn_type == IdentifierType.ISBN_10:

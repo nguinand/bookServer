@@ -14,14 +14,11 @@ class CurrencyCode(str, Enum):
 
 # Unsure about naming
 class Price(BaseModel):
-    amount: Optional[Decimal] = Field(
-        None, gt=0, description="The optional price amount."
-    )
+    amount: Optional[Decimal] = Field(None, description="The optional price amount.")
     currencyCode: Optional[CurrencyCode] = Field(
         None, description="Currency code following ISO 4217.", alias="currencyCode"
     )
 
-    # Currency validation with Pydantic v2 field validator
     @field_validator("currencyCode")
     def validate_currency(cls, currency: Optional[str]) -> Optional[str]:
         if currency is not None:
