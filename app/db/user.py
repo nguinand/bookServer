@@ -20,3 +20,6 @@ class User(Base):
     bookcases = relationship("Bookcase", back_populates="user")
     # A user can rate multiple books 1:N
     ratings = relationship("UserBookAttributes", back_populates="user")
+    status = relationship("UserStatus", back_populates="users")
+
+    avatar = relationship("Avatar", back_populates="users")
