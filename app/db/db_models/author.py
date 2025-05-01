@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text
 from sqlalchemy.orm import relationship
-from base import Base
-from book_authors import book_authors  # Import the association table
+from app.db.db_models.base import Base
 
 
 class Author(Base):
@@ -15,4 +14,4 @@ class Author(Base):
     bio = Column(Text, nullable=True)
 
     # An author can write multiple books. N:N
-    books = relationship("Book", secondary=book_authors, back_populates="authors")
+    books = relationship("Book", secondary="book_authors", back_populates="authors")
