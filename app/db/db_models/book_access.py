@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-from base import Base
+from app.db.db_models.base import Base
 
 
 class BookAccess(Base):

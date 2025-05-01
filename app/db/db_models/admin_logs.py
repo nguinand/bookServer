@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, Text, TIMESTAMP
-from base import Base
+from app.db.db_models.base import Base
 
 
-class admin_logs(Base):
-    __table__ = "admin_logs"
+class AdminLogs(Base):
+    __tablename__ = "admin_logs"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     event_type = Column(
