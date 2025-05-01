@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
-from base import Base  # or from app.db.base if using absolute imports
+from app.db.db_models.base import Base
 
 
 class Avatar(Base):
