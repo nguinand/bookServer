@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, Text, TIMESTAMP, UniqueConstraint
 from sqlalchemy.orm import relationship
-from base import Base
+from app.db.db_models.base import Base
 
 
 # Linking table

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP
 from sqlalchemy.orm import relationship
-from base import Base
+from app.db.db_models.base import Base
 
 
 class Bookcase(Base):
