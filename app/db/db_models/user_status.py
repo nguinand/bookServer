@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text
 from sqlalchemy.orm import relationship
-from base import Base  # or from app.db.base if you’re using a shared base
+from app.db.db_models.base import Base
 
 
 class UserStatus(Base):

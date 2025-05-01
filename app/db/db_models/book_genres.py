@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, Table
-from app.db.base import Base
+
+from app.db.db_models.base import Base
 
 # Association table to many-many relationship. Between a Genre and a Book.
 # A book can have multiple Genres.

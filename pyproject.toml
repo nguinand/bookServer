@@ -5,10 +5,14 @@ description = "Application to manage a users book library."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi",
+    "fastapi>=0.115.12",
     "inquirer>=3.4.0",
-    "requests",
-    "ruff",
-    "sqlalchemy>=2.0.38",
-    "uvicorn",
+    "mysqlclient>=2.2.7",
+    "pydantic[email]>=2.11.4",
+    "pytest>=8.3.5",
+    "python-dotenv>=1.1.0",
+    "requests>=2.32.3",
+    "ruff>=0.11.6",
+    "sqlalchemy>=2.0.40",
+    "uvicorn>=0.34.2",
 ]
