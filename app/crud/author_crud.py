@@ -16,7 +16,7 @@ class AuthorModel(BaseModel):
 
 
 class AuthorCrud:
-    def create_author(self, author_model: AuthorModel, session: Session) -> None:
+    def create_author(self, author_model: AuthorModel, session: Session) -> Author:
         """
         Function that creates an entry in the Author table.
         """
@@ -26,7 +26,11 @@ class AuthorCrud:
         session.refresh(author_data)
         return author_data
 
-    def read_author(self): ...
+    def get_author_by_name(self, name: str, session:Session) -> list[Author]:
+        return session.query(Author).filter_by(name=name).all()
+    
+    def get_author_by_id(self, id: int, session: Session) -> Author:
+        return session.query(Author).filter_by(id = id).first()
 
     def update_author(self): ...
 
