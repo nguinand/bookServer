@@ -13,7 +13,7 @@ class CurrencyCode(str, Enum):
 
 
 # Unsure about naming
-class Price(BaseModel):
+class PriceModel(BaseModel):
     amount: Optional[Decimal] = Field(None, description="The optional price amount.")
     currencyCode: Optional[CurrencyCode] = Field(
         None, description="Currency code following ISO 4217.", alias="currencyCode"
@@ -28,10 +28,10 @@ class Price(BaseModel):
         return currency
 
 
-class SaleInfo(BaseModel):
+class SaleInfoModel(BaseModel):
     country: Optional[str] = None
     saleability: Optional[str] = None
     is_ebook: Optional[bool] = Field(None, alias="isEbook")
-    list_price: Optional[Price] = Field(None, alias="listPrice")
-    retail_price: Optional[Price] = Field(None, alias="retailPrice")
+    list_price: Optional[PriceModel] = Field(None, alias="listPrice")
+    retail_price: Optional[PriceModel] = Field(None, alias="retailPrice")
     buy_link: Optional[str] = Field(None, alias="buyLink")

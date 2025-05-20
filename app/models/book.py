@@ -1,15 +1,15 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from app.models.volume_info import VolumeInfo
-from app.models.sale_info import SaleInfo
-from app.models.access_info import AccessInfo
+from app.models.volume_info import VolumeInfoModel
+from app.models.sale_info import SaleInfoModel
+from app.models.access_info import AccessInfoModel
 
 
 class Book(BaseModel):
     google_books_id: str = Field(..., example="wrOQLV6xB-wC")
-    volume_info: VolumeInfo = Field(..., alias="volumeInfo")
-    sale_info: Optional[SaleInfo] = Field(None, alias="saleInfo")
-    access_info: Optional[AccessInfo] = Field(None, alias="accessInfo")
+    volume_info: VolumeInfoModel = Field(..., alias="volumeInfo")
+    sale_info: Optional[SaleInfoModel] = Field(None, alias="saleInfo")
+    access_info: Optional[AccessInfoModel] = Field(None, alias="accessInfo")
 
     class Config:
         json_schema_extra = {

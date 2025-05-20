@@ -3,7 +3,7 @@ from typing import List
 from app.models.book import Book  # Import your Book model
 
 
-class User(BaseModel):
+class UserModel(BaseModel):
     id: int
     first_name: str
     last_name: str
