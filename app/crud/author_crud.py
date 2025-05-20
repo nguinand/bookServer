@@ -1,21 +1,7 @@
-from typing import List, Optional
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
-
-from app.crud.book_crud import BookModel
 from app.db.db_models.author import Author
 from app.db.db_models.book import Book
-
-
-class AuthorModel(BaseModel):
-    id: Optional[int] = None
-    google_books_id: Optional[str] = None
-    bio: Optional[str] = None
-    name: str
-    books: List[BookModel] = []
-
-    class Config:
-        from_attributes = True
+from app.models.author import AuthorModel
 
 
 class AuthorCrud:
