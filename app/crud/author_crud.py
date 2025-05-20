@@ -5,7 +5,7 @@ from app.models.author import AuthorModel
 
 
 class AuthorCrud:
-    def create_author(self, author_model: AuthorModel, session: Session) -> Author:
+    def create_author(self, author_model: AuthorModel, session: Session) -> AuthorModel:
         """
         Function that creates an entry in the Author table.
         """
@@ -13,7 +13,7 @@ class AuthorCrud:
         session.add(author_data)
         session.commit()
         session.refresh(author_data)
-        return author_data
+        return AuthorModel.model_validate(author_data)
 
     def get_authors_by_name(self, name: str, session: Session) -> list[AuthorModel]:
         authors = session.query(Author).filter_by(name=name).all()
@@ -32,9 +32,8 @@ class AuthorCrud:
                 f"Cannot replace author without an ID. {author_replacement.id} - {author_replacement.name}"
             )
 
-        author_record = (
-            session.query(Author).filter_by(id=author_replacement.id).first()
-        )
+        author_record = session.query(Author).filter_by(id=author_replacement.id).first()
+        
 
         if not author_record:
             return None
