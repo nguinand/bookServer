@@ -15,7 +15,7 @@ class AuthorCrud:
         session.refresh(author_data)
         return author_data
 
-    def get_author_by_name(self, name: str, session: Session) -> list[AuthorModel]:
+    def get_authors_by_name(self, name: str, session: Session) -> list[AuthorModel]:
         authors = session.query(Author).filter_by(name=name).all()
         return [AuthorModel.model_validate(x) for x in authors]
 
