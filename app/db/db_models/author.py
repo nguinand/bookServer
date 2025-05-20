@@ -1,17 +1,20 @@
-from sqlalchemy import Column, Integer, String, Text
-from sqlalchemy.orm import relationship
+from typing import Optional
+from sqlalchemy import Integer, String, Text
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.db.db_models.base import Base
 
 
 class Author(Base):
     __tablename__ = "authors"
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    google_books_id = Column(
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, index=True, autoincrement=True
+    )
+    google_books_id: Mapped[Optional[str]] = mapped_column(
         String(50), unique=True, nullable=True
     )  # Keep for API lookups
-    name = Column(String(255), unique=True, nullable=False)
-    bio = Column(Text, nullable=True)
+    name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    bio: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # An author can write multiple books. N:N
     books = relationship("Book", secondary="book_authors", back_populates="authors")

@@ -1,6 +1,7 @@
 import logging
 import sys
 
+
 def get_logger(name: str = "app") -> logging.Logger:
     """
     Returns a logger configured with a standard format.
