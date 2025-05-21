@@ -6,12 +6,12 @@ from app.models.user import UserModel
 
 
 class UserCrud:
-    def create_user(self, user_model: UserModel, session: Session) -> User:
+    def create_user(self, user_model: UserModel, session: Session) -> UserModel:
         user_data = User(**user_model.model_dump(by_alias=True, exclude_unset=True))
         session.add(user_data)
         session.commit()
         session.refresh(user_data)
-        return user_data
+        return UserModel.model_validate(user_data)
 
     def get_user_by_id(self, id: int, session: Session) -> UserModel:
         user_record = session.query(User).filter_by(id=id).first()
@@ -25,7 +25,7 @@ class UserCrud:
         user_record = session.query(User).filter_by(email=username).first()
         return UserModel.model_validate(user_record)
 
-    def update_user_all(
+    def update_user(
         self, user_replacement: UserModel, session: Session
     ) -> None | UserModel:
         if user_replacement.id is None:
@@ -66,7 +66,7 @@ class UserCrud:
         user_record.bookcases = user_record.bookcases
 
         session.commit()
-        return user_record
+        return UserModel.model_validate(user_record)
 
     def delete_user(self, user_id: int, session: Session) -> bool:
         user = session.query(User).filter_by(id=user_id).first()
