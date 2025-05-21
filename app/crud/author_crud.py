@@ -50,7 +50,7 @@ class AuthorCrud:
         author_record.books = author_replacement.books
         session.commit()
 
-        return author_record
+        return AuthorModel.model_validate(author_record)
 
     def delete_author_by_id(self, author_id: int, session: Session) -> bool:
         author = session.query(Author).filter_by(id=author_id).first()

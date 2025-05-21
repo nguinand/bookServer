@@ -1,4 +1,4 @@
-from app.crud.book_crud import BookModel
+from app.models.book import BookModel
 from typing import List, Optional
 from pydantic import BaseModel
 

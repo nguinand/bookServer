@@ -6,7 +6,8 @@ from app.models.access_info import AccessInfoModel
 
 
 class BookModel(BaseModel):
-    google_books_id: str = Field(..., example="wrOQLV6xB-wC")
+    id: Optional[str]
+    google_books_id: str
     volume_info: VolumeInfoModel = Field(..., alias="volumeInfo")
     sale_info: Optional[SaleInfoModel] = Field(None, alias="saleInfo")
     access_info: Optional[AccessInfoModel] = Field(None, alias="accessInfo")
