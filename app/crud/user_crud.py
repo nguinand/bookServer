@@ -73,9 +73,6 @@ class UserCrud:
         if not user:
             return False
 
-        # figure out if we need to delete the bookcase separately here.
-        # or if it deletes automatically.
-
         session.delete(user)
         session.commit()
         return True
