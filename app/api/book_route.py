@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import ValidationError
 import requests
 
-from app.models.book import Book
+from app.models.book import BookModel
 
 
 router = APIRouter()
@@ -11,7 +11,7 @@ GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes"
 api_key = "AIzaSyDZkhTGnPp04wGkVoZS6aAVt1wi3Qy3EVU"
 
 
-@router.get("/books/", response_model=List[Book])
+@router.get("/books/", response_model=List[BookModel])
 def get_books(query: str, max_results: int = 10):
     # Example: http://127.0.0.1:8000/api/books/?query=harry&max_results=1
     url = (
@@ -37,7 +37,7 @@ def get_books(query: str, max_results: int = 10):
         }
 
         try:
-            books.append(Book(**book_data))
+            books.append(BookModel(**book_data))
         except ValidationError as e:
             print(f"Error in Book model creation: {e}")
             return None

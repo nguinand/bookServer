@@ -32,8 +32,9 @@ class AuthorCrud:
                 f"Cannot replace author without an ID. {author_replacement.id} - {author_replacement.name}"
             )
 
-        author_record = session.query(Author).filter_by(id=author_replacement.id).first()
-        
+        author_record = (
+            session.query(Author).filter_by(id=author_replacement.id).first()
+        )
 
         if not author_record:
             return None

@@ -1,15 +1,21 @@
-from sqlalchemy import Column, Integer, String, Text, TIMESTAMP
+from datetime import datetime
+from sqlalchemy import Integer, String, Text, TIMESTAMP, func
 from app.db.db_models.base import Base
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class AdminLogs(Base):
     __tablename__ = "admin_logs"
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    event_type = Column(
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, index=True, autoincrement=True
+    )
+    event_type: Mapped[str] = mapped_column(
         String(100), nullable=False
     )  # Type of event (e.g., "USER_DELETED", "BOOK_ADDED")
-    event_description = Column(
+    event_description: Mapped[str] = mapped_column(
         Text, nullable=False
     )  # Detailed description of the event
-    created_at = Column(TIMESTAMP, server_default="CURRENT_TIMESTAMP")
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, server_default=func.current_timestamp()
+    )

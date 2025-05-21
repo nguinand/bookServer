@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, ForeignKey, Integer, TIMESTAMP
+from sqlalchemy import Table, Column, ForeignKey, Integer, TIMESTAMP, func
 from app.db.db_models.base import Base
 
 bookcase_books = Table(
@@ -13,5 +13,5 @@ bookcase_books = Table(
     Column(
         "book_id", Integer, ForeignKey("books.id", ondelete="CASCADE"), primary_key=True
     ),
-    Column("added_at", TIMESTAMP, server_default="CURRENT_TIMESTAMP"),
+    Column("added_at", TIMESTAMP, server_default=func.current_timestamp()),
 )

@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, ForeignKey, Text, TIMESTAMP, UniqueConstraint
-from sqlalchemy.orm import relationship
+from datetime import datetime
+from typing import Optional
+from sqlalchemy import Integer, ForeignKey, Text, TIMESTAMP, UniqueConstraint, func
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.db.db_models.base import Base
 
 
@@ -7,18 +9,24 @@ from app.db.db_models.base import Base
 class UserBookAttributes(Base):
     __tablename__ = "user_book_attributes"
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    user_id = Column(
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, index=True, autoincrement=True
+    )
+    user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    book_id = Column(
+    book_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("books.id", ondelete="CASCADE"), nullable=False
     )
-    rating = Column(Integer, nullable=False)
-    review_text = Column(Text, nullable=True)
-    created_at = Column(TIMESTAMP, server_default="CURRENT_TIMESTAMP")
-    updated_at = Column(
-        TIMESTAMP, server_default="CURRENT_TIMESTAMP", onupdate="CURRENT_TIMESTAMP"
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    review_text: Mapped[Optional[Text]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[Optional[datetime]] = mapped_column(
+        TIMESTAMP, server_default=func.current_timestamp()
+    )
+    updated_at: Mapped[Optional[datetime]] = mapped_column(
+        TIMESTAMP,
+        server_default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
     )
 
     # A user can rate multiple books
