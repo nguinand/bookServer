@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from app.db.db_models.base import Base
 
@@ -7,8 +7,10 @@ from app.db.db_models.base import Base
 class Genre(Base):
     __tablename__ = "genres"
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    name = Column(String(100), unique=True, nullable=False)
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, index=True, autoincrement=True
+    )
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
 
     # A Book can belong to multiple genres.
     # A genre can be associated with multiple books.

@@ -5,6 +5,7 @@ description = "Application to manage a users book library."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "alembic>=1.15.2",
     "fastapi>=0.115.12",
     "inquirer>=3.4.0",
     "mysqlclient>=2.2.7",

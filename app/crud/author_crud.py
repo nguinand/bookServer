@@ -5,7 +5,7 @@ from app.models.author import AuthorModel
 
 
 class AuthorCrud:
-    def create_author(self, author_model: AuthorModel, session: Session) -> Author:
+    def create_author(self, author_model: AuthorModel, session: Session) -> AuthorModel:
         """
         Function that creates an entry in the Author table.
         """
@@ -13,9 +13,9 @@ class AuthorCrud:
         session.add(author_data)
         session.commit()
         session.refresh(author_data)
-        return author_data
+        return AuthorModel.model_validate(author_data)
 
-    def get_author_by_name(self, name: str, session: Session) -> list[AuthorModel]:
+    def get_authors_by_name(self, name: str, session: Session) -> list[AuthorModel]:
         authors = session.query(Author).filter_by(name=name).all()
         return [AuthorModel.model_validate(x) for x in authors]
 
