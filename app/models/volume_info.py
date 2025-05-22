@@ -28,6 +28,7 @@ class VolumeInfoModel(BaseModel):
 
     class Config:
         # extra = "allow"
+        from_attributes = True
         json_schema_extra = {
             "example": {
                 "title": "Harry Potter and the Sorcerer's Stone",
