@@ -19,7 +19,7 @@ class AuthorCrud:
         authors = session.query(Author).filter_by(name=name).all()
         return [AuthorModel.model_validate(x) for x in authors]
 
-    def get_author_by_id(self, id: int, session: Session) -> AuthorModel:
+    def get_author_by_id(self, id: int, session: Session) -> AuthorModel | None:
         author_record = session.query(Author).filter_by(id=id).first()
         return AuthorModel.model_validate(author_record)
 
