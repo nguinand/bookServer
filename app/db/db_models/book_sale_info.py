@@ -19,7 +19,9 @@ class BookSaleInfo(Base):
     is_ebook: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
     buy_link: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     list_price: Mapped[Optional[Decimal]] = mapped_column(DECIMAL(10, 2), nullable=True)
-    list_price_currency_code: Mapped[Optional[str]] = mapped_column(String(5), nullable=True)
+    list_price_currency_code: Mapped[Optional[str]] = mapped_column(
+        String(5), nullable=True
+    )
     retail_price: Mapped[Optional[Decimal]] = mapped_column(
         DECIMAL(10, 2), nullable=True
     )

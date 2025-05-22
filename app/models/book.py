@@ -13,7 +13,7 @@ class BookModel(BaseModel):
     access_info: Optional[AccessInfoModel] = Field(None, alias="accessInfo")
 
     class Config:
-        from_attributes= True
+        from_attributes = True
         json_schema_extra = {
             "example": {
                 "id": "wrOQLV6xB-wC",

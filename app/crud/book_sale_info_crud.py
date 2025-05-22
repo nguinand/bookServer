@@ -18,11 +18,15 @@ class BookSaleInfoCrud:
 
         if book_sale_info_model.list_price is not None:
             book_sale_info_data.list_price = book_sale_info_model.list_price.amount
-            book_sale_info_data.list_price_currency_code = book_sale_info_model.list_price.currencyCode
+            book_sale_info_data.list_price_currency_code = (
+                book_sale_info_model.list_price.currencyCode
+            )
 
         if book_sale_info_model.retail_price is not None:
             book_sale_info_data.retail_price = book_sale_info_model.retail_price.amount
-            book_sale_info_data.retail_price_currency_code =book_sale_info_model.retail_price.currencyCode
+            book_sale_info_data.retail_price_currency_code = (
+                book_sale_info_model.retail_price.currencyCode
+            )
 
         session.add(book_sale_info_data)
         session.commit()
@@ -33,7 +37,7 @@ class BookSaleInfoCrud:
 
     def get_book_sale_info_by_id(
         self, id: int, session: Session
-    ) -> BookSaleInfoModel | None: 
+    ) -> BookSaleInfoModel | None:
         book_sale_info_record = session.query(BookSaleInfo).filter_by(id=id).first()
         try:
             return self.convert_book_sale_info(book_sale_info_record)
@@ -48,14 +52,16 @@ class BookSaleInfoCrud:
             raise ValueError(
                 f"Cannot replace a book sale info record without an ID. {book_sale_info_replacement.id}"
             )
-        
+
         book_sale_info_record = (
-            session.query(BookSaleInfo).filter_by(id=book_sale_info_replacement.id).first()
+            session.query(BookSaleInfo)
+            .filter_by(id=book_sale_info_replacement.id)
+            .first()
         )
 
         if not book_sale_info_record:
             return None
-        
+
         book_sale_info_record.id = book_sale_info_replacement.id
         book_sale_info_record.book_id = book_sale_info_replacement.book_id
         book_sale_info_record.country = book_sale_info_replacement.country
@@ -64,29 +70,39 @@ class BookSaleInfoCrud:
         book_sale_info_record.buy_link = book_sale_info_replacement.buy_link
 
         if book_sale_info_replacement.list_price is not None:
-            book_sale_info_record.list_price = book_sale_info_replacement.list_price.amount
-            book_sale_info_record.list_price_currency_code = book_sale_info_replacement.list_price.currencyCode
+            book_sale_info_record.list_price = (
+                book_sale_info_replacement.list_price.amount
+            )
+            book_sale_info_record.list_price_currency_code = (
+                book_sale_info_replacement.list_price.currencyCode
+            )
 
         if book_sale_info_replacement.retail_price is not None:
-            book_sale_info_record.retail_price = book_sale_info_replacement.retail_price.amount
-            book_sale_info_record.retail_price_currency_code =book_sale_info_replacement.retail_price.currencyCode
+            book_sale_info_record.retail_price = (
+                book_sale_info_replacement.retail_price.amount
+            )
+            book_sale_info_record.retail_price_currency_code = (
+                book_sale_info_replacement.retail_price.currencyCode
+            )
 
         session.commit()
         return self.convert_book_sale_info(book_sale_info_record)
-    
-    def delete_book_sale_info(
-        self, book_sale_info_id: int, session: Session
-    ) -> bool: 
-        book_sale_info = session.query(BookSaleInfo).filter_by(id=book_sale_info_id).first()
+
+    def delete_book_sale_info(self, book_sale_info_id: int, session: Session) -> bool:
+        book_sale_info = (
+            session.query(BookSaleInfo).filter_by(id=book_sale_info_id).first()
+        )
 
         if not book_sale_info:
             return False
-        
+
         session.delete(book_sale_info)
         session.commit()
         return True
 
-    def convert_book_sale_info(self,book_sale_info_data: BookSaleInfo) -> BookSaleInfoModel:
+    def convert_book_sale_info(
+        self, book_sale_info_data: BookSaleInfo
+    ) -> BookSaleInfoModel:
         converted_book_sale_info = BookSaleInfoModel(
             id=book_sale_info_data.id,
             book_id=book_sale_info_data.book_id,
