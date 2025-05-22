@@ -31,7 +31,7 @@ class Book(Base):
     publisher = relationship("Publisher", back_populates="books")
     # A book can have multiple authors. N:N
     authors = relationship("Author", secondary="book_authors", back_populates="books")
-    sale_info = relationship("BookSale", back_populates="book", uselist=False)
+    book_sale_info = relationship("BookSaleInfo", back_populates="book", uselist=False)
     access_info = relationship("BookAccess", back_populates="book", uselist=False)
     identifiers = relationship("BookIdentifier", back_populates="book")
     genres = relationship("Genre", secondary="book_genres", back_populates="books")
