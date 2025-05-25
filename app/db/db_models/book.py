@@ -15,9 +15,7 @@ class Book(Base):
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     subtitle: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    publisher_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("publishers.id"), nullable=True
-    )
+    publisher_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     published_date: Mapped[Optional[Date]] = mapped_column(Date, nullable=True)
     description: Mapped[Optional[Text]] = mapped_column(Text, nullable=True)
     page_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
@@ -27,8 +25,8 @@ class Book(Base):
     preview_link: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     info_link: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     language: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    maturity_rating: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
 
-    publisher = relationship("Publisher", back_populates="books")
     # A book can have multiple authors. N:N
     authors = relationship("Author", secondary="book_authors", back_populates="books")
     book_sale_info = relationship("BookSaleInfo", back_populates="book", uselist=False)
