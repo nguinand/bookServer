@@ -4,7 +4,6 @@ from .bookcase import Bookcase
 from .book import Book
 from .author import Author
 from .avatar import Avatar
-from .publisher import Publisher
 from .genre import Genre
 from .book_authors import book_authors
 from .book_genres import book_genres
