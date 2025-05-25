@@ -37,5 +37,4 @@ class BookSaleInfoModel(BaseModel):
     list_price: Optional[PriceModel] = Field(None, alias="listPrice")
     retail_price: Optional[PriceModel] = Field(None, alias="retailPrice")
     buy_link: Optional[str] = Field(None, alias="buyLink")
-
     model_config = {"from_attributes": True, "populate_by_name": True}
