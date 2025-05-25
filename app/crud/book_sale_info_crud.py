@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 class BookSaleInfoCrud:
     def create_book_sale_info(
         self, book_sale_info_model: BookSaleInfoModel, session: Session
-    ) -> BookSaleInfoModel:
+    ) -> BookSaleInfo:
         book_sale_info_data = BookSaleInfo(
             book_id=book_sale_info_model.book_id,
             country=book_sale_info_model.country,
@@ -32,22 +32,21 @@ class BookSaleInfoCrud:
         session.commit()
         session.refresh(book_sale_info_data)
 
-        # Convert the db model to a pydantic model. To return that.
-        return self.convert_book_sale_info(book_sale_info_data)
+        return book_sale_info_data
 
     def get_book_sale_info_by_id(
         self, id: int, session: Session
-    ) -> BookSaleInfoModel | None:
+    ) -> BookSaleInfo | None:
         book_sale_info_record = session.query(BookSaleInfo).filter_by(id=id).first()
         try:
-            return self.convert_book_sale_info(book_sale_info_record)
+            return book_sale_info_record
         except AttributeError as e:
             print(e)
             return None
 
     def update_book_sale_info(
         self, book_sale_info_replacement: BookSaleInfoModel, session: Session
-    ) -> None | BookSaleInfoModel:
+    ) -> None | BookSaleInfo:
         if book_sale_info_replacement.id is None:
             raise ValueError(
                 f"Cannot replace a book sale info record without an ID. {book_sale_info_replacement.id}"
@@ -86,7 +85,7 @@ class BookSaleInfoCrud:
             )
 
         session.commit()
-        return self.convert_book_sale_info(book_sale_info_record)
+        return book_sale_info_record
 
     def delete_book_sale_info(self, book_sale_info_id: int, session: Session) -> bool:
         book_sale_info = (

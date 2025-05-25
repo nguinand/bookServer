@@ -6,28 +6,28 @@ from app.models.user import UserModel
 
 
 class UserCrud:
-    def create_user(self, user_model: UserModel, session: Session) -> UserModel:
+    def create_user(self, user_model: UserModel, session: Session) -> User:
         user_data = User(**user_model.model_dump(by_alias=True, exclude_unset=True))
         session.add(user_data)
         session.commit()
         session.refresh(user_data)
-        return UserModel.model_validate(user_data)
+        return user_data
 
-    def get_user_by_id(self, id: int, session: Session) -> UserModel:
+    def get_user_by_id(self, id: int, session: Session) -> User:
         user_record = session.query(User).filter_by(id=id).first()
-        return UserModel.model_validate(user_record)
+        return user_record
 
-    def get_users_by_email(self, email: str, session: Session) -> list[UserModel]:
+    def get_users_by_email(self, email: str, session: Session) -> list[User]:
         users = session.query(User).filter_by(email=email).all()
-        return [UserModel.model_validate(x) for x in users]
+        return users
 
-    def get_users_by_username(self, username: str, session: Session) -> UserModel:
+    def get_users_by_username(self, username: str, session: Session) -> User:
         user_record = session.query(User).filter_by(email=username).first()
-        return UserModel.model_validate(user_record)
+        return user_record
 
     def update_user(
         self, user_replacement: UserModel, session: Session
-    ) -> None | UserModel:
+    ) -> None | User:
         if user_replacement.id is None:
             raise ValueError(
                 f"Cannot replace user without an ID. {user_replacement.id} - {user_replacement.email}"
@@ -66,7 +66,7 @@ class UserCrud:
         user_record.bookcases = user_record.bookcases
 
         session.commit()
-        return UserModel.model_validate(user_record)
+        return user_record
 
     def delete_user(self, user_id: int, session: Session) -> bool:
         user = session.query(User).filter_by(id=user_id).first()
@@ -76,3 +76,8 @@ class UserCrud:
         session.delete(user)
         session.commit()
         return True
+
+    def convert_user(
+        self, user_data: User
+    ) -> UserModel:
+        return UserModel.model_validate(user_data)

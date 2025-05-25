@@ -13,19 +13,20 @@ class AuthorCrud:
         session.add(author_data)
         session.commit()
         session.refresh(author_data)
-        return AuthorModel.model_validate(author_data)
+        return author_data
 
-    def get_authors_by_name(self, name: str, session: Session) -> list[AuthorModel]:
-        authors = session.query(Author).filter_by(name=name).all()
-        return [AuthorModel.model_validate(x) for x in authors]
+    # Assuming any author is unique
+    def get_author_by_name(self, name: str, session: Session) -> list[Author]:
+        authors = session.query(Author).filter_by(name=name).first()
+        return authors
 
     def get_author_by_id(self, id: int, session: Session) -> AuthorModel | None:
         author_record = session.query(Author).filter_by(id=id).first()
-        return AuthorModel.model_validate(author_record)
+        return author_record
 
     def update_author(
         self, author_replacement: AuthorModel, session: Session
-    ) -> None | AuthorModel:
+    ) -> None | Author:
         # find original author and replace contents
         if author_replacement.id is None:
             raise ValueError(
@@ -50,7 +51,7 @@ class AuthorCrud:
         author_record.books = author_replacement.books
         session.commit()
 
-        return AuthorModel.model_validate(author_record)
+        return author_record
 
     def delete_author_by_id(self, author_id: int, session: Session) -> bool:
         author = session.query(Author).filter_by(id=author_id).first()
@@ -61,3 +62,8 @@ class AuthorCrud:
         session.delete(author)
         session.commit()
         return True
+
+    def convert_author(
+        self, author_data: Author
+    ) -> AuthorModel:
+        ...
