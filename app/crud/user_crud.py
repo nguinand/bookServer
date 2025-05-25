@@ -25,9 +25,7 @@ class UserCrud:
         user_record = session.query(User).filter_by(email=username).first()
         return user_record
 
-    def update_user(
-        self, user_replacement: UserModel, session: Session
-    ) -> None | User:
+    def update_user(self, user_replacement: UserModel, session: Session) -> None | User:
         if user_replacement.id is None:
             raise ValueError(
                 f"Cannot replace user without an ID. {user_replacement.id} - {user_replacement.email}"
@@ -77,7 +75,5 @@ class UserCrud:
         session.commit()
         return True
 
-    def convert_user(
-        self, user_data: User
-    ) -> UserModel:
+    def convert_user(self, user_data: User) -> UserModel:
         return UserModel.model_validate(user_data)

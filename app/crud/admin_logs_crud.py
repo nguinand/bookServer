@@ -47,7 +47,4 @@ class AdminLogsCrud:
         session.commit()
         return True
 
-    def convert_admin_logs(
-        self, admin_logs_data: AdminLogs
-    ) -> AdminLogsModel:
-        ...
+    def convert_admin_logs(self, admin_logs_data: AdminLogs) -> AdminLogsModel: ...

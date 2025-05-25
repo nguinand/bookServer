@@ -63,7 +63,4 @@ class AuthorCrud:
         session.commit()
         return True
 
-    def convert_author(
-        self, author_data: Author
-    ) -> AuthorModel:
-        ...
+    def convert_author(self, author_data: Author) -> AuthorModel: ...

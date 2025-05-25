@@ -27,7 +27,7 @@ class VolumeInfoModel(BaseModel):
     industryIdentifiers: Optional[List[IndustryIdentifier]] = Field(
         None, alias="industryIdentifiers"
     )
-    maturity_rating:Optional[str] = None
+    maturity_rating: Optional[str] = None
 
     class Config:
         # extra = "allow"
