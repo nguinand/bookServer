@@ -104,10 +104,20 @@ class BookCrud:
 
         return book_data
 
-    def get_book_by_id(self, id: int, session: Session) -> BookModel: ...
+    def get_books_by_title(self, name: str, session: Session) -> list[Book]: 
+        book_records = session.query(Book).filter_by(title=name).all()
+        return book_records
+    
+    def get_book_by_google_id(self, name: str, session: Session) -> list[Book]: 
+        book_record = session.query(Book).filter_by(google_books_id=name).first()
+        return book_record
+    
+    def get_book_by_id(self, id: int, session: Session) -> Book: 
+        book_record = session.query(Book).filter_by(id=id).first()
+        return book_record
 
     def update_book(
         self, book_replacement: BookModel, session: Session
-    ) -> None | BookModel: ...
+    ) -> None | Book: ...
 
     def delete_book(self, book_id: int, session: Session) -> bool: ...
