@@ -22,9 +22,12 @@ class VolumeInfoModel(BaseModel):
     ratings_count: Optional[int] = Field(None, alias="ratingsCount")
     image_links: Optional[ImageLinksModel] = Field(None, alias="imageLinks")
     preview_link: Optional[str] = Field(None, alias="previewLink")
+    info_link: Optional[str] = Field(None, alias="infoLink")
+    language: Optional[str] = None
     industryIdentifiers: Optional[List[IndustryIdentifier]] = Field(
         None, alias="industryIdentifiers"
     )
+    maturity_rating:Optional[str] = None
 
     class Config:
         # extra = "allow"
