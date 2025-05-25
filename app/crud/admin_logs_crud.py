@@ -46,3 +46,8 @@ class AdminLogsCrud:
         session.delete(admin_log)
         session.commit()
         return True
+
+    def convert_admin_logs(
+        self, admin_logs_data: AdminLogs
+    ) -> AdminLogsModel:
+        ...
