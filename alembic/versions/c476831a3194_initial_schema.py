@@ -1,8 +1,8 @@
-"""initial schema
+"""Initial schema
 
-Revision ID: 20f71cde105e
+Revision ID: c476831a3194
 Revises: 
-Create Date: 2025-05-20 19:25:11.738171
+Create Date: 2025-05-24 21:00:34.938150
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '20f71cde105e'
+revision: str = 'c476831a3194'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -47,6 +47,26 @@ def upgrade() -> None:
     sa.UniqueConstraint('image_url')
     )
     op.create_index(op.f('ix_avatars_id'), 'avatars', ['id'], unique=False)
+    op.create_table('books',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('google_books_id', sa.String(length=50), nullable=False),
+    sa.Column('title', sa.String(length=255), nullable=False),
+    sa.Column('subtitle', sa.String(length=255), nullable=True),
+    sa.Column('publisher_name', sa.String(length=255), nullable=True),
+    sa.Column('published_date', sa.Date(), nullable=True),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('page_count', sa.Integer(), nullable=True),
+    sa.Column('average_rating', sa.Float(), nullable=True),
+    sa.Column('ratings_count', sa.Integer(), nullable=True),
+    sa.Column('cover_image', sa.String(length=255), nullable=True),
+    sa.Column('preview_link', sa.String(length=255), nullable=True),
+    sa.Column('info_link', sa.String(length=255), nullable=True),
+    sa.Column('language', sa.String(length=10), nullable=True),
+    sa.Column('maturity_rating', sa.String(length=10), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('google_books_id')
+    )
+    op.create_index(op.f('ix_books_id'), 'books', ['id'], unique=False)
     op.create_table('genres',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
@@ -54,13 +74,6 @@ def upgrade() -> None:
     sa.UniqueConstraint('name')
     )
     op.create_index(op.f('ix_genres_id'), 'genres', ['id'], unique=False)
-    op.create_table('publishers',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('name', sa.String(length=255), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
-    )
-    op.create_index(op.f('ix_publishers_id'), 'publishers', ['id'], unique=False)
     op.create_table('user_status',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
@@ -71,45 +84,6 @@ def upgrade() -> None:
     sa.UniqueConstraint('name')
     )
     op.create_index(op.f('ix_user_status_id'), 'user_status', ['id'], unique=False)
-    op.create_table('books',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('google_books_id', sa.String(length=50), nullable=False),
-    sa.Column('title', sa.String(length=255), nullable=False),
-    sa.Column('subtitle', sa.String(length=255), nullable=True),
-    sa.Column('publisher_id', sa.Integer(), nullable=True),
-    sa.Column('published_date', sa.Date(), nullable=True),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('page_count', sa.Integer(), nullable=True),
-    sa.Column('average_rating', sa.Float(), nullable=True),
-    sa.Column('ratings_count', sa.Integer(), nullable=True),
-    sa.Column('cover_image', sa.String(length=255), nullable=True),
-    sa.Column('preview_link', sa.String(length=255), nullable=True),
-    sa.Column('info_link', sa.String(length=255), nullable=True),
-    sa.Column('language', sa.String(length=10), nullable=True),
-    sa.ForeignKeyConstraint(['publisher_id'], ['publishers.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('google_books_id')
-    )
-    op.create_index(op.f('ix_books_id'), 'books', ['id'], unique=False)
-    op.create_table('users',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('first_name', sa.String(length=50), nullable=False),
-    sa.Column('last_name', sa.String(length=50), nullable=False),
-    sa.Column('username', sa.String(length=50), nullable=False),
-    sa.Column('email', sa.String(length=100), nullable=False),
-    sa.Column('password_hash', sa.String(length=255), nullable=False),
-    sa.Column('role', sa.String(length=20), nullable=False),
-    sa.Column('avatar_id', sa.Integer(), nullable=True),
-    sa.Column('status_id', sa.Integer(), nullable=True),
-    sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
-    sa.Column('last_login', sa.TIMESTAMP(), nullable=True),
-    sa.ForeignKeyConstraint(['avatar_id'], ['avatars.id'], ),
-    sa.ForeignKeyConstraint(['status_id'], ['user_status.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('username')
-    )
-    op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
     op.create_table('book_access',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('book_id', sa.Integer(), nullable=False),
@@ -147,26 +121,46 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_book_identifiers_id'), 'book_identifiers', ['id'], unique=False)
-    op.create_table('book_sales',
+    op.create_table('book_sale_info',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('book_id', sa.Integer(), nullable=False),
     sa.Column('country', sa.String(length=10), nullable=True),
     sa.Column('saleability', sa.String(length=50), nullable=True),
     sa.Column('is_ebook', sa.Boolean(), nullable=True),
-    sa.Column('price', sa.DECIMAL(precision=10, scale=2), nullable=True),
-    sa.Column('currency_code', sa.String(length=5), nullable=True),
+    sa.Column('buy_link', sa.Text(), nullable=True),
+    sa.Column('list_price', sa.DECIMAL(precision=10, scale=2), nullable=True),
+    sa.Column('list_price_currency_code', sa.String(length=5), nullable=True),
     sa.Column('retail_price', sa.DECIMAL(precision=10, scale=2), nullable=True),
-    sa.Column('retail_currency_code', sa.String(length=5), nullable=True),
+    sa.Column('retail_price_currency_code', sa.String(length=5), nullable=True),
     sa.ForeignKeyConstraint(['book_id'], ['books.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_book_sales_id'), 'book_sales', ['id'], unique=False)
+    op.create_index(op.f('ix_book_sale_info_id'), 'book_sale_info', ['id'], unique=False)
+    op.create_table('users',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('first_name', sa.String(length=50), nullable=False),
+    sa.Column('last_name', sa.String(length=50), nullable=False),
+    sa.Column('username', sa.String(length=50), nullable=False),
+    sa.Column('email', sa.String(length=100), nullable=False),
+    sa.Column('password_hash', sa.String(length=255), nullable=False),
+    sa.Column('role', sa.String(length=20), nullable=False),
+    sa.Column('avatar_id', sa.Integer(), nullable=True),
+    sa.Column('status_id', sa.Integer(), nullable=True),
+    sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('last_login', sa.TIMESTAMP(), nullable=True),
+    sa.ForeignKeyConstraint(['avatar_id'], ['avatars.id'], ),
+    sa.ForeignKeyConstraint(['status_id'], ['user_status.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('username')
+    )
+    op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
     op.create_table('bookcases',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_bookcases_id'), 'bookcases', ['id'], unique=False)
@@ -203,24 +197,22 @@ def downgrade() -> None:
     op.drop_table('user_book_attributes')
     op.drop_index(op.f('ix_bookcases_id'), table_name='bookcases')
     op.drop_table('bookcases')
-    op.drop_index(op.f('ix_book_sales_id'), table_name='book_sales')
-    op.drop_table('book_sales')
+    op.drop_index(op.f('ix_users_id'), table_name='users')
+    op.drop_table('users')
+    op.drop_index(op.f('ix_book_sale_info_id'), table_name='book_sale_info')
+    op.drop_table('book_sale_info')
     op.drop_index(op.f('ix_book_identifiers_id'), table_name='book_identifiers')
     op.drop_table('book_identifiers')
     op.drop_table('book_genres')
     op.drop_table('book_authors')
     op.drop_index(op.f('ix_book_access_id'), table_name='book_access')
     op.drop_table('book_access')
-    op.drop_index(op.f('ix_users_id'), table_name='users')
-    op.drop_table('users')
-    op.drop_index(op.f('ix_books_id'), table_name='books')
-    op.drop_table('books')
     op.drop_index(op.f('ix_user_status_id'), table_name='user_status')
     op.drop_table('user_status')
-    op.drop_index(op.f('ix_publishers_id'), table_name='publishers')
-    op.drop_table('publishers')
     op.drop_index(op.f('ix_genres_id'), table_name='genres')
     op.drop_table('genres')
+    op.drop_index(op.f('ix_books_id'), table_name='books')
+    op.drop_table('books')
     op.drop_index(op.f('ix_avatars_id'), table_name='avatars')
     op.drop_table('avatars')
     op.drop_index(op.f('ix_authors_id'), table_name='authors')
