@@ -10,9 +10,6 @@ class Author(Base):
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True, index=True, autoincrement=True
     )
-    google_books_id: Mapped[Optional[str]] = mapped_column(
-        String(50), unique=True, nullable=True
-    )  # Keep for API lookups
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     bio: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
