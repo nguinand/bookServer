@@ -20,7 +20,7 @@ class AuthorCrud:
         authors = session.query(Author).filter_by(name=name).first()
         return authors
 
-    def get_author_by_id(self, id: int, session: Session) -> AuthorModel | None:
+    def get_author_by_id(self, id: int, session: Session) -> Author | None:
         author_record = session.query(Author).filter_by(id=id).first()
         return author_record
 
@@ -54,7 +54,7 @@ class AuthorCrud:
         return author_record
 
     def delete_author_by_id(self, author_id: int, session: Session) -> bool:
-        author = session.query(Author).filter_by(id=author_id).first()
+        author = self.get_author_by_id(author_id, session)
 
         if not author:
             return False  # could have returned an exception
