@@ -6,6 +6,8 @@ class FormatInfoModel(BaseModel):
     isAvailable: Optional[bool] = None
     acsTokenLink: Optional[str] = None
 
+    model_config = {"populate_by_name": True, "from_attributes": True}
+
 
 class AccessInfoModel(BaseModel):
     country: Optional[str] = None
