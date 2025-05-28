@@ -1,3 +1,4 @@
+from decimal import Decimal
 from enum import Enum
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
@@ -13,7 +14,7 @@ class CurrencyCode(str, Enum):
 
 # Unsure about naming
 class PriceModel(BaseModel):
-    amount: Optional[float] = None
+    amount: Optional[Decimal] = None
     currencyCode: Optional[CurrencyCode] = Field(
         None, description="Currency code following ISO 4217.", alias="currencyCode"
     )

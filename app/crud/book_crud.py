@@ -287,11 +287,11 @@ class BookCrud:
                 saleability=book.book_sale_info.saleability,
                 isEbook=book.book_sale_info.is_ebook,
                 listPrice=PriceModel(
-                    amount=float(book.book_sale_info.list_price),
+                    amount=book.book_sale_info.list_price,
                     currencyCode=book.book_sale_info.list_price_currency_code,
                 ),
                 retailPrice=PriceModel(
-                    amount=float(book.book_sale_info.retail_price),
+                    amount=book.book_sale_info.retail_price,
                     currencyCode=book.book_sale_info.retail_price_currency_code,
                 )
                 if book.book_sale_info.retail_price is not None
