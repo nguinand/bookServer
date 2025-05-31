@@ -1,4 +1,5 @@
 from app.db.db_models.book_sale_info import BookSaleInfo
+from app.db.sql_queries.book_sale_info_queries import get_book_sale_info_by_id
 from app.models.book_sale_info import BookSaleInfoModel, CurrencyCode, PriceModel
 from sqlalchemy.orm import Session
 
@@ -37,12 +38,7 @@ class BookSaleInfoCrud:
     def get_book_sale_info_by_id(
         self, id: int, session: Session
     ) -> BookSaleInfo | None:
-        book_sale_info_record = session.query(BookSaleInfo).filter_by(id=id).first()
-        try:
-            return book_sale_info_record
-        except AttributeError as e:
-            print(e)
-            return None
+        return get_book_sale_info_by_id(id, session)
 
     def update_book_sale_info(
         self, book_sale_info_replacement: BookSaleInfoModel, session: Session
@@ -52,10 +48,8 @@ class BookSaleInfoCrud:
                 f"Cannot replace a book sale info record without an ID. {book_sale_info_replacement.id}"
             )
 
-        book_sale_info_record = (
-            session.query(BookSaleInfo)
-            .filter_by(id=book_sale_info_replacement.id)
-            .first()
+        book_sale_info_record = get_book_sale_info_by_id(
+            book_sale_info_replacement.id, session
         )
 
         if not book_sale_info_record:
@@ -88,9 +82,7 @@ class BookSaleInfoCrud:
         return book_sale_info_record
 
     def delete_book_sale_info(self, book_sale_info_id: int, session: Session) -> bool:
-        book_sale_info = (
-            session.query(BookSaleInfo).filter_by(id=book_sale_info_id).first()
-        )
+        book_sale_info = get_book_sale_info_by_id(book_sale_info_id, session)
 
         if not book_sale_info:
             return False

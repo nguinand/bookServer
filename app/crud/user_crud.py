@@ -1,7 +1,12 @@
 from sqlalchemy.orm import Session
-from app.db.db_models.avatar import Avatar
 from app.db.db_models.user import User
-from app.db.db_models.user_status import UserStatus
+from app.db.sql_queries.avatar_queries import get_avatar_by_id
+from app.db.sql_queries.user_queries import (
+    get_user_by_id,
+    get_user_by_username,
+    get_users_by_email,
+)
+from app.db.sql_queries.user_status_queries import get_user_status_by_id
 from app.models.user import UserModel
 
 
@@ -14,16 +19,14 @@ class UserCrud:
         return user_data
 
     def get_user_by_id(self, id: int, session: Session) -> User:
-        user_record = session.query(User).filter_by(id=id).first()
+        user_record = get_user_by_id(id, session)
         return user_record
 
     def get_users_by_email(self, email: str, session: Session) -> list[User]:
-        users = session.query(User).filter_by(email=email).all()
-        return users
+        return get_users_by_email(email, session)
 
     def get_users_by_username(self, username: str, session: Session) -> User:
-        user_record = session.query(User).filter_by(email=username).first()
-        return user_record
+        return get_user_by_username(username, session)
 
     def update_user(self, user_replacement: UserModel, session: Session) -> None | User:
         if user_replacement.id is None:
@@ -31,8 +34,7 @@ class UserCrud:
                 f"Cannot replace user without an ID. {user_replacement.id} - {user_replacement.email}"
             )
 
-        user_record = session.query(User).filter_by(id=user_replacement.id).first()
-
+        user_record = get_user_by_id(user_replacement.id, session)
         if not user_record:
             return None
 
@@ -46,18 +48,12 @@ class UserCrud:
 
         # check avatar_id exists in Avatar
         if user_replacement.avatar_id is not None:
-            avatar = (
-                session.query(Avatar).filter_by(id=user_replacement.avatar_id).first()
-            )
+            avatar = get_avatar_by_id(user_replacement.avatar_id, session)
             if avatar is not None:
                 user_record.avatar_id = user_replacement.avatar_id
         # check status_id exists in UserStatus
         if user_replacement.status_id is not None:
-            user_status = (
-                session.query(UserStatus)
-                .filter_by(id=user_replacement.status_id)
-                .first()
-            )
+            user_status = get_user_status_by_id(user_replacement.status_id, session)
             if user_status is not None:
                 user_record.status_id = user_replacement.status_id
 
@@ -67,7 +63,7 @@ class UserCrud:
         return user_record
 
     def delete_user(self, user_id: int, session: Session) -> bool:
-        user = session.query(User).filter_by(id=user_id).first()
+        user = get_user_by_id(user_id, session)
         if not user:
             return False
 

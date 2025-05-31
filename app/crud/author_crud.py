@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
+from app.crud.book_crud import BookCrud
 from app.db.db_models.author import Author
-from app.db.db_models.book import Book
+from app.db.sql_queries.author_queries import get_author_by_id, get_author_by_name
+from app.db.sql_queries.book_queries import get_book_by_id
 from app.models.author import AuthorModel
 
 
@@ -17,12 +19,10 @@ class AuthorCrud:
 
     # Assuming any author is unique
     def get_author_by_name(self, name: str, session: Session) -> list[Author]:
-        authors = session.query(Author).filter_by(name=name).first()
-        return authors
+        return get_author_by_name(name, session)
 
     def get_author_by_id(self, id: int, session: Session) -> Author | None:
-        author_record = session.query(Author).filter_by(id=id).first()
-        return author_record
+        return get_author_by_id(id, session)
 
     def update_author(
         self, author_replacement: AuthorModel, session: Session
@@ -33,18 +33,15 @@ class AuthorCrud:
                 f"Cannot replace author without an ID. {author_replacement.id} - {author_replacement.name}"
             )
 
-        author_record = (
-            session.query(Author).filter_by(id=author_replacement.id).first()
-        )
+        author_record = get_author_by_id(author_replacement.id, session)
 
         if not author_record:
             return None
 
         author_record.name = author_replacement.name
         author_record.bio = author_replacement.bio
-        author_record.google_books_id = author_replacement.google_books_id
         author_record.books = [
-            session.query(Book).filter_by(id=book.id).first()
+            get_book_by_id(book.id, session)
             for book in author_replacement.books
             if book.id is not None
         ]
@@ -63,4 +60,12 @@ class AuthorCrud:
         session.commit()
         return True
 
-    def convert_author(self, author_data: Author) -> AuthorModel: ...
+    def convert_author(self, author_data: Author) -> AuthorModel:
+        return AuthorModel(
+            id=author_data.id,
+            bio=author_data.bio,
+            name=author_data.name,
+            books=[
+                BookCrud().convert_book_to_model(book) for book in author_data.books
+            ],
+        )

@@ -1,9 +1,15 @@
-from app.crud.author_crud import AuthorCrud
 from app.db.db_models.author import Author
 from app.db.db_models.book_access import BookAccess
 from app.db.db_models.book_identifier import BookIdentifier
 from app.db.db_models.book_sale_info import BookSaleInfo
 from app.db.db_models.genre import Genre
+from app.db.queries.author_queries import get_author_by_name
+from app.db.queries.book_queries import (
+    get_book_by_id,
+    get_books_by_google_id,
+    get_books_by_title,
+)
+from app.db.queries.genre_queries import get_genre_by_name
 from app.models.access_info import AccessInfoModel, FormatInfoModel
 from app.models.book import BookModel
 from app.db.db_models import Book
@@ -38,7 +44,7 @@ class BookCrud:
         author_names = book_model.volume_info.authors or []
         book_authors = []
         for name in author_names:
-            author = AuthorCrud().get_author_by_name(name, session)
+            author = get_author_by_name(name, session)
             if not author:
                 author = Author(name=name)
                 session.add(author)
@@ -106,7 +112,7 @@ class BookCrud:
 
         genres = []
         for name in book_model.volume_info.categories or []:
-            genre = session.query(Genre).filter_by(name=name).first()
+            genre = get_genre_by_name(name, session)
             if not genre:
                 genre = Genre(name=name)
                 session.add(genre)
@@ -119,17 +125,14 @@ class BookCrud:
 
         return book_data
 
-    def get_books_by_title(self, name: str, session: Session) -> list[Book]:
-        book_records = session.query(Book).filter_by(title=name).all()
-        return book_records
+    def get_books_by_title(self, title: str, session: Session) -> list[Book]:
+        return get_books_by_title(title, session)
 
-    def get_book_by_google_id(self, name: str, session: Session) -> list[Book]:
-        book_record = session.query(Book).filter_by(google_books_id=name).first()
-        return book_record
+    def get_book_by_google_id(self, google_id: str, session: Session) -> list[Book]:
+        return get_books_by_google_id(google_id, session)
 
     def get_book_by_id(self, id: int, session: Session) -> Book:
-        book_record = session.query(Book).filter_by(id=id).first()
-        return book_record
+        return get_book_by_id(id, session)
 
     def update_book(self, book_replacement: BookModel, session: Session) -> None | Book:
         if book_replacement.id is None:
@@ -166,7 +169,7 @@ class BookCrud:
 
         # authors is a list[str] -> ["auth1", "auth2"]
         for name in book_replacement.volume_info.authors or []:
-            author = AuthorCrud().get_author_by_name(name, session)
+            author = get_author_by_name(name, session)
             if not author:
                 author = Author(name=name)
                 session.add(author)
@@ -184,7 +187,7 @@ class BookCrud:
 
         book_record.genres.clear()
         for name in book_replacement.volume_info.categories or []:
-            genre = session.query(Genre).filter_by(name=name).first()
+            genre = get_genre_by_name(name, session)
             if not genre:
                 genre = Genre(name=name)
                 session.add(genre)
