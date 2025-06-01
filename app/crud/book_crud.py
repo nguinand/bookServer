@@ -3,13 +3,13 @@ from app.db.db_models.book_access import BookAccess
 from app.db.db_models.book_identifier import BookIdentifier
 from app.db.db_models.book_sale_info import BookSaleInfo
 from app.db.db_models.genre import Genre
-from app.db.queries.author_queries import get_author_by_name
-from app.db.queries.book_queries import (
+from app.db.sql_queries.author_queries import get_author_by_name
+from app.db.sql_queries.book_queries import (
     get_book_by_id,
     get_books_by_google_id,
     get_books_by_title,
 )
-from app.db.queries.genre_queries import get_genre_by_name
+from app.db.sql_queries.genre_queries import get_genre_by_name
 from app.models.access_info import AccessInfoModel, FormatInfoModel
 from app.models.book import BookModel
 from app.db.db_models import Book
