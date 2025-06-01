@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 class AuthorModel(BaseModel):
     id: Optional[int] = None
-    google_books_id: Optional[str] = None
     bio: Optional[str] = None
     name: str
     books: List[BookModel] = []

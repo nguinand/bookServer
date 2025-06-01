@@ -1,18 +1,19 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from app.models.volume_info import VolumeInfoModel
-from app.models.sale_info import SaleInfoModel
+from app.models.book_sale_info import BookSaleInfoModel
 from app.models.access_info import AccessInfoModel
 
 
 class BookModel(BaseModel):
-    id: Optional[str]
+    id: Optional[int] = None
     google_books_id: str
     volume_info: VolumeInfoModel = Field(..., alias="volumeInfo")
-    sale_info: Optional[SaleInfoModel] = Field(None, alias="saleInfo")
+    sale_info: Optional[BookSaleInfoModel] = Field(None, alias="saleInfo")
     access_info: Optional[AccessInfoModel] = Field(None, alias="accessInfo")
 
     class Config:
+        from_attributes = True
         json_schema_extra = {
             "example": {
                 "id": "wrOQLV6xB-wC",

@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+# This is the USER input for the book.
 class UserBookAttributesModel(BaseModel):
     id: int
     user_id: int

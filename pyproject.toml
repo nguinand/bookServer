@@ -17,3 +17,6 @@ dependencies = [
     "sqlalchemy>=2.0.40",
     "uvicorn>=0.34.2",
 ]
+
+[tool.ruff]
+exclude = ["alembic/", "app/db/test_db_conn.py"]

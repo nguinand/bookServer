@@ -18,7 +18,9 @@ class BookAccess(Base):
     embeddable: Mapped[Optional[Boolean]] = mapped_column(Boolean, nullable=True)
     public_domain: Mapped[Optional[Boolean]] = mapped_column(Boolean, nullable=True)
     epub_available: Mapped[Optional[Boolean]] = mapped_column(Boolean, nullable=True)
+    epub_token_link: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     pdf_available: Mapped[Optional[Boolean]] = mapped_column(Boolean, nullable=True)
+    pdf_token_link: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     web_reader_link: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
     book = relationship("Book", back_populates="access_info")
