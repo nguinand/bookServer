@@ -12,7 +12,7 @@ class BookSaleInfo(Base):
         Integer, primary_key=True, index=True, autoincrement=True
     )
     book_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("books.id"), nullable=False
+        Integer, ForeignKey("books.id", ondelete="CASCADE"), nullable=False
     )
     country: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
     saleability: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
