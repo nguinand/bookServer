@@ -45,3 +45,7 @@ def delete_genre(genre_id: int, session: Session) -> bool:
     session.delete(genre_record)
     session.commit()
     return True
+
+
+def convert_genre_model(genre_record: Genre) -> GenreModel:
+    return GenreModel.model_validate(genre_record)
