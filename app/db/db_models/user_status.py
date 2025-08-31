@@ -10,15 +10,12 @@ class UserStatus(Base):
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True, index=True, autoincrement=True
     )
-    name: Mapped[str] = mapped_column(
-        String(50), unique=True, nullable=False
-    )  # e.g. Bronze, Silver
-    level: Mapped[int] = mapped_column(
-        Integer, unique=True, nullable=False
-    )  # Numeric rank
-    benefits: Mapped[Optional[Text]] = mapped_column(
-        Text, nullable=True
-    )  # Optional description of perks
+    # e.g. Bronze, Silver
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    # Numeric rank
+    level: Mapped[int] = mapped_column(Integer, unique=True, nullable=False)
+    # Optional description of perks
+    benefits: Mapped[Optional[Text]] = mapped_column(Text, nullable=True)
 
     # Reverse relationship to User
     users = relationship("User", back_populates="status")

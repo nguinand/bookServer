@@ -23,7 +23,7 @@ def get_users_by_email(email: str, session: Session) -> list[User]:
     return session.query(User).filter_by(email=email).filter_by(email=email).all()
 
 
-def get_users_by_username(username: str, session: Session) -> User:
+def get_users_by_username(username: str, session: Session) -> User | None:
     return session.query(User).filter_by(username=username).first()
 
 

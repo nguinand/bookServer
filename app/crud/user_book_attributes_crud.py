@@ -15,19 +15,21 @@ def create_user_book_attribute(
     return user_book_attribute_data
 
 
-def get_user_book_attribute_by_id(id: int, session: Session) -> UserBookAttributes:
+def get_user_book_attribute_by_id(
+    id: int, session: Session
+) -> UserBookAttributes | None:
     return session.query(UserBookAttributes).filter_by(id=id).first()
 
 
 def get_user_book_attribute_by_user_id(
     user_id: int, session: Session
-) -> UserBookAttributes:
+) -> UserBookAttributes | None:
     return session.query(UserBookAttributes).filter_by(user_id=user_id).first()
 
 
 def get_user_book_attribute_by_book_id(
     book_id: int, session: Session
-) -> UserBookAttributes:
+) -> UserBookAttributes | None:
     return session.query(UserBookAttributes).filter_by(book_id=book_id).first()
 
 
