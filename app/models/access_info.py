@@ -26,6 +26,7 @@ class AccessInfoModel(BaseModel):
         validation_alias=AliasChoices("webReaderLink", "web_reader_link"),
     )
 
+    # Translates the pydantic model to the sqlalchemy ORM model
     def to_orm_dict(self) -> dict:
         return {
             "country": self.country,
