@@ -15,9 +15,8 @@ def create_author(author_model: AuthorModel, session: Session) -> AuthorModel:
     return author_data
 
 
-# Assuming any author is unique
-def get_author_by_name(name: str, session: Session) -> list[Author]:
-    return session.query(Author).filter_by(name=name).first()
+def get_authors_by_name(name: str, session: Session) -> list[Author]:
+    return session.query(Author).filter_by(name=name).all()
 
 
 def get_author_by_id(id: int, session: Session) -> Author | None:

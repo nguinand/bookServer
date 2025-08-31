@@ -38,7 +38,9 @@ class User(Base):
     )
 
     # A user can rate multiple books 1:N
-    ratings = relationship("UserBookAttributes", back_populates="user")
+    ratings = relationship(
+        "UserBookAttributes", back_populates="user", cascade="all, delete-orphan"
+    )
     status = relationship("UserStatus", back_populates="users")
 
     avatar = relationship("Avatar", back_populates="users")

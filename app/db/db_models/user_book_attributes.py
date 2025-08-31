@@ -19,7 +19,7 @@ class UserBookAttributes(Base):
         Integer, ForeignKey("books.id", ondelete="CASCADE"), nullable=False
     )
     rating: Mapped[int] = mapped_column(Integer, nullable=False)
-    review_text: Mapped[Optional[Text]] = mapped_column(Text, nullable=True)
+    review_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[Optional[datetime]] = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
