@@ -1,5 +1,5 @@
 from typing import List
-from app.crud.author_crud import get_author_by_name
+from app.crud.author_crud import get_authors_by_name
 from app.crud.genre_crud import get_genre_by_name
 from app.db.db_models.author import Author
 from app.db.db_models.book_access import BookAccess
@@ -39,7 +39,7 @@ def create_book(book_model: BookModel, session: Session) -> Book:
     author_names = book_model.volume_info.authors or []
     book_authors: List[Author] = []
     for name in author_names:
-        author = get_author_by_name(name, session)
+        author = get_authors_by_name(name, session)
         if not author:
             author = Author(name=name)
             session.add(author)
@@ -162,7 +162,7 @@ def update_book(book_replacement: BookModel, session: Session) -> None | Book:
 
     # authors is a list[str] -> ["auth1", "auth2"]
     for name in book_replacement.volume_info.authors or []:
-        author = get_author_by_name(name, session)
+        author = get_authors_by_name(name, session)
         if not author:
             author = Author(name=name)
             session.add(author)
