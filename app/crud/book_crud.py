@@ -1,5 +1,5 @@
 from typing import List
-from app.crud.author_crud import get_authors_by_name
+from app.crud.author_crud import get_authors_by_name, resolve_author
 from app.crud.genre_crud import get_genre_by_name
 from app.db.db_models.author import Author
 from app.db.db_models.book_access import BookAccess
@@ -36,15 +36,11 @@ def create_book(book_model: BookModel, session: Session) -> Book:
         language=book_model.volume_info.language,
     )
 
-    author_names = book_model.volume_info.authors or []
     book_authors: List[Author] = []
-    for name in author_names:
-        author = get_authors_by_name(name, session)
-        if not author:
-            author = Author(name=name)
-            session.add(author)
-            session.flush()
+    for name in book_model.volume_info.authors or []:
+        author = resolve_author(name, book_model.volume_info.title, session)
         book_authors.append(author)
+
     book_data.authors = book_authors
 
     if book_model.sale_info:
@@ -74,7 +70,7 @@ def create_book(book_model: BookModel, session: Session) -> Book:
             country=access_info_model.country,
             viewability=access_info_model.viewability,
             embeddable=access_info_model.embeddable,
-            public_domain=access_info_model.publicDomain,
+            public_domain=access_info_model.public_domain,
             epub_available=(
                 access_info_model.epub.isAvailable if access_info_model.epub else None
             ),
@@ -119,11 +115,11 @@ def get_books_by_title(title: str, session: Session) -> list[Book]:
     return session.query(Book).filter_by(title=title).all()
 
 
-def get_book_by_google_id(google_id: str, session: Session) -> list[Book]:
+def get_book_by_google_id(google_id: str, session: Session) -> None | Book:
     return session.query(Book).filter_by(google_id=google_id).first()
 
 
-def get_book_by_id(id: int, session: Session) -> Book:
+def get_book_by_id(id: int, session: Session) -> None | Book:
     return session.query(Book).filter_by(id=id).first()
 
 

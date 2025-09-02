@@ -21,7 +21,7 @@ def get_user_status_by_id(id: int, session: Session) -> UserStatus | None:
 
 
 def update_user_status(
-    user_status_replacement: UserStatus, session: Session
+    user_status_replacement: UserStatusModel, session: Session
 ) -> None | UserStatus:
     if user_status_replacement.id is None:
         raise ValueError("user_status_replacement must have an id")
