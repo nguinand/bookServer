@@ -11,11 +11,11 @@ def create_genre(genre_model: GenreModel, session: Session) -> Genre:
     return genre_data
 
 
-def get_genre_by_id(id: int, session: Session) -> Genre:
+def get_genre_by_id(id: int, session: Session) -> None | Genre:
     return session.query(Genre).filter_by(id=id).first()
 
 
-def get_genre_by_name(name: str, session: Session) -> Genre:
+def get_genre_by_name(name: str, session: Session) -> None | Genre:
     return session.query(Genre).filter_by(name=name).first()
 
 

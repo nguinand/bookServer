@@ -15,15 +15,15 @@ def create_user(user_model: UserModel, session: Session) -> User:
     return user_data
 
 
-def get_user_by_id(id: int, session: Session) -> User:
+def get_user_by_id(id: int, session: Session) -> None | User:
     return session.query(User).filter_by(id=id).first()
 
 
-def get_users_by_email(email: str, session: Session) -> list[User]:
+def get_users_by_email(email: str, session: Session) -> None | list[User]:
     return session.query(User).filter_by(email=email).filter_by(email=email).all()
 
 
-def get_users_by_username(username: str, session: Session) -> User | None:
+def get_users_by_username(username: str, session: Session) -> None | User:
     return session.query(User).filter_by(username=username).first()
 
 

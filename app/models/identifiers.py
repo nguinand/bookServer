@@ -10,7 +10,7 @@ class IdentifierType(str, Enum):
 
 class IndustryIdentifier(BaseModel):
     type: IdentifierType
-    identifier: str = Field(..., example="9781781100486")
+    identifier: str = Field(..., json_schema_extra={"example": "9781781100486"})
 
     @field_validator("identifier")
     @classmethod
