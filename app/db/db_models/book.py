@@ -47,3 +47,9 @@ class Book(Base):
     bookcases = relationship(
         "Bookcase", secondary="bookcase_books", back_populates="books"
     )
+
+    user_states = relationship(
+        "UserBookState",
+        back_populates="book",
+        cascade="all, delete-orphan",
+    )

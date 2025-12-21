@@ -17,10 +17,10 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[str] = mapped_column(String(20), nullable=False, default="user")
-    avatar_id: Mapped[int] = mapped_column(
+    avatar_id: Mapped[Optional[int]] = mapped_column(
         Integer, ForeignKey("avatars.id"), nullable=True
     )
-    status_id: Mapped[int] = mapped_column(
+    status_id: Mapped[Optional[int]] = mapped_column(
         Integer, ForeignKey("user_status.id"), nullable=True
     )
     created_at: Mapped[datetime] = mapped_column(
@@ -44,3 +44,7 @@ class User(Base):
     status = relationship("UserStatus", back_populates="users")
 
     avatar = relationship("Avatar", back_populates="users")
+
+    book_states = relationship(
+        "UserBookState", back_populates="user", cascade="all, delete-orphan"
+    )
