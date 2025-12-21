@@ -1,8 +1,8 @@
-"""Initial schema
+"""initial
 
-Revision ID: c476831a3194
+Revision ID: 5fc65ff53c68
 Revises: 
-Create Date: 2025-05-24 21:00:34.938150
+Create Date: 2025-12-20 22:57:44.001423
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c476831a3194'
-down_revision: Union[str, None] = None
+revision: str = '5fc65ff53c68'
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -31,11 +31,9 @@ def upgrade() -> None:
     op.create_index(op.f('ix_admin_logs_id'), 'admin_logs', ['id'], unique=False)
     op.create_table('authors',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('google_books_id', sa.String(length=50), nullable=True),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('bio', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('google_books_id'),
     sa.UniqueConstraint('name')
     )
     op.create_index(op.f('ix_authors_id'), 'authors', ['id'], unique=False)
@@ -53,7 +51,7 @@ def upgrade() -> None:
     sa.Column('title', sa.String(length=255), nullable=False),
     sa.Column('subtitle', sa.String(length=255), nullable=True),
     sa.Column('publisher_name', sa.String(length=255), nullable=True),
-    sa.Column('published_date', sa.Date(), nullable=True),
+    sa.Column('published_date', sa.String(length=20), nullable=True),
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('page_count', sa.Integer(), nullable=True),
     sa.Column('average_rating', sa.Float(), nullable=True),
@@ -92,7 +90,9 @@ def upgrade() -> None:
     sa.Column('embeddable', sa.Boolean(), nullable=True),
     sa.Column('public_domain', sa.Boolean(), nullable=True),
     sa.Column('epub_available', sa.Boolean(), nullable=True),
+    sa.Column('epub_token_link', sa.String(length=255), nullable=True),
     sa.Column('pdf_available', sa.Boolean(), nullable=True),
+    sa.Column('pdf_token_link', sa.String(length=255), nullable=True),
     sa.Column('web_reader_link', sa.String(length=255), nullable=True),
     sa.ForeignKeyConstraint(['book_id'], ['books.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -132,7 +132,7 @@ def upgrade() -> None:
     sa.Column('list_price_currency_code', sa.String(length=5), nullable=True),
     sa.Column('retail_price', sa.DECIMAL(precision=10, scale=2), nullable=True),
     sa.Column('retail_price_currency_code', sa.String(length=5), nullable=True),
-    sa.ForeignKeyConstraint(['book_id'], ['books.id'], ),
+    sa.ForeignKeyConstraint(['book_id'], ['books.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_book_sale_info_id'), 'book_sale_info', ['id'], unique=False)
