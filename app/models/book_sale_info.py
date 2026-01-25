@@ -14,7 +14,7 @@ class CurrencyCode(str, Enum):
 # Unsure about naming
 class PriceModel(BaseModel):
     amount: Decimal | None = Field(
-        None, description="Cost of the book price.", examples=[Decimal("5.00")]
+        None, description="Cost of the book price.", examples=[Decimal("5.00")], ge=0
     )
     currencyCode: CurrencyCode | None = Field(
         None,
@@ -34,8 +34,8 @@ class PriceModel(BaseModel):
 
 class BookSaleInfoModel(BaseModel):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
-    id: int = Field(description="Book sale id of the book.", examples=[1, 2, 55])
-    book_id: int = Field(description="Book id of the book.", examples=[1, 2, 55], gt=0)
+    # id: int = Field(description="Book sale id of the book.", examples=[1, 2, 55])
+    # book_id: int = Field(description="Book id of the book.", examples=[1, 2, 55], gt=0)
     country: str | None = Field(
         None, description="Sale country location.", examples=["USA"]
     )
@@ -53,14 +53,12 @@ class BookSaleInfoModel(BaseModel):
         alias="listPrice",
         description="Price listing of the book",
         json_schema_extra={"example": {"amount": 5.99, "currencyCode": "USD"}},
-        ge=0,
     )
     retail_price: PriceModel | None = Field(
         None,
         alias="retailPrice",
         description="Retail price of the book.",
         json_schema_extra={"example": {"amount": 5.99, "currencyCode": "USD"}},
-        ge=0,
     )
     buy_link: str | None = Field(
         None,

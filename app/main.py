@@ -5,7 +5,7 @@ from app.api.books.router import router as book_route
 
 app = FastAPI()
 
-app.include_router(book_route.router, prefix="/api")
+app.include_router(book_route, prefix="/api")
 
 
 @app.get("/")

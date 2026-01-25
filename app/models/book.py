@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field, ConfigDict
-from app.models.identifiers import IdentifierType
 from app.models.volume_info import VolumeInfoModel
 from app.models.book_sale_info import BookSaleInfoModel
 from app.models.access_info import AccessInfoModel
@@ -7,7 +6,7 @@ from app.models.access_info import AccessInfoModel
 
 class BookModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int = Field(gt=1, description="Book ID", examples=[1, 5, 99])
+    # id: int = Field(gt=1, description="Book ID", examples=[1, 5, 99])
     google_books_id: str = Field(
         description="ID given from the google books api",
         examples=["wkNGAAAAYAAJ", "OWGH-FVGafEC"],
@@ -15,7 +14,7 @@ class BookModel(BaseModel):
     volume_info: VolumeInfoModel = Field(
         description="Information about the book",
         alias="volumeInfo",
-        json_schema={
+        json_schema_extra={
             "example": {
                 "title": "Harry Potter and the Sorcerer's Stone",
                 "subtitle": "Harry",
@@ -30,7 +29,7 @@ class BookModel(BaseModel):
                 "info_link": "https://example.com/",
                 "language": "English",
                 "industryIdentifiers": {
-                    "type": IdentifierType.ISBN_10,
+                    "type": "isbn_10",
                     "identifier": "1234567890",
                 },
                 "maturity_rating": "NOT_MATURE",

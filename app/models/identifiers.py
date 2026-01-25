@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, field_validator
 class IdentifierType(str, Enum):
     ISBN_10 = "ISBN_10"
     ISBN_13 = "ISBN_13"
+    OTHER = "OTHER"
 
 
 class IndustryIdentifier(BaseModel):
