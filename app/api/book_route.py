@@ -1,14 +1,15 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
 from pydantic import ValidationError
+from app.utils.get_env import get_env_val_or_raise
 import requests
 
 from app.models.book import BookModel
 
 
 router = APIRouter()
-GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes"
-api_key = ""
+GOOGLE_BOOKS_API_URL = get_env_val_or_raise("GOOGLE_BOOKS_API_URL")
+api_key = get_env_val_or_raise("GOOGLE_BOOKS_API_KEY")
 
 
 @router.get("/books/", response_model=List[BookModel])
