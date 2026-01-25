@@ -8,7 +8,7 @@ from app.models.book import BookModel
 
 router = APIRouter()
 GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes"
-api_key = "AIzaSyDZkhTGnPp04wGkVoZS6aAVt1wi3Qy3EVU"
+api_key = ""
 
 
 @router.get("/books/", response_model=List[BookModel])
