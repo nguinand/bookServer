@@ -12,8 +12,8 @@ GOOGLE_BOOKS_API_URL = get_env_val_or_raise("GOOGLE_BOOKS_API_URL")
 api_key = get_env_val_or_raise("GOOGLE_BOOKS_API_KEY")
 
 
-@router.get("/books/", response_model=List[BookModel])
-def get_books(query: str, max_results: int = 10):
+@router.get("/name/", response_model=List[BookModel])
+def get_books_by_name(query: str, max_results: int = 10):
     # Example: http://127.0.0.1:8000/api/books/?query=harry&max_results=1
     url = (
         f"https://www.googleapis.com/books/v1/volumes?"
