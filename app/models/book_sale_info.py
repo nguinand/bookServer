@@ -1,7 +1,6 @@
 from decimal import Decimal
 from enum import Enum
-from pydantic import BaseModel, Field, field_validator
-from typing import Optional
+from pydantic import BaseModel, Field, field_validator, StrictBool, ConfigDict
 
 
 class CurrencyCode(str, Enum):
@@ -14,13 +13,18 @@ class CurrencyCode(str, Enum):
 
 # Unsure about naming
 class PriceModel(BaseModel):
-    amount: Optional[Decimal] = None
-    currencyCode: Optional[CurrencyCode] = Field(
-        None, description="Currency code following ISO 4217.", alias="currencyCode"
+    amount: Decimal | None = Field(
+        None, description="Cost of the book price.", examples=[Decimal("5.00")]
+    )
+    currencyCode: CurrencyCode | None = Field(
+        None,
+        description="Currency code following ISO 4217.",
+        alias="currencyCode",
+        examples=["USD", "EUR", "GBP", "JPY", "INR"],
     )
 
     @field_validator("currencyCode")
-    def validate_currency(cls, currency: Optional[str]) -> Optional[str]:
+    def validate_currency(cls, currency: str | None) -> str | None:
         if currency is not None:
             allowed_currencies = {"USD", "EUR", "GBP", "JPY", "INR"}
             if currency not in allowed_currencies:
@@ -29,13 +33,38 @@ class PriceModel(BaseModel):
 
 
 class BookSaleInfoModel(BaseModel):
-    id: Optional[int] = None
-    book_id: int
-    country: Optional[str] = None
-    saleability: Optional[str] = None
-    is_ebook: Optional[bool] = Field(None, alias="isEbook")
-    list_price: Optional[PriceModel] = Field(None, alias="listPrice")
-    retail_price: Optional[PriceModel] = Field(None, alias="retailPrice")
-    buy_link: Optional[str] = Field(None, alias="buyLink")
-
-    model_config = {"from_attributes": True, "populate_by_name": True}
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    id: int = Field(description="Book sale id of the book.", examples=[1, 2, 55])
+    book_id: int = Field(description="Book id of the book.", examples=[1, 2, 55], gt=0)
+    country: str | None = Field(
+        None, description="Sale country location.", examples=["USA"]
+    )
+    saleability: str | None = Field(
+        None, description="Listed for sale or not.", examples=["NOT_FOR_SALE"]
+    )
+    is_ebook: StrictBool = Field(
+        False,
+        alias="isEbook",
+        description="Whether the book is ebook or not.",
+        examples=[True, False],
+    )
+    list_price: PriceModel | None = Field(
+        None,
+        alias="listPrice",
+        description="Price listing of the book",
+        json_schema_extra={"example": {"amount": 5.99, "currencyCode": "USD"}},
+        ge=0,
+    )
+    retail_price: PriceModel | None = Field(
+        None,
+        alias="retailPrice",
+        description="Retail price of the book.",
+        json_schema_extra={"example": {"amount": 5.99, "currencyCode": "USD"}},
+        ge=0,
+    )
+    buy_link: str | None = Field(
+        None,
+        alias="buyLink",
+        description="Buy link of the book.",
+        examples=["https://example.com/"],
+    )

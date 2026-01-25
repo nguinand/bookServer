@@ -1,14 +1,35 @@
 from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 # This is the USER input for the book.
 class UserBookAttributesModel(BaseModel):
-    id: int
-    user_id: int
-    book_id: int
-    rating: int
-    review_text: Optional[str] = ""
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    id: int = Field(
+        description="Id for the user given attributes. Most likely comes from the database.",
+        examples=[1234],
+        gt=0,
+    )
+    user_id: int = Field(
+        description="The User associated with the given attribute.",
+        examples=[1234],
+        gt=0,
+    )
+    book_id: int = Field(
+        description="The Book id associated with the given attribute",
+        examples=[1234],
+        gt=0,
+    )
+    rating: int = Field(
+        description="Book rating given by the user", examples=[0, 5, 10], ge=0, lt=10
+    )
+    review_text: str = Field("", description="The review test for the book.")
+    created_at: datetime = Field(
+        datetime.now(),
+        description="Date and time when the attribute was created.",
+        example=datetime(2020, 1, 1),
+    )
+    updated_at: datetime = Field(
+        datetime.now(),
+        description="Date and time when the attribute updated.",
+        example=datetime(2020, 1, 1),
+    )

@@ -9,8 +9,12 @@ class IdentifierType(str, Enum):
 
 
 class IndustryIdentifier(BaseModel):
-    type: IdentifierType
-    identifier: str = Field(..., json_schema_extra={"example": "9781781100486"})
+    type: IdentifierType = Field(
+        description="The ISBN type", examples=["ISBN_10", "ISBN_13"]
+    )
+    identifier: str = Field(
+        description="ISBN 10 or 13 value", examples=["9781781100486"]
+    )
 
     @field_validator("identifier")
     @classmethod

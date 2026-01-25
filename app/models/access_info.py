@@ -1,29 +1,70 @@
-from typing import Optional
-from pydantic import BaseModel, Field, AliasChoices
+from pydantic import BaseModel, Field, AliasChoices, StrictBool, ConfigDict
 
 
 class FormatInfoModel(BaseModel):
-    isAvailable: Optional[bool] = None
-    acsTokenLink: Optional[str] = None
+    isAvailable: StrictBool = Field(
+        False,
+        description="Whether or not the book is available in this format",
+        examples=[True, False],
+    )
+    acsTokenLink: str | None = Field(
+        None,
+        description="The token link to the pdf or epub",
+        examples=["https://example.com/epub.acsm"],
+    )
 
-    model_config = {"populate_by_name": True, "from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AccessInfoModel(BaseModel):
-    country: Optional[str] = None
-    viewability: Optional[str] = None
-    embeddable: Optional[bool] = None
-    public_domain: Optional[bool] = Field(
+    country: str | None = Field(
         None,
+        description="The country where this book is accessed.",
+        examples=["US", "PE"],
+    )
+    viewability: str | None = Field(
+        None,
+        description="The viewability of the book. Could be partial or have no pages (electronic)",
+        examples=["PARTIAL", "NO_PAGES"],
+    )
+    embeddable: StrictBool = Field(
+        False,
+        description="Whether or not the book is embedded in the book's web reader.",
+        examples=[True, False],
+    )
+    public_domain: StrictBool = Field(
+        False,
         alias="publicDomain",
         validation_alias=AliasChoices("publicDomain", "public_domain"),
+        description="Whether or not the book has a public domain.",
+        examples=[True, False],
     )
-    epub: Optional[FormatInfoModel] = None
-    pdf: Optional[FormatInfoModel] = None
-    web_reader_link: Optional[str] = Field(
+    epub: FormatInfoModel | None = Field(
+        None,
+        description="The epub format of the book. Extends from the FormatInfoModel",
+        json_schema_extra={
+            "example": {
+                "isAvailable": True,
+                "acsTokenLink": "https://example.com/epub.acsm",
+            }
+        },
+    )
+    pdf: FormatInfoModel | None = Field(
+        None,
+        description="The pdf format of the book. Extends from the FormatInfoModel",
+        json_schema_extra={
+            "example": {
+                "isAvailable": True,
+                "acsTokenLink": "https://example.com/epub.acsm",
+            }
+        },
+    )
+    web_reader_link: str | None = Field(
         None,
         alias="webReaderLink",
         validation_alias=AliasChoices("webReaderLink", "web_reader_link"),
+        description="The web reader link of the book.",
+        examples=["https://example.com/webreader_link"],
     )
 
     # Translates the pydantic model to the sqlalchemy ORM model
@@ -38,20 +79,4 @@ class AccessInfoModel(BaseModel):
             "pdf_available": self.pdf.isAvailable if self.pdf else None,
             "pdf_token_link": self.pdf.acsTokenLink if self.pdf else None,
             "web_reader_link": self.web_reader_link,
-        }
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "country": "US",
-                "viewability": "PARTIAL",
-                "embeddable": True,
-                "publicDomain": False,
-                "epub": {
-                    "isAvailable": True,
-                    "acsTokenLink": "http://example.com/epub.acsm",
-                },
-                "pdf": {"isAvailable": False, "acsTokenLink": None},
-                "webReaderLink": "http://example.com/webreader",
-            }
         }
