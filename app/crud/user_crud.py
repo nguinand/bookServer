@@ -15,8 +15,8 @@ def create_user(user_model: UserModel, session: Session) -> User:
     return user_data
 
 
-def get_user_by_id(id: int, session: Session) -> None | User:
-    return session.query(User).filter_by(id=id).first()
+def get_user_by_id(user_id: int, session: Session) -> None | User:
+    return session.query(User).filter_by(id=user_id).first()
 
 
 def get_users_by_email(email: str, session: Session) -> None | list[User]:
@@ -72,5 +72,5 @@ def delete_user(user_id: int, session: Session) -> bool:
     return True
 
 
-def convert_user(user_data: User) -> UserModel:
+def transform_db_to_user_model(user_data: User) -> UserModel:
     return UserModel.model_validate(user_data)
