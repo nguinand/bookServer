@@ -1,7 +1,7 @@
 import httpx
 from fastapi import APIRouter
 from typing import List
-from app import api_key, book_api_request, BooksRequestError
+from app.api.books.external_api import api_key, book_api_request, BooksRequestError
 from app.models.book import BookModel
 from app.utils.logger import get_logger
 from fastapi.responses import JSONResponse

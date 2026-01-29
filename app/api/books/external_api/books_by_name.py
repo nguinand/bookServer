@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from app import api_key, book_api_request, BooksRequestError
+from app.api.books.external_api import api_key, book_api_request, BooksRequestError
 from app.utils.logger import get_logger
 import httpx
 
