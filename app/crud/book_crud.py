@@ -88,11 +88,11 @@ def create_book(book_model: BookModel, session: Session) -> Book:
 
     identifiers: List[BookIdentifier] = []
     for book_identifier_model in book_model.volume_info.industryIdentifiers or []:
-        identifer = BookIdentifier(
+        identifier = BookIdentifier(
             identifier_type=book_identifier_model.type.value,
             identifier_value=book_identifier_model.identifier,
         )
-        identifiers.append(identifer)
+        identifiers.append(identifier)
     book_data.identifiers = identifiers
 
     genres: List[Genre] = []
