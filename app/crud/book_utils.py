@@ -1,13 +1,9 @@
-
 from app.db.db_models import Book
 from app.models.access_info import AccessInfoModel, FormatInfoModel
 from app.models.book import BookModel
 from app.models.book_sale_info import BookSaleInfoModel, PriceModel
 from app.models.identifiers import IdentifierType, IndustryIdentifier
 from app.models.volume_info import ImageLinksModel, VolumeInfoModel
-
-
-
 
 
 def convert_book_to_model(book: Book) -> BookModel:

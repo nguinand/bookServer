@@ -11,7 +11,10 @@ bookcase_books = Table(
         primary_key=True,
     ),
     Column(
-        "book_id", Integer, ForeignKey("books.book_id", ondelete="CASCADE"), primary_key=True
+        "book_id",
+        Integer,
+        ForeignKey("books.book_id", ondelete="CASCADE"),
+        primary_key=True,
     ),
     Column("added_at", TIMESTAMP, server_default=func.current_timestamp()),
 )

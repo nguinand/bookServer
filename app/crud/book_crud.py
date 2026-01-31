@@ -238,5 +238,6 @@ def delete_book(book_id: int, session: Session) -> bool:
     session.commit()
     return True
 
+
 def get_book_by_id(id: int, session: Session) -> None | Book:
     return session.query(Book).filter_by(id=id).first()
