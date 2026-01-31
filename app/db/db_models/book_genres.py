@@ -9,7 +9,7 @@ book_genres = Table(
     "book_genres",
     Base.metadata,
     Column(
-        "book_id", Integer, ForeignKey("books.id", ondelete="CASCADE"), primary_key=True
+        "book_id", Integer, ForeignKey("books.book_id", ondelete="CASCADE"), primary_key=True
     ),
     Column(
         "genre_id",

@@ -16,7 +16,7 @@ class UserBookAttributes(Base):
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     book_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("books.id", ondelete="CASCADE"), nullable=False
+        Integer, ForeignKey("books.book_id", ondelete="CASCADE"), nullable=False
     )
     rating: Mapped[int] = mapped_column(Integer, nullable=False)
     review_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

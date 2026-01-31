@@ -28,7 +28,7 @@ class UserBookState(Base):
     )
 
     book_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("books.id", ondelete="CASCADE"), nullable=False, index=True
+        Integer, ForeignKey("books.book_id", ondelete="CASCADE"), nullable=False, index=True
     )
 
     reading_status: Mapped[ReadingStatus] = mapped_column(

@@ -6,7 +6,7 @@ from app.models.access_info import AccessInfoModel
 
 class BookModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    # id: int = Field(gt=1, description="Book ID", examples=[1, 5, 99])
+    book_id: int |None = Field(default=None,gt=1, description="Book ID", examples=[1, 5, 99])
     google_books_id: str = Field(
         alias="id",
         description="ID given from the google books api",

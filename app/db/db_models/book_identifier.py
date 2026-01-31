@@ -11,7 +11,7 @@ class BookIdentifier(Base):
         Integer, primary_key=True, index=True, autoincrement=True
     )
     book_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("books.id", ondelete="CASCADE"), nullable=False
+        Integer, ForeignKey("books.book_id", ondelete="CASCADE"), nullable=False
     )
     identifier_type: Mapped[str] = mapped_column(
         String(50), nullable=False

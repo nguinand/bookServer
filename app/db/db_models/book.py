@@ -7,7 +7,7 @@ from app.db.db_models.base import Base
 class Book(Base):
     __tablename__ = "books"
 
-    id: Mapped[int] = mapped_column(
+    book_id: Mapped[int] = mapped_column(
         Integer, primary_key=True, index=True, autoincrement=True
     )
     google_books_id: Mapped[str] = mapped_column(
