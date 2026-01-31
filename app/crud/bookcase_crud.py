@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.crud.book_crud import convert_book_to_model
+from app.crud.book_utils import convert_book_to_model
 from app.db.db_models import Bookcase, Book
 from app.models.bookcase import BookcaseModel
 

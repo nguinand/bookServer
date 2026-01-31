@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.crud.book_crud import convert_book_to_model, get_book_by_id
+from app.crud.book_utils import convert_book_to_model
 from app.db.db_models.author import Author
 from app.models.author import AuthorModel
 
