@@ -36,7 +36,7 @@ async def get_books_by_name(
         books: List[BookModel] = []
         for item in data.get("items", []):
             book_data = {
-                "google_books_id": item["id"],
+                "id": item["id"],
                 "volumeInfo": item.get("volumeInfo", {}),
                 "saleInfo": item.get("saleInfo"),
                 "accessInfo": item.get("accessInfo", {}),
