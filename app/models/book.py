@@ -45,7 +45,6 @@ class BookModel(BaseModel):
         description="Information about the sale",
         json_schema_extra={
             "example": {
-                "id": 1,
                 "book_id": 12,
                 "country": "USA",
                 "saleability": "NOT_FOR_SALE",
