@@ -17,8 +17,8 @@ def create_author(author_model: AuthorModel, session: Session) -> AuthorModel:
     return author_data
 
 
-def get_authors_by_name(name: str, session: Session) -> list[Author]:
-    return session.query(Author).filter_by(name=name).all()
+def get_author_by_name(name: str, session: Session) -> Author:
+    return session.query(Author).filter_by(name=name).first()
 
 
 def get_author_by_id(id: int, session: Session) -> Author | None:
@@ -71,7 +71,7 @@ def convert_author(author_data: Author) -> AuthorModel:
 
 
 def resolve_author(name: str, book_title: str, session: Session) -> Author:
-    possible_authors = get_authors_by_name(name, session)
+    possible_authors = get_author_by_name(name, session)
 
     for author in possible_authors:
         for book in author.books:
