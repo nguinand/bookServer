@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from app.crud.book_crud import get_book_by_id
 from app.crud.book_utils import convert_book_to_model
+from app.crud.shared_queries import get_book_by_id
 from app.db.db_models.author import Author
 from app.models.author import AuthorModel
 
@@ -40,9 +40,9 @@ def update_author(author_replacement: AuthorModel, session: Session) -> None | A
     author_record.name = author_replacement.name
     author_record.bio = author_replacement.bio
     author_record.books = [
-        get_book_by_id(book.id, session)
+        get_book_by_id(book.book_id, session)
         for book in author_replacement.books
-        if book.id is not None
+        if book.book_id is not None
     ]
     author_record.books = author_replacement.books
     session.commit()
