@@ -7,7 +7,7 @@ from app.models.access_info import AccessInfoModel
 class BookModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     book_id: int | None = Field(
-        default=None, gt=1, description="Book ID", examples=[1, 5, 99]
+        default=None, gt=0, description="Book ID", examples=[1, 5, 99]
     )
     google_books_id: str = Field(
         alias="id",
