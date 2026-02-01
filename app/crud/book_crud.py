@@ -165,7 +165,7 @@ def update_book_by_model(book_replacement: BookModel, session: Session) -> None 
     for identifier_model in book_replacement.volume_info.industryIdentifiers or []:
         identifier = BookIdentifier(
             identifier_type=identifier_model.type.value,
-            identifier_value=identifier_model.identifier
+            identifier_value=identifier_model.identifier,
         )
         book_record.identifiers.append(identifier)
 

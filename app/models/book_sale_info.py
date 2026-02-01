@@ -34,7 +34,12 @@ class PriceModel(BaseModel):
 
 class BookSaleInfoModel(BaseModel):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
-    book_id: int | None = Field(None, description="Book id of the book. From Google API, its missing. Would get set after the database creates entry.", examples=[1, 2, 55], gt=0)
+    book_id: int | None = Field(
+        None,
+        description="Book id of the book. From Google API, its missing. Would get set after the database creates entry.",
+        examples=[1, 2, 55],
+        gt=0,
+    )
     country: str | None = Field(
         None, description="Sale country location.", examples=["USA"]
     )
