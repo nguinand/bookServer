@@ -72,6 +72,7 @@ def convert_book_to_model(book: Book) -> BookModel:
         )
 
     return BookModel(
+        book_id=book.book_id,
         id=book.google_books_id,
         volumeInfo=volume_info,
         saleInfo=sale_info,
