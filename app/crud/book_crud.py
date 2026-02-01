@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.author_crud import get_authors_by_name, resolve_author
 from app.crud.genre_crud import get_genre_by_name
-from app.crud.shared_queries import get_book_by_id
+from app.crud.shared_queries import get_book_by_book_id
 from app.db.db_models import Book
 from app.db.db_models.author import Author
 from app.db.db_models.book_access import BookAccess
@@ -115,7 +115,8 @@ def get_books_by_title(title: str, session: Session) -> list[Book]:
 
 
 def get_book_by_google_id(google_id: str, session: Session) -> None | Book:
-    return session.query(Book).filter_by(google_id=google_id).first()
+    return session.query(Book).filter_by(google_books_id=google_id).first()
+
 
 def update_book(book_replacement: BookModel, session: Session) -> None | Book:
     if book_replacement.book_id is None:
@@ -123,8 +124,8 @@ def update_book(book_replacement: BookModel, session: Session) -> None | Book:
             f"Cannot replace book without an ID. {book_replacement.book_id} - {book_replacement.volume_info.title}"
         )
 
-    # book_record = session.query(Book).filter_by(id=book_replacement.book_id).first() 
-    book_record = get_book_by_id(book_replacement.book_id, session)
+    # book_record = session.query(Book).filter_by(id=book_replacement.book_id).first()
+    book_record = get_book_by_book_id(book_replacement.book_id, session)
 
     if not book_record:
         return None
@@ -231,7 +232,7 @@ def update_book(book_replacement: BookModel, session: Session) -> None | Book:
 
 
 def delete_book(book_id: int, session: Session) -> bool:
-    book = get_book_by_id(book_id, session)
+    book = get_book_by_book_id(book_id, session)
 
     if not book:
         return False

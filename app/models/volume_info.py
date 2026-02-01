@@ -19,7 +19,7 @@ class ImageLinksModel(BaseModel):
 
 
 class VolumeInfoModel(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
     title: str = Field(
         description="The title of the book.",

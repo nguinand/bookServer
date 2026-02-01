@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from app.crud.shared_queries import get_book_by_id
-from app.crud.book_utils import convert_book_to_model
+from app.crud.shared_queries import get_book_by_book_id
+from app.crud.model_conversions import convert_book_to_model
 from app.db.db_models import Bookcase, Book
 from app.models.bookcase import BookcaseModel
 
@@ -53,7 +53,7 @@ def update_bookcase(
         bookcase_record.books.clear()
 
         for book_model in bookcase_replacement.books:
-            book = get_book_by_id(id=book_model.book_id, session=session)
+            book = get_book_by_book_id(book_id=book_model.book_id, session=session)
             book = session.query(Book).filter_by(id=book_model.book_id).first()
             if book:
                 bookcase_record.books.append(book)
