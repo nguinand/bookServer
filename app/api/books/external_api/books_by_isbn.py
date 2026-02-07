@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 @router.get("/books_by_isbn/", response_model=List[BookModel], status_code=200)
 async def get_books_by_isbn(
     isbn: int, max_results: int = 10, start_index: int = 0
-) -> List[BookModel]:
+) -> List[BookModel] | JSONResponse:
     params = {
         "q": f"isbn:{isbn}",
         "startIndex": start_index,
