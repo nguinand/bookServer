@@ -26,7 +26,7 @@ class SearchType(Enum):
 @router.get("/generic/", response_model=List[BookModel], status_code=200)
 async def get_books_by_generic(
     search_type: SearchType, val: str, max_results: int = 10, start_index: int = 0
-) -> List[BookModel]:
+) -> List[BookModel] | JSONResponse:
     params = {
         "q": f"{search_type.value}:{val}",
         "startIndex": start_index,
