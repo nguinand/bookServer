@@ -1,4 +1,5 @@
 """Ensure project root is on sys.path so `app` imports resolve in tests."""
+
 from __future__ import annotations
 
 import sys
