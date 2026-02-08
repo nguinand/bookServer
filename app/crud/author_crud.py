@@ -70,16 +70,11 @@ def convert_author(author_data: Author) -> AuthorModel:
     )
 
 
-def resolve_author(name: str, book_title: str, session: Session) -> Author:
-    possible_authors = get_author_by_name(name, session)
-
-    for author in possible_authors:
-        for book in author.books:
-            if book.title.lower().strip() == book_title.lower().strip():
-                return author  # We found a likely match
-
-    # No overlap match found — create a new one
-    new_author = Author(name=name)
-    session.add(new_author)
-    session.flush()
-    return new_author
+# def resolve_author(author_name: str, session: Session) -> Author:
+#     if author := get_author_by_name(author_name, session): return author
+#
+#     # No overlap match found — create a new one
+#     new_author = Author(name=author_name)
+#     session.add(new_author)
+#     session.flush()
+#     return new_author

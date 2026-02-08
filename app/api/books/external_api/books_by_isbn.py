@@ -7,7 +7,7 @@ from app.utils.logger import get_logger
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-router = APIRouter()
+router = APIRouter(prefix="/books", tags=["books-external"])
 logger = get_logger(__name__)
 
 

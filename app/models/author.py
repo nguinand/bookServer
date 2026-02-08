@@ -6,7 +6,8 @@ from pydantic import BaseModel, ConfigDict, Field
 class AuthorModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(
+    id: int | None = Field(
+        None,
         description="The id of the author. Most likely from the database",
         gt=0,
         examples=[1, 2],

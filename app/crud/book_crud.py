@@ -2,7 +2,7 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from app.crud.author_crud import get_author_by_name, resolve_author
+from app.crud.author_crud import get_author_by_name, create_author
 from app.crud.genre_crud import get_genre_by_name
 from app.crud.shared_queries import get_book_by_book_id
 from app.db.db_models import Book
@@ -11,6 +11,7 @@ from app.db.db_models.book_access import BookAccess
 from app.db.db_models.book_identifier import BookIdentifier
 from app.db.db_models.book_sale_info import BookSaleInfo
 from app.db.db_models.genre import Genre
+from app.models.author import AuthorModel
 from app.models.book import BookModel
 
 
@@ -36,8 +37,11 @@ def store_book_entry(book_model: BookModel, session: Session) -> Book:
 
     book_authors: List[Author] = []
     for name in book_model.volume_info.authors or []:
-        author = resolve_author(name, book_model.volume_info.title, session)
-        book_authors.append(author)
+        if author := get_author_by_name(name, session):
+            book_authors.append(author)
+        else:
+            author = create_author(AuthorModel(name=name), session=session)
+            book_authors.append(author)
 
     book_data.authors = book_authors
 
@@ -230,7 +234,7 @@ def update_book_by_model(book_replacement: BookModel, session: Session) -> None 
     return book_record
 
 
-def delete_book(book_id: int, session: Session) -> bool:
+def delete_book_by_book_id(book_id: int, session: Session) -> bool:
     book = get_book_by_book_id(book_id, session)
 
     if not book:

@@ -35,7 +35,9 @@ class Book(Base):
         uselist=False,
         cascade="all, delete-orphan",
     )
-    access_info = relationship("BookAccess", back_populates="book", uselist=False)
+    access_info = relationship(
+        "BookAccess", back_populates="book", cascade="all, delete-orphan", uselist=False
+    )
     identifiers = relationship(
         "BookIdentifier", back_populates="book", cascade="all, delete-orphan"
     )

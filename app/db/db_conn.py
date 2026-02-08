@@ -32,6 +32,13 @@ class DatabaseManager:
         """
         return self.SessionLocal()
 
+    def get_db(self) -> Session:
+        session = self.session
+        try:
+            yield session
+        finally:
+            session.close()
+
 
 # Singleton instance
 db_manager = DatabaseManager()

@@ -12,7 +12,7 @@ from app.models.book import BookModel
 logger = get_logger(__name__)
 
 
-router = APIRouter()
+router = APIRouter(prefix="/books", tags=["books-external"])
 
 
 @router.get("/name/", response_model=List[BookModel], status_code=200)
