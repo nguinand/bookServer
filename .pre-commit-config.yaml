@@ -1,16 +1,17 @@
 # must add pre-commit pip package. Then run pre-commit install
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    rev: v0.15.0
     hooks:
-      # Organize imports (isort rules)
-      - id: ruff
-        name: ruff (fix imports)
-        args: [check, --select, I, --fix]
+      # Organize imports (isort rules) and apply fixes
+      - id: ruff-check
+        name: ruff (imports)
+        args: [--select, I, --fix]
 
       # Format code (ruff formatter)
       - id: ruff-format
         name: ruff-format
+
 
 
 #repos:
