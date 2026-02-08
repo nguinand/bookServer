@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, AliasChoices, StrictBool, ConfigDict
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, StrictBool
 
 
 class FormatInfoModel(BaseModel):

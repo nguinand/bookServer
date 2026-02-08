@@ -1,6 +1,7 @@
 from typing import Generator
-import pytest
 from unittest.mock import MagicMock, Mock
+
+import pytest
 
 from app.crud import user_book_state_crud as crud
 from app.db.db_models.user_book_state import ReadingStatus, UserBookState

@@ -1,14 +1,14 @@
 from enum import Enum
 from typing import List
+
+import httpx
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from app.api.books.external_api import api_key, book_api_request, BooksRequestError
-from app.utils.logger import get_logger
-import httpx
-
+from app.api.books.external_api import BooksRequestError, api_key, book_api_request
 from app.models.book import BookModel
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

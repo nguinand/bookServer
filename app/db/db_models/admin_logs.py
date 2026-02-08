@@ -1,7 +1,9 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, Text, TIMESTAMP, func
-from app.db.db_models.base import Base
+
+from sqlalchemy import TIMESTAMP, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
+
+from app.db.db_models.base import Base
 
 
 class AdminLogs(Base):

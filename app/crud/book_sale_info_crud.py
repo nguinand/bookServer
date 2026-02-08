@@ -1,6 +1,7 @@
+from sqlalchemy.orm import Session
+
 from app.db.db_models.book_sale_info import BookSaleInfo
 from app.models.book_sale_info import BookSaleInfoModel, CurrencyCode, PriceModel
-from sqlalchemy.orm import Session
 
 
 def create_book_sale_info(

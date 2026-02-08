@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
-from starlette.responses import JSONResponse
 from sqlalchemy.orm import Session
+from starlette.responses import JSONResponse
+
 from app.crud.book_crud import update_book_by_model
 from app.crud.model_conversions import convert_book_to_model
 from app.db.db_conn import db_manager

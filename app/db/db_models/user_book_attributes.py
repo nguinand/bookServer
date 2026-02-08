@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import Optional
-from sqlalchemy import Integer, ForeignKey, Text, TIMESTAMP, UniqueConstraint, func
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+
+from sqlalchemy import TIMESTAMP, ForeignKey, Integer, Text, UniqueConstraint, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.db.db_models.base import Base
 
 

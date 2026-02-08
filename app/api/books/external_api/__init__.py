@@ -1,4 +1,5 @@
 import httpx
+
 from app.utils.get_env import get_env_val_or_raise
 
 GOOGLE_BOOKS_API_URL = get_env_val_or_raise("GOOGLE_BOOKS_API_URL")

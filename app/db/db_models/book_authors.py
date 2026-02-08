@@ -1,4 +1,5 @@
-from sqlalchemy import Table, Column, ForeignKey, Integer
+from sqlalchemy import Column, ForeignKey, Integer, Table
+
 from app.db.db_models.base import Base
 
 book_authors = Table(

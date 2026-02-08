@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 
-from app.models.identifiers import IndustryIdentifier, IdentifierType
+from pydantic import BaseModel, ConfigDict, Field
+
+from app.models.identifiers import IdentifierType, IndustryIdentifier
 
 
 class ImageLinksModel(BaseModel):

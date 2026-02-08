@@ -1,11 +1,13 @@
+from typing import List
+
 import httpx
 from fastapi import APIRouter
-from typing import List
-from app.api.books.external_api import api_key, book_api_request, BooksRequestError
-from app.models.book import BookModel
-from app.utils.logger import get_logger
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+
+from app.api.books.external_api import BooksRequestError, api_key, book_api_request
+from app.models.book import BookModel
+from app.utils.logger import get_logger
 
 router = APIRouter(prefix="/books", tags=["books-external"])
 logger = get_logger(__name__)

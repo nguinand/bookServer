@@ -1,9 +1,11 @@
-from datetime import datetime
 import enum
+from datetime import datetime
 from typing import Optional
-from sqlalchemy import DateTime, ForeignKey, Integer, Enum, UniqueConstraint
-from app.db.db_models.base import Base
+
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.db_models.base import Base
 
 
 class ReadingStatus(str, enum.Enum):

@@ -1,8 +1,10 @@
-from typing import Optional
-from sqlalchemy import Integer, String, ForeignKey, TIMESTAMP, func
-from sqlalchemy.orm import relationship, Mapped, mapped_column
-from app.db.db_models.base import Base
 from datetime import datetime
+from typing import Optional
+
+from sqlalchemy import TIMESTAMP, ForeignKey, Integer, String, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.db_models.base import Base
 
 
 class User(Base):

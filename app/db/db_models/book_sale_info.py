@@ -1,8 +1,10 @@
-from typing import Optional
-from sqlalchemy import DECIMAL, Boolean, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import relationship, Mapped, mapped_column
-from app.db.db_models.base import Base
 from decimal import Decimal
+from typing import Optional
+
+from sqlalchemy import DECIMAL, Boolean, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.db_models.base import Base
 
 
 class BookSaleInfo(Base):

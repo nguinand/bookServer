@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+
 from app.crud.avatar_crud import get_avatar_by_id
 from app.crud.user_status_crud import get_user_status_by_id
 from app.db.db_models.user import User

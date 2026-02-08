@@ -2,6 +2,7 @@
 # Some queries are shared between crud operations.
 
 from sqlalchemy.orm import Session
+
 from app.db.db_models.book import Book
 
 

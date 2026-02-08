@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
-from app.models.admin_log import AdminLogsModel
+
 from app.db.db_models import AdminLogs
+from app.models.admin_log import AdminLogsModel
 
 
 def create_admin_logs(admin_log_model: AdminLogsModel, session: Session) -> AdminLogs:
