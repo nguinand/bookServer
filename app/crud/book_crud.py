@@ -2,7 +2,7 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from app.crud.author_crud import get_author_by_name, create_author
+from app.crud.author_crud import create_author, get_author_by_name
 from app.crud.genre_crud import get_genre_by_name
 from app.crud.shared_queries import get_book_by_book_id
 from app.db.db_models import Book

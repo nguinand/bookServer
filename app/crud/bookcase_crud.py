@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 
-from app.crud.shared_queries import get_book_by_book_id
 from app.crud.model_conversions import convert_book_to_model
-from app.db.db_models import Bookcase, Book
+from app.crud.shared_queries import get_book_by_book_id
+from app.db.db_models import Book, Bookcase
 from app.models.bookcase import BookcaseModel
 
 

@@ -1,6 +1,8 @@
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
 from pydantic import ValidationError
+
 from app.crud.author_crud import AuthorCrud, AuthorModel
 
 

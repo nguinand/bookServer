@@ -1,6 +1,6 @@
+import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
-import uvicorn
 
 from app.api.books.router import router as book_route
 

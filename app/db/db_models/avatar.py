@@ -1,8 +1,9 @@
 from typing import Optional
+
 from sqlalchemy import Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.db.db_models.base import Base
-from sqlalchemy.orm import Mapped, mapped_column
 
 
 class Avatar(Base):

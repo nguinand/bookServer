@@ -1,6 +1,7 @@
+from sqlalchemy.orm import Session
+
 from app.db.db_models import BookAccess
 from app.models.access_info import AccessInfoModel, FormatInfoModel
-from sqlalchemy.orm import Session
 
 
 def create_access_info(access_info: AccessInfoModel, session: Session) -> BookAccess:

@@ -3,9 +3,15 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
     hooks:
+      # Organize imports (isort rules)
       - id: ruff
-        args: []
+        name: ruff (fix imports)
+        args: [check, --select, I, --fix]
+
+      # Format code (ruff formatter)
       - id: ruff-format
+        name: ruff-format
+
 
 #repos:
 #  - repo: local

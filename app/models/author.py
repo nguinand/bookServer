@@ -1,6 +1,8 @@
-from app.models.book import BookModel
 from typing import List
+
 from pydantic import BaseModel, ConfigDict, Field
+
+from app.models.book import BookModel
 
 
 class AuthorModel(BaseModel):

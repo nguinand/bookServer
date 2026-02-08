@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+
 from app.db.db_models.genre import Genre
 from app.models.genre import GenreModel
 

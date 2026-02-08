@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field, ConfigDict
-from app.models.volume_info import VolumeInfoModel
-from app.models.book_sale_info import BookSaleInfoModel
+from pydantic import BaseModel, ConfigDict, Field
+
 from app.models.access_info import AccessInfoModel
+from app.models.book_sale_info import BookSaleInfoModel
+from app.models.volume_info import VolumeInfoModel
 
 
 class BookModel(BaseModel):

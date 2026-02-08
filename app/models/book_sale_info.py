@@ -1,6 +1,7 @@
 from decimal import Decimal
 from enum import Enum
-from pydantic import BaseModel, Field, field_validator, StrictBool, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, field_validator
 
 
 class CurrencyCode(str, Enum):

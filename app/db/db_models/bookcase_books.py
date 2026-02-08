@@ -1,4 +1,5 @@
-from sqlalchemy import Table, Column, ForeignKey, Integer, TIMESTAMP, func
+from sqlalchemy import TIMESTAMP, Column, ForeignKey, Integer, Table, func
+
 from app.db.db_models.base import Base
 
 bookcase_books = Table(
