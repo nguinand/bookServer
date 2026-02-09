@@ -52,7 +52,7 @@ def update_user_book_attribute(
     user_book_attribute_record.created_at = book_attribute_replacement.created_at
     user_book_attribute_record.updated_at = book_attribute_replacement.updated_at
 
-    session.commit()
+    db_manager.commit_or_raise(session)
     return user_book_attribute_record
 
 
