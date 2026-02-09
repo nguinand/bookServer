@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 
 from app.db.db_conn import db_manager
@@ -37,23 +39,21 @@ def get_user_book_attribute_by_book_id(
 
 def update_user_book_attribute(
     book_attribute_replacement: UserBookAttributesModel, session: Session
-) -> None | UserBookAttributes:
+) -> bool:
     user_book_attribute_record = get_user_book_attribute_by_book_id(
         book_attribute_replacement.book_id, session
     )
 
     if not user_book_attribute_record:
-        return None
+        return False
 
     user_book_attribute_record.user_id = book_attribute_replacement.user_id
-    user_book_attribute_record.book_id = book_attribute_replacement.book_id
     user_book_attribute_record.rating = book_attribute_replacement.rating
     user_book_attribute_record.review_text = book_attribute_replacement.review_text
-    user_book_attribute_record.created_at = book_attribute_replacement.created_at
-    user_book_attribute_record.updated_at = book_attribute_replacement.updated_at
+    user_book_attribute_record.updated_at = datetime.now()
 
     db_manager.commit_or_raise(session)
-    return user_book_attribute_record
+    return True
 
 
 def delete_user_book_attribute_by_id(
