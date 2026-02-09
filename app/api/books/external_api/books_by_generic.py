@@ -5,6 +5,7 @@ import httpx
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+from starlette import status
 
 from app.api.books.external_api import BooksRequestError, api_key, book_api_request
 from app.models.book import BookModel
@@ -23,7 +24,7 @@ class SearchType(Enum):
     SUBJECT = "subject"
 
 
-@router.get("/generic/", response_model=List[BookModel], status_code=200)
+@router.get("/generic/", response_model=List[BookModel], status_code=status.HTTP_200_OK)
 async def get_books_by_generic(
     search_type: SearchType, val: str, max_results: int = 10, start_index: int = 0
 ) -> List[BookModel] | JSONResponse:
@@ -55,7 +56,7 @@ async def get_books_by_generic(
             except (ValidationError, TypeError) as e:
                 logger.error(f"Validation error building BookModel: {str(e)}")
                 return JSONResponse(
-                    status_code=422,
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     content={"error": "Validation error", "detail": str(e)},
                 )
         return books

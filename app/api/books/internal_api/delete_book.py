@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/database", tags=["books-database"])
 
 
-@router.delete("/delete_book/{book_id}", status_code=200)
+@router.delete("/delete_book/{book_id}", status_code=status.HTTP_200_OK)
 async def delete_book(
     book_id: int, session: Session = Depends(db_manager.get_db)
 ) -> JSONResponse:
@@ -28,6 +28,6 @@ async def delete_book(
     }
 
     return JSONResponse(
-        status_code=200,
+        status_code=status.HTTP_200_OK,
         content=content,
     )

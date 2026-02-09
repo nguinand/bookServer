@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/database", tags=["books-database"])
 
 
-@router.post("/create_book/", response_model=BookModel, status_code=200)
+@router.post("/create_book/", response_model=BookModel, status_code=status.HTTP_200_OK)
 async def create_book(
     book_model: BookModel, session: Session = Depends(db_manager.get_db)
 ) -> BookModel:
