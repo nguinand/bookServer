@@ -123,7 +123,7 @@ def get_book_by_google_id(google_id: str, session: Session) -> None | Book:
     return session.query(Book).filter_by(google_books_id=google_id).first()
 
 
-def update_book_by_model(book_replacement: BookModel, session: Session) -> None | Book:
+def update_book_by_model(book_replacement: BookModel, session: Session) -> bool:
     if book_replacement.book_id is None:
         raise ValueError(
             f"Cannot replace book without an ID. book_id: {book_replacement.book_id} - title:{book_replacement.volume_info.title}"
@@ -133,7 +133,7 @@ def update_book_by_model(book_replacement: BookModel, session: Session) -> None 
     book_record = get_book_by_book_id(book_replacement.book_id, session)
 
     if not book_record:
-        return None
+        return False
 
     book_record.google_books_id = book_replacement.google_books_id
     book_record.title = book_replacement.volume_info.title
@@ -231,7 +231,7 @@ def update_book_by_model(book_replacement: BookModel, session: Session) -> None 
             )
     db_manager.commit_or_raise(session)
     session.refresh(book_record)
-    return book_record
+    return True
 
 
 def delete_book_by_book_id(book_id: int, session: Session) -> bool:
