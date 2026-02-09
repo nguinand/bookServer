@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.crud.book_crud import store_book_entry
 from app.crud.model_conversions import convert_book_to_model
-from app.db.db_conn import db_manager
+from app.db.db_conn import DatabaseOperationError, db_manager
 from app.models.book import BookModel
 from app.utils.logger import get_logger
 
@@ -15,5 +15,11 @@ router = APIRouter(prefix="/database", tags=["books-database"])
 async def create_book(
     book_model: BookModel, session: Session = Depends(db_manager.get_db)
 ) -> BookModel:
-    book_data = store_book_entry(book_model=book_model, session=session)
-    return convert_book_to_model(book_data)
+    try:
+        book_data = store_book_entry(book_model=book_model, session=session)
+        return convert_book_to_model(book_data)
+    except DatabaseOperationError as e:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Unable to create book {book_model.volume_info.title} - {e}",
+        )
