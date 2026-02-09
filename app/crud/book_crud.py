@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.crud.author_crud import create_author, get_author_by_name
 from app.crud.genre_crud import get_genre_by_name
 from app.crud.shared_queries import get_book_by_book_id
+from app.db.db_conn import db_manager
 from app.db.db_models import Book
 from app.db.db_models.author import Author
 from app.db.db_models.book_access import BookAccess
@@ -108,7 +109,7 @@ def store_book_entry(book_model: BookModel, session: Session) -> Book:
     book_data.genres = genres
 
     session.add(book_data)
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(book_data)
 
     return book_data
@@ -122,7 +123,7 @@ def get_book_by_google_id(google_id: str, session: Session) -> None | Book:
     return session.query(Book).filter_by(google_books_id=google_id).first()
 
 
-def update_book_by_model(book_replacement: BookModel, session: Session) -> None | Book:
+def update_book_by_model(book_replacement: BookModel, session: Session) -> bool:
     if book_replacement.book_id is None:
         raise ValueError(
             f"Cannot replace book without an ID. book_id: {book_replacement.book_id} - title:{book_replacement.volume_info.title}"
@@ -132,7 +133,7 @@ def update_book_by_model(book_replacement: BookModel, session: Session) -> None 
     book_record = get_book_by_book_id(book_replacement.book_id, session)
 
     if not book_record:
-        return None
+        return False
 
     book_record.google_books_id = book_replacement.google_books_id
     book_record.title = book_replacement.volume_info.title
@@ -228,10 +229,9 @@ def update_book_by_model(book_replacement: BookModel, session: Session) -> None 
                 if sale_info_model.retail_price
                 else None,
             )
-
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(book_record)
-    return book_record
+    return True
 
 
 def delete_book_by_book_id(book_id: int, session: Session) -> bool:
@@ -241,5 +241,5 @@ def delete_book_by_book_id(book_id: int, session: Session) -> bool:
         return False
 
     session.delete(book)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return True

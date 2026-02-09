@@ -27,10 +27,10 @@ class UserBookAttributesModel(BaseModel):
     created_at: datetime = Field(
         datetime.now(),
         description="Date and time when the attribute was created.",
-        example=datetime(2020, 1, 1),
+        examples=[datetime(2020, 1, 1)],
     )
     updated_at: datetime = Field(
         datetime.now(),
         description="Date and time when the attribute updated.",
-        example=datetime(2020, 1, 1),
+        examples=[datetime(2020, 1, 1)],
     )

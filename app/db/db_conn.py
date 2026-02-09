@@ -2,12 +2,20 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.utils.get_env import get_env_val_or_raise
+from app.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 # Load .env file from the current directory
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env", override=True)
+
+
+class DatabaseOperationError(Exception):
+    pass
 
 
 class DatabaseManager:
@@ -39,6 +47,15 @@ class DatabaseManager:
             yield session
         finally:
             session.close()
+
+    @staticmethod
+    def commit_or_raise(session: Session) -> None:
+        try:
+            session.commit()
+        except (IntegrityError, SQLAlchemyError) as e:
+            session.rollback()
+            logger.error(e)
+            raise DatabaseOperationError(e.orig) from e
 
 
 # Singleton instance

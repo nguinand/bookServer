@@ -1,5 +1,8 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 
+from app.db.db_conn import db_manager
 from app.db.db_models.user_book_attributes import UserBookAttributes
 from app.models.user_book_attributes import UserBookAttributesModel
 
@@ -17,9 +20,9 @@ def create_user_book_attribute(
 
 
 def get_user_book_attribute_by_id(
-    id: int, session: Session
+    attribute_id: int, session: Session
 ) -> UserBookAttributes | None:
-    return session.query(UserBookAttributes).filter_by(id=id).first()
+    return session.query(UserBookAttributes).filter_by(id=attribute_id).first()
 
 
 def get_user_book_attribute_by_user_id(
@@ -36,23 +39,21 @@ def get_user_book_attribute_by_book_id(
 
 def update_user_book_attribute(
     book_attribute_replacement: UserBookAttributesModel, session: Session
-) -> None | UserBookAttributes:
-    user_book_attribute_record = get_user_book_attribute_by_id(
-        book_attribute_replacement.id, session
+) -> bool:
+    user_book_attribute_record = get_user_book_attribute_by_book_id(
+        book_attribute_replacement.book_id, session
     )
 
     if not user_book_attribute_record:
-        return None
+        return False
 
     user_book_attribute_record.user_id = book_attribute_replacement.user_id
-    user_book_attribute_record.book_id = book_attribute_replacement.book_id
     user_book_attribute_record.rating = book_attribute_replacement.rating
     user_book_attribute_record.review_text = book_attribute_replacement.review_text
-    user_book_attribute_record.created_at = book_attribute_replacement.created_at
-    user_book_attribute_record.updated_at = book_attribute_replacement.updated_at
+    user_book_attribute_record.updated_at = datetime.now()
 
-    session.commit()
-    return user_book_attribute_record
+    db_manager.commit_or_raise(session)
+    return True
 
 
 def delete_user_book_attribute_by_id(
@@ -66,7 +67,7 @@ def delete_user_book_attribute_by_id(
         return False
 
     session.delete(user_book_attribute_record)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return True
 
 

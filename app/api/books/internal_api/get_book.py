@@ -2,6 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from starlette import status
 
 from app.crud.book_crud import get_book_by_google_id, get_books_by_title
 from app.crud.model_conversions import convert_book_to_model
@@ -14,7 +15,11 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/database", tags=["books-database"])
 
 
-@router.get("/books_by_title/{title}", response_model=List[BookModel], status_code=200)
+@router.get(
+    "/books_by_title/{title}",
+    response_model=List[BookModel],
+    status_code=status.HTTP_200_OK,
+)
 async def books_by_title(
     title: str, session: Session = Depends(db_manager.get_db)
 ) -> List[BookModel]:
@@ -26,7 +31,9 @@ async def books_by_title(
 
 
 @router.get(
-    "/books_by_google_id/{google_id}", response_model=BookModel, status_code=200
+    "/books_by_google_id/{google_id}",
+    response_model=BookModel,
+    status_code=status.HTTP_200_OK,
 )
 async def books_by_google_id(
     google_id: str, session: Session = Depends(db_manager.get_db)
@@ -35,7 +42,11 @@ async def books_by_google_id(
     return convert_book_to_model(books_result)
 
 
-@router.get("/books_by_book_id/{book_id}", response_model=BookModel, status_code=200)
+@router.get(
+    "/books_by_book_id/{book_id}",
+    response_model=BookModel,
+    status_code=status.HTTP_200_OK,
+)
 async def books_by_book_id(
     book_id: str, session: Session = Depends(db_manager.get_db)
 ) -> BookModel:
