@@ -37,8 +37,8 @@ def get_user_book_attribute_by_book_id(
 def update_user_book_attribute(
     book_attribute_replacement: UserBookAttributesModel, session: Session
 ) -> None | UserBookAttributes:
-    user_book_attribute_record = get_user_book_attribute_by_id(
-        book_attribute_replacement.id, session
+    user_book_attribute_record = get_user_book_attribute_by_book_id(
+        book_attribute_replacement.book_id, session
     )
 
     if not user_book_attribute_record:
