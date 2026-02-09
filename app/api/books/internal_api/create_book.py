@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from starlette import status
 
 from app.crud.book_crud import store_book_entry
 from app.crud.model_conversions import convert_book_to_model
@@ -20,6 +21,6 @@ async def create_book(
         return convert_book_to_model(book_data)
     except DatabaseOperationError as e:
         raise HTTPException(
-            status_code=409,
+            status_code=status.HTTP_409_CONFLICT,
             detail=f"Unable to create book {book_model.volume_info.title} - {e}",
         )

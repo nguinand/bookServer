@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from starlette import status
 from starlette.responses import JSONResponse
 
 from app.crud.book_crud import delete_book_by_book_id
@@ -18,7 +19,8 @@ async def delete_book(
         deleted = delete_book_by_book_id(book_id=book_id, session=session)
     except DatabaseOperationError as e:
         raise HTTPException(
-            status_code=409, detail=f"Unable to delete book by ID {book_id} - {e}"
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Unable to delete book by ID {book_id} - {e}",
         )
     content = {
         "book_id": book_id,
