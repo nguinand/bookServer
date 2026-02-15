@@ -5,7 +5,8 @@ from pydantic import BaseModel, Field
 
 # This is the USER input for the book.
 class UserBookAttributesModel(BaseModel):
-    id: int = Field(
+    id: int | None = Field(
+        None,
         description="Id for the user given attributes. Most likely comes from the database.",
         examples=[1234],
         gt=0,
