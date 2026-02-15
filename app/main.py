@@ -3,10 +3,12 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from app.api.books.router import router as book_route
+from app.api.user_book_attributes.router import router as user_book_attributes
 
 app = FastAPI()
 
 app.include_router(book_route, prefix="/api")
+app.include_router(user_book_attributes, prefix="/api")
 
 
 @app.get("/")
