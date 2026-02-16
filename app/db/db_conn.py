@@ -1,7 +1,8 @@
 from pathlib import Path
+from typing import Any, Generator
 
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from sqlalchemy import ChunkedIteratorResult, create_engine
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -16,6 +17,16 @@ load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env", overrid
 
 class DatabaseOperationError(Exception):
     pass
+
+
+def batch_results(
+    result: ChunkedIteratorResult, batch_size: int = 500
+) -> Generator[list[Any], None, None]:
+    while True:
+        batch = result.fetchmany(batch_size)
+        if not batch:
+            break
+        yield batch
 
 
 class DatabaseManager:
