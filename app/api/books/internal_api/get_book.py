@@ -16,14 +16,14 @@ router = APIRouter(prefix="/database", tags=["books-database"])
 
 
 @router.get(
-    "/books_by_title/{title}",
+    "/books_by_title/",
     response_model=List[BookModel],
     status_code=status.HTTP_200_OK,
 )
 async def books_by_title(
-    title: str, session: Session = Depends(db_manager.get_db)
+    title: str, limit: int, offset: int, session: Session = Depends(db_manager.get_db)
 ) -> List[BookModel]:
-    books_result = get_books_by_title(title=title, session=session)
+    books_result = get_books_by_title(title, session, limit, offset)
     books = []
     for book in books_result:
         books.append(convert_book_to_model(book))
