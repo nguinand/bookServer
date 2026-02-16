@@ -7,4 +7,4 @@ from app.db.db_models.book import Book
 
 
 def get_book_by_book_id(book_id: int, session: Session) -> None | Book:
-    return session.query(Book).filter_by(book_id=book_id).first()
+    return session.get(Book, book_id)
