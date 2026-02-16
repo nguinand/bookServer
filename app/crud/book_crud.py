@@ -1,5 +1,6 @@
 from typing import List
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.crud.author_crud import create_author, get_author_by_name
@@ -115,8 +116,17 @@ def store_book_entry(book_model: BookModel, session: Session) -> Book:
     return book_data
 
 
-def get_books_by_title(title: str, session: Session) -> list[Book]:
-    return session.query(Book).filter_by(title=title).all()
+def get_books_by_title(
+    title: str, session: Session, limit: int = 100, offset: int = 0
+) -> list[Book]:
+    stmt = (
+        select(Book)
+        .where(Book.title == title)
+        .order_by(Book.book_id)
+        .limit(limit)
+        .offset(offset)
+    )
+    return session.scalars(stmt).all()
 
 
 def get_book_by_google_id(google_id: str, session: Session) -> None | Book:
