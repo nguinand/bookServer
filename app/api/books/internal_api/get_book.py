@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -21,7 +21,10 @@ router = APIRouter(prefix="/database", tags=["books-database"])
     status_code=status.HTTP_200_OK,
 )
 async def books_by_title(
-    title: str, limit: int, offset: int, session: Session = Depends(db_manager.get_db)
+    title: str,
+    limit: int = 100,
+    offset: int = 0,
+    session: Session = Depends(db_manager.get_db),
 ) -> List[BookModel]:
     books_result = get_books_by_title(title, session, limit, offset)
     books = []
@@ -39,7 +42,9 @@ async def books_by_google_id(
     google_id: str, session: Session = Depends(db_manager.get_db)
 ) -> BookModel:
     books_result = get_book_by_google_id(google_id=google_id, session=session)
-    return convert_book_to_model(books_result)
+    if books_result:
+        return convert_book_to_model(books_result)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
 
 
 @router.get(
@@ -51,4 +56,6 @@ async def books_by_book_id(
     book_id: str, session: Session = Depends(db_manager.get_db)
 ) -> BookModel:
     books_result = get_book_by_book_id(book_id=book_id, session=session)
-    return convert_book_to_model(books_result)
+    if books_result:
+        return convert_book_to_model(books_result)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
