@@ -1,12 +1,13 @@
 from typing import List
 
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.crud.author_crud import create_author, get_author_by_name
 from app.crud.genre_crud import get_genre_by_name
 from app.crud.shared_queries import get_book_by_book_id
-from app.db.db_conn import db_manager
+from app.db.db_conn import DatabaseOperationError, db_manager
 from app.db.db_models import Book
 from app.db.db_models.author import Author
 from app.db.db_models.book_access import BookAccess
@@ -15,6 +16,9 @@ from app.db.db_models.book_sale_info import BookSaleInfo
 from app.db.db_models.genre import Genre
 from app.models.author import AuthorModel
 from app.models.book import BookModel
+from app.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def store_book_entry(book_model: BookModel, session: Session) -> Book:
@@ -126,13 +130,21 @@ def get_books_by_title(
         .limit(limit)
         .offset(offset)
     )
-    return session.scalars(stmt).all()
+    try:
+        return session.scalars(stmt).all()
+    except SQLAlchemyError as e:
+        logger.error(e)
+        raise DatabaseOperationError(e) from e
 
 
 def get_book_by_google_id(google_id: str, session: Session) -> Book | None:
-    return session.scalars(
-        select(Book).where(Book.google_books_id == google_id)
-    ).one_or_none()
+    try:
+        return session.scalars(
+            select(Book).where(Book.google_books_id == google_id)
+        ).one_or_none()
+    except SQLAlchemyError as e:
+        logger.error(e)
+        raise DatabaseOperationError(e) from e
 
 
 def update_book_by_model(book_replacement: BookModel, session: Session) -> bool:
