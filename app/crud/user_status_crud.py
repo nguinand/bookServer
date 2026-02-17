@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.db.db_conn import db_manager
 from app.db.db_models.user_status import UserStatus
 from app.models.user_status import UserStatusModel
 from app.utils.logger import get_logger
@@ -14,7 +15,7 @@ def create_user_status(
         **user_status_model.model_dump(by_alias=True, exclude_unset=True)
     )
     session.add(user_status_data)
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(user_status_data)
     return user_status_data
 
@@ -36,7 +37,7 @@ def update_user_status(
     user_status_record.name = user_status_replacement.name
     user_status_record.level = user_status_replacement.level
     user_status_record.benefits = user_status_replacement.benefits
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(user_status_record)
     return user_status_record
 
@@ -47,5 +48,5 @@ def delete_user_status(id: int, session: Session) -> bool:
         return False
 
     session.delete(user_status)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return True

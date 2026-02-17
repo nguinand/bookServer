@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.avatar_crud import get_avatar_by_id
 from app.crud.user_status_crud import get_user_status_by_id
+from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.user import UserModel
 from app.utils.logger import get_logger
@@ -15,7 +16,7 @@ def create_user(user_model: UserModel, session: Session) -> User:
         **user_model.model_dump(by_alias=True, exclude_unset=True)
     )  # verify this
     session.add(user_data)
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(user_data)
     return user_data
 
@@ -65,7 +66,7 @@ def update_user(user_replacement: UserModel, session: Session) -> None | User:
 
     user_record.bookcases = user_record.bookcases
 
-    session.commit()
+    db_manager.commit_or_raise(session)
     return user_record
 
 
@@ -75,7 +76,7 @@ def delete_user(user_id: int, session: Session) -> bool:
         return False
 
     session.delete(user)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return True
 
 
