@@ -1,5 +1,6 @@
 from typing import List
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.crud.author_crud import create_author, get_author_by_name
@@ -14,6 +15,9 @@ from app.db.db_models.book_sale_info import BookSaleInfo
 from app.db.db_models.genre import Genre
 from app.models.author import AuthorModel
 from app.models.book import BookModel
+from app.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def store_book_entry(book_model: BookModel, session: Session) -> Book:
@@ -115,12 +119,23 @@ def store_book_entry(book_model: BookModel, session: Session) -> Book:
     return book_data
 
 
-def get_books_by_title(title: str, session: Session) -> list[Book]:
-    return session.query(Book).filter_by(title=title).all()
+def get_books_by_title(
+    title: str, session: Session, limit: int = 100, offset: int = 0
+) -> list[Book]:
+    stmt = (
+        select(Book)
+        .where(Book.title == title)
+        .order_by(Book.book_id)
+        .limit(limit)
+        .offset(offset)
+    )
+    return session.scalars(stmt).all()
 
 
-def get_book_by_google_id(google_id: str, session: Session) -> None | Book:
-    return session.query(Book).filter_by(google_books_id=google_id).first()
+def get_book_by_google_id(google_id: str, session: Session) -> Book | None:
+    return session.scalars(
+        select(Book).where(Book.google_books_id == google_id)
+    ).one_or_none()
 
 
 def update_book_by_model(book_replacement: BookModel, session: Session) -> bool:
@@ -129,7 +144,6 @@ def update_book_by_model(book_replacement: BookModel, session: Session) -> bool:
             f"Cannot replace book without an ID. book_id: {book_replacement.book_id} - title:{book_replacement.volume_info.title}"
         )
 
-    # book_record = session.query(Book).filter_by(id=book_replacement.book_id).first()
     book_record = get_book_by_book_id(book_replacement.book_id, session)
 
     if not book_record:

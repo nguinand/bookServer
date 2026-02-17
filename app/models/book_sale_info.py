@@ -35,6 +35,10 @@ class PriceModel(BaseModel):
 
 class BookSaleInfoModel(BaseModel):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    id: int | None = Field(
+        description="id of the book sale info. Most likely derived from the database.",
+        examples=[1, 2],
+    )
     book_id: int | None = Field(
         None,
         description="Book id of the book. From Google API, its missing. Would get set after the database creates entry.",

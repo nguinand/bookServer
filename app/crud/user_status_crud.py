@@ -2,6 +2,9 @@ from sqlalchemy.orm import Session
 
 from app.db.db_models.user_status import UserStatus
 from app.models.user_status import UserStatusModel
+from app.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def create_user_status(
@@ -16,8 +19,8 @@ def create_user_status(
     return user_status_data
 
 
-def get_user_status_by_id(id: int, session: Session) -> UserStatus | None:
-    return session.query(UserStatus).filter_by(id=id).first()
+def get_user_status_by_id(status_id: int, session: Session) -> UserStatus | None:
+    return session.get(UserStatus, status_id)
 
 
 def update_user_status(

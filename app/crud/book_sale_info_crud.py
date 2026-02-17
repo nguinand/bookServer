@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.db.db_conn import db_manager
 from app.db.db_models.book_sale_info import BookSaleInfo
 from app.models.book_sale_info import BookSaleInfoModel, CurrencyCode, PriceModel
 
@@ -29,14 +30,16 @@ def create_book_sale_info(
         )
 
     session.add(book_sale_info_data)
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(book_sale_info_data)
 
     return book_sale_info_data
 
 
-def get_book_sale_info_by_id(id: int, session: Session) -> BookSaleInfo | None:
-    return session.query(BookSaleInfo).filter_by(id=id).first()
+def get_book_sale_info_by_id(
+    book_sale_info_id: int, session: Session
+) -> BookSaleInfo | None:
+    return session.get(BookSaleInfo, book_sale_info_id)
 
 
 def update_book_sale_info(
@@ -75,7 +78,7 @@ def update_book_sale_info(
             book_sale_info_replacement.retail_price.currencyCode
         )
 
-    session.commit()
+    db_manager.commit_or_raise(session)
     return book_sale_info_record
 
 
@@ -86,7 +89,7 @@ def delete_book_sale_info(book_sale_info_id: int, session: Session) -> bool:
         return False
 
     session.delete(book_sale_info)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return True
 
 

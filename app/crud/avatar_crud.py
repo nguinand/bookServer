@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.db.db_conn import db_manager
 from app.db.db_models.avatar import Avatar
 from app.models.avatar import AvatarModel
 
@@ -7,13 +8,13 @@ from app.models.avatar import AvatarModel
 def create_avatar(avatar_model: AvatarModel, session: Session) -> Avatar:
     avatar_data = Avatar(**avatar_model.model_dump(by_alias=True))
     session.add(avatar_data)
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(avatar_data)
     return avatar_data
 
 
 def get_avatar_by_id(avatar_id: int, session: Session) -> Avatar | None:
-    return session.query(Avatar).filter_by(id=avatar_id).first()
+    return session.get(Avatar, avatar_id)
 
 
 def update_avatar(avatar_replacement: AvatarModel, session: Session) -> None | Avatar:
@@ -26,7 +27,7 @@ def update_avatar(avatar_replacement: AvatarModel, session: Session) -> None | A
 
     avatar_record.image_url = avatar_replacement.image_url
     avatar_record.description = avatar_replacement.description
-    session.commit()
+    db_manager.commit_or_raise(session)
     return avatar_record
 
 
@@ -37,7 +38,7 @@ def delete_avatar(avatar_id: int, session: Session) -> bool:
         return False
 
     session.delete(avatar_record)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return True
 
 

@@ -1,9 +1,13 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.crud.avatar_crud import get_avatar_by_id
 from app.crud.user_status_crud import get_user_status_by_id
 from app.db.db_models.user import User
 from app.models.user import UserModel
+from app.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def create_user(user_model: UserModel, session: Session) -> User:
@@ -17,15 +21,17 @@ def create_user(user_model: UserModel, session: Session) -> User:
 
 
 def get_user_by_id(user_id: int, session: Session) -> None | User:
-    return session.query(User).filter_by(id=user_id).first()
+    return session.get(User, user_id)
 
 
 def get_users_by_email(email: str, session: Session) -> None | list[User]:
-    return session.query(User).filter_by(email=email).filter_by(email=email).all()
+    stmt = select(User).where(User.email == email)
+    return session.scalars(stmt).one_or_none()
 
 
 def get_users_by_username(username: str, session: Session) -> None | User:
-    return session.query(User).filter_by(username=username).first()
+    stmt = select(User).where(User.username == username)
+    return session.scalars(stmt).one_or_none()
 
 
 def update_user(user_replacement: UserModel, session: Session) -> None | User:
@@ -73,5 +79,5 @@ def delete_user(user_id: int, session: Session) -> bool:
     return True
 
 
-def transform_db_to_user_model(user_data: User) -> UserModel:
+def convert_user_to_model(user_data: User) -> UserModel:
     return UserModel.model_validate(user_data)

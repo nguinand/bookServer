@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from starlette import status
 from starlette.responses import JSONResponse
 
 from app.crud.user_book_attributes_crud import delete_user_book_attribute_by_id
-from app.db.db_conn import DatabaseOperationError, db_manager
+from app.db.db_conn import db_manager
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -19,13 +19,7 @@ router = APIRouter(prefix="/user_book_attributes", tags=["User Book Attributes"]
 async def delete_user_book_attribute(
     attribute_id: int, session: Session = Depends(db_manager.get_db)
 ) -> JSONResponse:
-    try:
-        deleted = delete_user_book_attribute_by_id(attribute_id, session)
-    except DatabaseOperationError as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Unable to delete book attribute with id {attribute_id} - {e}",
-        )
+    deleted = delete_user_book_attribute_by_id(attribute_id, session)
 
     content = {"user_attribute_id": attribute_id, "deleted": deleted}
     return JSONResponse(status_code=status.HTTP_200_OK, content=content)

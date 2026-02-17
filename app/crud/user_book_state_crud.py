@@ -1,5 +1,7 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.db.db_conn import db_manager
 from app.db.db_models.user_book_state import UserBookState
 from app.models.user_book_state import UserBookStateModel
 
@@ -11,7 +13,7 @@ def create_user_book_state(
         **user_book_state_model.model_dump(by_alias=True)
     )
     session.add(user_book_state_data)
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(user_book_state_data)
     return user_book_state_data
 
@@ -19,21 +21,33 @@ def create_user_book_state(
 def get_user_book_state_by_id(
     user_book_state_id: int, session: Session
 ) -> UserBookState | None:
-    return session.query(UserBookState).filter_by(id=user_book_state_id).first()
+    return session.get(UserBookState, user_book_state_id)
 
 
 def get_user_book_states_by_user_id(
-    user_id: int, session: Session
-) -> list[UserBookState] | None:
-    return session.query(UserBookState).filter_by(user_id=user_id).all()
+    user_id: int, session: Session, limit: int = 100, offset: int = 0
+) -> list[UserBookState]:
+    stmt = (
+        select(UserBookState)
+        .where(UserBookState.user_id == user_id)
+        .order_by(UserBookState.id)
+        .limit(limit)
+        .offset(offset)
+    )
+    return session.scalars(stmt).all()
 
 
 def get_user_book_state_by_user_and_book(
-    user_id: int, book_id: int, session: Session
+    user_id: int, book_id: int, session: Session, limit: int = 100, offset: int = 0
 ) -> UserBookState | None:
-    return (
-        session.query(UserBookState).filter_by(user_id=user_id, book_id=book_id).first()
+    stmt = (
+        select(UserBookState)
+        .where(UserBookState.user_id == user_id, UserBookState.book_id == book_id)
+        .order_by(UserBookState.id)
+        .limit(limit)
+        .offset(offset)
     )
+    return session.scalars(stmt).all()
 
 
 def update_user_book_state(
@@ -59,7 +73,7 @@ def update_user_book_state(
     user_book_state_record.started_at = user_book_state_replacement.started_at
     user_book_state_record.finished_at = user_book_state_replacement.finished_at
 
-    session.commit()
+    db_manager.commit_or_raise(session)
     return user_book_state_record
 
 
@@ -70,7 +84,7 @@ def delete_user_book_state_by_id(user_book_state_id: int, session: Session) -> b
         return False
 
     session.delete(user_book_state_record)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return True
 
 
