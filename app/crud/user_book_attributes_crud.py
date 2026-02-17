@@ -2,10 +2,9 @@ from datetime import datetime
 from typing import List
 
 from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.db.db_conn import DatabaseOperationError, db_manager
+from app.db.db_conn import db_manager
 from app.db.db_models.user_book_attributes import UserBookAttributes
 from app.models.user_book_attributes import UserBookAttributesModel
 
@@ -25,10 +24,7 @@ def create_user_book_attribute(
 def get_user_book_attribute_by_id(
     attribute_id: int, session: Session
 ) -> UserBookAttributes | None:
-    try:
-        return session.get(UserBookAttributes, attribute_id)
-    except SQLAlchemyError as e:
-        raise DatabaseOperationError(e) from e
+    return session.get(UserBookAttributes, attribute_id)
 
 
 def get_user_book_attribute_by_user_id(
@@ -42,10 +38,7 @@ def get_user_book_attribute_by_user_id(
         .limit(limit)
         .offset(offset)
     )
-    try:
-        return session.scalars(stmt).all()
-    except SQLAlchemyError as e:
-        raise DatabaseOperationError(e) from e
+    return session.scalars(stmt).all()
 
 
 def get_user_book_attribute_by_book_id(
@@ -59,10 +52,7 @@ def get_user_book_attribute_by_book_id(
         .limit(limit)
         .offset(offset)
     )
-    try:
-        return session.scalars(stmt).all()
-    except SQLAlchemyError as e:
-        raise DatabaseOperationError(e) from e
+    return session.scalars(stmt).all()
 
 
 def update_user_book_attribute(

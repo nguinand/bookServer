@@ -1,5 +1,7 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.db.db_conn import db_manager
 from app.db.db_models import BookAccess
 from app.models.access_info import AccessInfoModel, FormatInfoModel
 
@@ -7,16 +9,16 @@ from app.models.access_info import AccessInfoModel, FormatInfoModel
 def create_access_info(access_info: AccessInfoModel, session: Session) -> BookAccess:
     access_info_data = BookAccess(**access_info.to_orm_dict())
     session.add(access_info_data)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return access_info_data
 
 
 def get_access_info_by_id(access_info_id: int, session: Session) -> BookAccess | None:
-    return session.query(BookAccess).filter_by(id=access_info_id).first()
+    return session.get(BookAccess, access_info_id)
 
 
 def get_access_info_by_book_id(book_id: int, session: Session) -> BookAccess | None:
-    return session.query(BookAccess).filter_by(id=book_id).first()
+    return session.scalars(select(BookAccess).where(BookAccess.book_id == book_id))
 
 
 def update_access_info(
@@ -46,7 +48,7 @@ def update_access_info(
 
     access_info_record.web_reader_link = access_info_replacement.web_reader_link
 
-    session.commit()
+    db_manager.commit_or_raise(session)
     return access_info_record
 
 
@@ -55,7 +57,7 @@ def delete_access_info(book_access_id: int, session: Session) -> bool:
     if not access_info:
         return False
     session.delete(access_info)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return True
 
 

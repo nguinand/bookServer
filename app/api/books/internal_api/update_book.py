@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from starlette import status
 from starlette.responses import JSONResponse
 
 from app.crud.book_crud import update_book_by_model
-from app.db.db_conn import DatabaseOperationError, db_manager
+from app.db.db_conn import db_manager
 from app.models.book import BookModel
 from app.utils.logger import get_logger
 
@@ -28,11 +28,6 @@ async def update_book(
             content = {f"Book not updated - {book_model.volume_info.title}"}
         return JSONResponse(status_code=status_code, content=content)
 
-    except DatabaseOperationError as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Unable to update book {book_model.volume_info.title} - {e}",
-        )
     except ValueError as e:
         logger.error(e)
         return JSONResponse(

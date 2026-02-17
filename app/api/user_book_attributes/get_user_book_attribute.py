@@ -10,7 +10,7 @@ from app.crud.user_book_attributes_crud import (
     get_user_book_attribute_by_id,
     get_user_book_attribute_by_user_id,
 )
-from app.db.db_conn import DatabaseOperationError, db_manager
+from app.db.db_conn import db_manager
 from app.models.user_book_attributes import UserBookAttributesModel
 from app.utils.logger import get_logger
 
@@ -29,13 +29,7 @@ router = APIRouter(prefix="/user_book_attributes", tags=["books-external"])
 async def user_book_attribute_by_id(
     attribute_id: int, session: Session = Depends(db_manager.get_db)
 ) -> UserBookAttributesModel:
-    try:
-        attribute_results = get_user_book_attribute_by_id(attribute_id, session)
-    except DatabaseOperationError:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"unable to fetch book attribute by attribute ID - {attribute_id}",
-        )
+    attribute_results = get_user_book_attribute_by_id(attribute_id, session)
     if attribute_results:
         return convert_user_book_attribute(attribute_results)
     raise HTTPException(
@@ -52,13 +46,7 @@ async def user_book_attribute_by_id(
 async def user_book_attribute_by_user_id(
     user_id: int, session: Session = Depends(db_manager.get_db)
 ) -> List[UserBookAttributesModel]:
-    try:
-        attribute_result = get_user_book_attribute_by_user_id(user_id, session)
-    except DatabaseOperationError:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"unable to fetch book attribute by user ID - {user_id}",
-        )
+    attribute_result = get_user_book_attribute_by_user_id(user_id, session)
     attributes = []
     for attribute in attribute_result:
         attributes.append(convert_user_book_attribute(attribute))
@@ -74,13 +62,7 @@ async def user_book_attribute_by_user_id(
 async def user_book_attribute_by_book_id(
     book_id: int, session: Session = Depends(db_manager.get_db)
 ) -> List[UserBookAttributesModel]:
-    try:
-        attribute_result = get_user_book_attribute_by_book_id(book_id, session)
-    except DatabaseOperationError:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"unable to fetch book attribute by book ID - {book_id}",
-        )
+    attribute_result = get_user_book_attribute_by_book_id(book_id, session)
     attributes = []
     for attribute in attribute_result:
         attributes.append(convert_user_book_attribute(attribute))

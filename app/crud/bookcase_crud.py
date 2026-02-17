@@ -1,7 +1,11 @@
+from typing import List
+
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.crud.model_conversions import convert_book_to_model
 from app.crud.shared_queries import get_book_by_book_id
+from app.db.db_conn import db_manager
 from app.db.db_models import Book, Bookcase
 from app.models.bookcase import BookcaseModel
 
@@ -16,22 +20,32 @@ def create_bookcase(bookcase_model: BookcaseModel, session: Session) -> Bookcase
 
     if bookcase_model.books:
         for book_model in bookcase_model.books:
-            book = session.query(Book).filter_by(id=book_model.book_id).first()
+            book = session.get(Book, book_model.book_id)
             if book:
                 bookcase_data.books.append(book)
 
     session.add(bookcase_data)
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(bookcase_data)
     return bookcase_data
 
 
 def get_bookcase_by_id(bookcase_id: int, session: Session) -> None | Bookcase:
-    return session.query(Bookcase).filter_by(id=bookcase_id).first()
+    return session.get(Bookcase, bookcase_id)
 
 
-def get_bookcase_by_user_id(user_id: int, session: Session) -> None | Bookcase:
-    return session.query(Bookcase).filter_by(user_id=user_id).first()
+def get_bookcases_by_user_id(
+    user_id: int, session: Session, limit: int = 100, offset: int = 0
+) -> List[Bookcase]:
+    # A user can have multiple bookshelves. So there may be multiple entries with the same user_id
+    stmt = (
+        select(Bookcase)
+        .where(Bookcase.user_id == user_id)
+        .order_by(Bookcase.id)
+        .limit(limit)
+        .offset(offset)
+    )
+    return session.scalars(stmt).all()
 
 
 def update_bookcase(
@@ -54,11 +68,11 @@ def update_bookcase(
 
         for book_model in bookcase_replacement.books:
             book = get_book_by_book_id(book_id=book_model.book_id, session=session)
-            book = session.query(Book).filter_by(id=book_model.book_id).first()
+            book = session.get(Book, book_model.book_id)
             if book:
                 bookcase_record.books.append(book)
 
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(bookcase_record)
     return bookcase_record
 
@@ -69,7 +83,7 @@ def delete_bookcase_by_id(bookcase_id: int, session: Session) -> bool:
         return False
 
     session.delete(bookcase_info)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return True
 
 

@@ -1,7 +1,9 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.crud.model_conversions import convert_book_to_model
 from app.crud.shared_queries import get_book_by_book_id
+from app.db.db_conn import db_manager
 from app.db.db_models.author import Author
 from app.models.author import AuthorModel
 
@@ -12,17 +14,24 @@ def create_author(author_model: AuthorModel, session: Session) -> AuthorModel:
     """
     author_data = Author(**author_model.model_dump(by_alias=True))
     session.add(author_data)
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(author_data)
     return author_data
 
 
-def get_author_by_name(name: str, session: Session) -> Author:
-    return session.query(Author).filter_by(name=name).first()
+def get_author_by_name(name: str, session: Session, limit=100, offset=0) -> Author:
+    stmt = (
+        select(Author)
+        .where(Author.name == name)
+        .order_by(Author.id)
+        .limit(limit)
+        .offset(offset)
+    )
+    return session.scalar(stmt).all()
 
 
-def get_author_by_id(id: int, session: Session) -> Author | None:
-    return session.query(Author).filter_by(id=id).first()
+def get_author_by_id(author_id: int, session: Session) -> Author | None:
+    return session.get(Author, author_id)
 
 
 def update_author(author_replacement: AuthorModel, session: Session) -> None | Author:
@@ -45,7 +54,7 @@ def update_author(author_replacement: AuthorModel, session: Session) -> None | A
         if book.book_id is not None
     ]
     author_record.books = author_replacement.books
-    session.commit()
+    db_manager.commit_or_raise(session)
 
     return author_record
 
@@ -57,7 +66,7 @@ def delete_author_by_id(author_id: int, session: Session) -> bool:
         return False  # could have returned an exception
 
     session.delete(author_record)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return True
 
 
@@ -68,13 +77,3 @@ def convert_author(author_data: Author) -> AuthorModel:
         name=author_data.name,
         books=[convert_book_to_model(book) for book in author_data.books],
     )
-
-
-# def resolve_author(author_name: str, session: Session) -> Author:
-#     if author := get_author_by_name(author_name, session): return author
-#
-#     # No overlap match found — create a new one
-#     new_author = Author(name=author_name)
-#     session.add(new_author)
-#     session.flush()
-#     return new_author

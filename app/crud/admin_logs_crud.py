@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.db.db_conn import db_manager
 from app.db.db_models import AdminLogs
 from app.models.admin_log import AdminLogsModel
 
@@ -7,13 +8,13 @@ from app.models.admin_log import AdminLogsModel
 def create_admin_logs(admin_log_model: AdminLogsModel, session: Session) -> AdminLogs:
     admin_log_data = AdminLogs(**admin_log_model.model_dump(by_alias=True))
     session.add(admin_log_data)
-    session.commit()
+    db_manager.commit_or_raise(session)
     session.refresh(admin_log_data)
     return admin_log_data
 
 
 def get_admin_logs_by_id(admin_log_id: int, session: Session) -> AdminLogs:
-    return session.query(AdminLogs).filter_by(id=admin_log_id).first()
+    return session.get(AdminLogs, admin_log_id)
 
 
 def update_admin_logs(
@@ -32,7 +33,7 @@ def update_admin_logs(
     admin_log_record.event_description = admin_log_replacement.event_description
     admin_log_record.event_type = admin_log_replacement.event_type
 
-    session.commit()
+    db_manager.commit_or_raise(session)
     return admin_log_record
 
 
@@ -42,7 +43,7 @@ def delete_admin_logs(admin_log_id: int, session: Session) -> bool:
         return False
 
     session.delete(admin_log)
-    session.commit()
+    db_manager.commit_or_raise(session)
     return True
 
 

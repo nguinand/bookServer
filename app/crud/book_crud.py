@@ -1,13 +1,12 @@
 from typing import List
 
 from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.crud.author_crud import create_author, get_author_by_name
 from app.crud.genre_crud import get_genre_by_name
 from app.crud.shared_queries import get_book_by_book_id
-from app.db.db_conn import DatabaseOperationError, db_manager
+from app.db.db_conn import db_manager
 from app.db.db_models import Book
 from app.db.db_models.author import Author
 from app.db.db_models.book_access import BookAccess
@@ -130,21 +129,13 @@ def get_books_by_title(
         .limit(limit)
         .offset(offset)
     )
-    try:
-        return session.scalars(stmt).all()
-    except SQLAlchemyError as e:
-        logger.error(e)
-        raise DatabaseOperationError(e) from e
+    return session.scalars(stmt).all()
 
 
 def get_book_by_google_id(google_id: str, session: Session) -> Book | None:
-    try:
-        return session.scalars(
-            select(Book).where(Book.google_books_id == google_id)
-        ).one_or_none()
-    except SQLAlchemyError as e:
-        logger.error(e)
-        raise DatabaseOperationError(e) from e
+    return session.scalars(
+        select(Book).where(Book.google_books_id == google_id)
+    ).one_or_none()
 
 
 def update_book_by_model(book_replacement: BookModel, session: Session) -> bool:
