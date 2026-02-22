@@ -27,7 +27,7 @@ def get_author_by_name(name: str, session: Session, limit=100, offset=0) -> Auth
         .limit(limit)
         .offset(offset)
     )
-    return session.scalar(stmt).all()
+    return session.scalars(stmt).one_or_none()
 
 
 def get_author_by_id(author_id: int, session: Session) -> Author | None:

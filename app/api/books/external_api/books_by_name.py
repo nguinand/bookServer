@@ -19,7 +19,7 @@ router = APIRouter(prefix="/books", tags=["books-external"])
 @router.get("/name/", response_model=List[BookModel], status_code=status.HTTP_200_OK)
 async def get_books_by_name(
     book_name: str, max_results: int = 10, start_index: int = 0
-) -> List[BookModel]:
+) -> List[BookModel] | JSONResponse:
     params = {
         "q": book_name,
         "startIndex": start_index,
