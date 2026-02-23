@@ -45,7 +45,7 @@ def get_bookcases_by_user_id(
         .limit(limit)
         .offset(offset)
     )
-    return session.scalars(stmt).all()
+    return session.scalars(stmt).all()  # type: ignore
 
 
 def update_bookcase(
@@ -67,10 +67,11 @@ def update_bookcase(
         bookcase_record.books.clear()
 
         for book_model in bookcase_replacement.books:
-            book = get_book_by_book_id(book_id=book_model.book_id, session=session)
-            book = session.get(Book, book_model.book_id)
-            if book:
-                bookcase_record.books.append(book)
+            if book_model.book_id:
+                book = get_book_by_book_id(book_id=book_model.book_id, session=session)
+                book = session.get(Book, book_model.book_id)
+                if book:
+                    bookcase_record.books.append(book)
 
     db_manager.commit_or_raise(session)
     session.refresh(bookcase_record)

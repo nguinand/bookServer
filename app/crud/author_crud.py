@@ -8,7 +8,7 @@ from app.db.db_models.author import Author
 from app.models.author import AuthorModel
 
 
-def create_author(author_model: AuthorModel, session: Session) -> AuthorModel:
+def create_author(author_model: AuthorModel, session: Session) -> Author:
     """
     Function that creates an entry in the Author table.
     """
@@ -19,7 +19,9 @@ def create_author(author_model: AuthorModel, session: Session) -> AuthorModel:
     return author_data
 
 
-def get_author_by_name(name: str, session: Session, limit=100, offset=0) -> Author:
+def get_author_by_name(
+    name: str, session: Session, limit=100, offset=0
+) -> Author | None:
     stmt = (
         select(Author)
         .where(Author.name == name)

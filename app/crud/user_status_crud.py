@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 def create_user_status(
     user_status_model: UserStatusModel, session: Session
 ) -> UserStatus:
-    user_status_data = UserStatusModel(
+    user_status_data = UserStatus(
         **user_status_model.model_dump(by_alias=True, exclude_unset=True)
     )
     session.add(user_status_data)

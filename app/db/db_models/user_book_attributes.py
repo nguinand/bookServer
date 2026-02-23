@@ -22,10 +22,10 @@ class UserBookAttributes(Base):
     )
     rating: Mapped[int] = mapped_column(Integer, nullable=False)
     review_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[Optional[datetime]] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
-    updated_at: Mapped[Optional[datetime]] = mapped_column(
+    updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMP,
         server_default=func.current_timestamp(),
         onupdate=func.current_timestamp(),

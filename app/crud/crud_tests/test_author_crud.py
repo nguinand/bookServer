@@ -1,15 +1,22 @@
+import os
 from unittest.mock import MagicMock
 
 import pytest
 from pydantic import ValidationError
 
-from app.crud.author_crud import AuthorCrud, AuthorModel
+# Avoid import-time db_manager initialization errors in unit tests.
+os.environ.setdefault("DATABASE_USERNAME", "test")
+os.environ.setdefault("DATABASE_PASSWORD", "test")
+os.environ.setdefault("DATABASE_URL", "localhost")
+os.environ.setdefault("DATABASE_NAME", "test")
+
+from app.crud import author_crud as crud
+from app.models.author import AuthorModel
 
 
 def test_create_author_commits():
     mock_session = MagicMock()
-    crud = AuthorCrud()
-    author = AuthorModel(name="Fake_author", google_books_id="123", bio="fake bio")
+    author = AuthorModel(name="Fake_author", bio="fake bio")
 
     created_author = crud.create_author(author, mock_session)
 
@@ -19,16 +26,15 @@ def test_create_author_commits():
 
     assert created_author
     assert created_author.name == "Fake_author"
-    assert created_author.google_books_id == "123"
     assert created_author.bio == "fake bio"
 
 
 @pytest.mark.parametrize(
     "input_data,should_raise",
     [
-        ({"name": "fake author", "google_books_id": "123", "bio": "fake_bio"}, False),
+        ({"name": "fake author", "bio": "fake_bio"}, False),
         ({"name": "fake _author"}, False),
-        ({"google_books_id": "123"}, True),  # Missing required field `name`
+        ({"bio": "fake_bio"}, True),  # Missing required field `name`
         ({"name": None}, True),  # `name` is required, cannot be None
     ],
 )

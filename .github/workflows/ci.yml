@@ -42,7 +42,6 @@ jobs:
 
       - name: Ty type check
         run: uv run ty check .
-        continue-on-error: true
 
   pytest:
     needs: [ruff, ty]

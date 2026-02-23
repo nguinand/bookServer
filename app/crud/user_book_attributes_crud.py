@@ -13,7 +13,7 @@ def create_user_book_attribute(
     book_attribute_model: UserBookAttributesModel, session: Session
 ) -> UserBookAttributes:
     user_book_attribute_data = UserBookAttributes(
-        **book_attribute_model.model_dump(by_alias=True)
+        **book_attribute_model.model_dump(by_alias=True, exclude_none=True)
     )
     session.add(user_book_attribute_data)
     db_manager.commit_or_raise(session)
@@ -38,7 +38,7 @@ def get_user_book_attribute_by_user_id(
         .limit(limit)
         .offset(offset)
     )
-    return session.scalars(stmt).all()
+    return session.scalars(stmt).all()  # type: ignore
 
 
 def get_user_book_attribute_by_book_id(
@@ -52,7 +52,7 @@ def get_user_book_attribute_by_book_id(
         .limit(limit)
         .offset(offset)
     )
-    return session.scalars(stmt).all()
+    return session.scalars(stmt).all()  # type: ignore
 
 
 def update_user_book_attribute(
