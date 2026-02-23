@@ -9,13 +9,13 @@ class AuthorModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int | None = Field(
-        None,
+        default=None,
         description="The id of the author. Most likely from the database",
         gt=0,
         examples=[1, 2],
     )
     bio: str | None = Field(
-        None,
+        default=None,
         description="The biography or description of the author.",
         examples=["J.K Rowling was a good writer"],
     )

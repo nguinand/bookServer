@@ -17,7 +17,7 @@ class UserStatus(Base):
     # Numeric rank
     level: Mapped[int] = mapped_column(Integer, unique=True, nullable=False)
     # Optional description of perks
-    benefits: Mapped[Optional[Text]] = mapped_column(Text, nullable=True)
+    benefits: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Reverse relationship to User
     users = relationship("User", back_populates="status")

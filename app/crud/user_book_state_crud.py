@@ -34,7 +34,7 @@ def get_user_book_states_by_user_id(
         .limit(limit)
         .offset(offset)
     )
-    return session.scalars(stmt).all()
+    return session.scalars(stmt).all()  # type: ignore
 
 
 def get_user_book_state_by_user_and_book(
@@ -47,7 +47,7 @@ def get_user_book_state_by_user_and_book(
         .limit(limit)
         .offset(offset)
     )
-    return session.scalars(stmt).all()
+    return session.scalars(stmt).all()  # type: ignore
 
 
 def update_user_book_state(

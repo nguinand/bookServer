@@ -52,7 +52,7 @@ class DatabaseManager:
         """
         return self.SessionLocal()
 
-    def get_db(self) -> Session:
+    def get_db(self) -> Session | Generator:
         session = self.session
         try:
             yield session
@@ -66,7 +66,7 @@ class DatabaseManager:
         except (IntegrityError, SQLAlchemyError) as e:
             session.rollback()
             logger.error(e)
-            raise DatabaseOperationError(e.orig) from e
+            raise DatabaseOperationError(e) from e
 
 
 # Singleton instance

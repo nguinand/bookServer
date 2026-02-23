@@ -129,7 +129,7 @@ def get_books_by_title(
         .limit(limit)
         .offset(offset)
     )
-    return session.scalars(stmt).all()
+    return session.scalars(stmt).all()  # type: ignore
 
 
 def get_book_by_google_id(google_id: str, session: Session) -> Book | None:

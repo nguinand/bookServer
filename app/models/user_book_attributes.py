@@ -24,14 +24,14 @@ class UserBookAttributesModel(BaseModel):
     rating: int = Field(
         description="Book rating given by the user", examples=[0, 5, 10], ge=0, lt=10
     )
-    review_text: str = Field("", description="The review test for the book.")
-    created_at: datetime = Field(
-        datetime.now(),
+    review_text: str | None = Field("", description="The review test for the book.")
+    created_at: datetime | None = Field(
+        None,
         description="Date and time when the attribute was created.",
         examples=[datetime(2020, 1, 1)],
     )
-    updated_at: datetime = Field(
-        datetime.now(),
+    updated_at: datetime | None = Field(
+        None,
         description="Date and time when the attribute updated.",
         examples=[datetime(2020, 1, 1)],
     )

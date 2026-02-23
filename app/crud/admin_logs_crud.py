@@ -13,7 +13,7 @@ def create_admin_logs(admin_log_model: AdminLogsModel, session: Session) -> Admi
     return admin_log_data
 
 
-def get_admin_logs_by_id(admin_log_id: int, session: Session) -> AdminLogs:
+def get_admin_logs_by_id(admin_log_id: int, session: Session) -> AdminLogs | None:
     return session.get(AdminLogs, admin_log_id)
 
 

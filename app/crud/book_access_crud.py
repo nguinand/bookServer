@@ -18,7 +18,7 @@ def get_access_info_by_id(access_info_id: int, session: Session) -> BookAccess |
 
 
 def get_access_info_by_book_id(book_id: int, session: Session) -> BookAccess | None:
-    return session.scalars(select(BookAccess).where(BookAccess.book_id == book_id))
+    return session.scalars(select(BookAccess).where(BookAccess.book_id == book_id))  # type: ignore
 
 
 def update_access_info(
@@ -33,14 +33,14 @@ def update_access_info(
     access_info_record.public_domain = access_info_replacement.public_domain
 
     if access_info_replacement.epub is None:
-        access_info_record.epub_available = None
+        access_info_record.epub_available = False
         access_info_record.epub_token_link = None
     else:
         access_info_record.epub_available = access_info_replacement.epub.isAvailable
         access_info_record.epub_token_link = access_info_replacement.epub.acsTokenLink
 
     if access_info_replacement.pdf is None:
-        access_info_record.pdf_available = None
+        access_info_record.pdf_available = False
         access_info_record.pdf_token_link = None
     else:
         access_info_record.pdf_available = access_info_replacement.pdf.isAvailable

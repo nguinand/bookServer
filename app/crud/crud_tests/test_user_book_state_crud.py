@@ -1,7 +1,14 @@
+import os
 from typing import Generator
 from unittest.mock import MagicMock, Mock
 
 import pytest
+
+# Avoid import-time db_manager initialization errors in unit tests.
+os.environ.setdefault("DATABASE_USERNAME", "test")
+os.environ.setdefault("DATABASE_PASSWORD", "test")
+os.environ.setdefault("DATABASE_URL", "localhost")
+os.environ.setdefault("DATABASE_NAME", "test")
 
 from app.crud import user_book_state_crud as crud
 from app.db.db_models.user_book_state import ReadingStatus, UserBookState
@@ -33,11 +40,22 @@ def replacement_model() -> UserBookStateModel:
         reading_status=ReadingStatus.READING,
         current_page=30,
         percent_complete=40,
+        started_at=None,
+        finished_at=None,
     )
 
 
 def test_create_user_book_state_commits(session: MagicMock) -> None:
-    model = UserBookStateModel(user_id=1, book_id=2)
+    model = UserBookStateModel(
+        id=1,
+        user_id=1,
+        book_id=2,
+        reading_status=ReadingStatus.WANT_TO_READ,
+        current_page=0,
+        percent_complete=0,
+        started_at=None,
+        finished_at=None,
+    )
 
     created = crud.create_user_book_state(model, session)
 
@@ -50,7 +68,16 @@ def test_create_user_book_state_commits(session: MagicMock) -> None:
 
 
 def test_update_user_book_state_raises_without_id(session: MagicMock) -> None:
-    model = UserBookStateModel(user_id=1, book_id=2)
+    model = UserBookStateModel.model_construct(
+        id=None,
+        user_id=1,
+        book_id=2,
+        reading_status=ReadingStatus.WANT_TO_READ,
+        current_page=0,
+        percent_complete=0,
+        started_at=None,
+        finished_at=None,
+    )
 
     with pytest.raises(ValueError):
         crud.update_user_book_state(model, session)

@@ -18,7 +18,7 @@ class BookSaleInfo(Base):
     )
     country: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
     saleability: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
-    is_ebook: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
+    is_ebook: Mapped[bool] = mapped_column(Boolean, default=False)
     buy_link: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     list_price: Mapped[Optional[Decimal]] = mapped_column(DECIMAL(10, 2), nullable=True)
     list_price_currency_code: Mapped[Optional[str]] = mapped_column(

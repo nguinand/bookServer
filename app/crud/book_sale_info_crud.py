@@ -58,7 +58,8 @@ def update_book_sale_info(
         return None
 
     book_sale_info_record.id = book_sale_info_replacement.id
-    book_sale_info_record.book_id = book_sale_info_replacement.book_id
+    if book_id := book_sale_info_replacement.book_id:
+        book_sale_info_record.book_id = book_id
     book_sale_info_record.country = book_sale_info_replacement.country
     book_sale_info_record.saleability = book_sale_info_replacement.saleability
     book_sale_info_record.is_ebook = book_sale_info_replacement.is_ebook
