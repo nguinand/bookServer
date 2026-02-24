@@ -21,5 +21,7 @@ async def delete_user_book_attribute(
 ) -> JSONResponse:
     deleted = delete_user_book_attribute_by_id(attribute_id, session)
 
-    content = {"user_attribute_id": attribute_id, "deleted": deleted}
-    return JSONResponse(status_code=status.HTTP_200_OK, content=content)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"user_attribute_id": attribute_id, "deleted": deleted},
+    )
