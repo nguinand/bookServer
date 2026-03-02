@@ -52,14 +52,11 @@ async def user_book_attribute_by_user_id(
     attribute_result = get_user_book_attribute_by_user_id(
         user_id, session, limit, offset
     )
-    attributes = []
-    for attribute in attribute_result:
-        attributes.append(convert_user_book_attribute(attribute))
-    return attributes
+    return [convert_user_book_attribute(attribute) for attribute in attribute_result]
 
 
 @router.get(
-    "/book_attribute_by_book_id/{book_id}",
+    "/book_attribute_by_book_id/",
     tags=["User Book Attributes"],
     response_model=List[UserBookAttributesModel],
     status_code=status.HTTP_200_OK,
@@ -68,7 +65,4 @@ async def user_book_attribute_by_book_id(
     book_id: int, session: Session = Depends(db_manager.get_db)
 ) -> List[UserBookAttributesModel]:
     attribute_result = get_user_book_attribute_by_book_id(book_id, session)
-    attributes = []
-    for attribute in attribute_result:
-        attributes.append(convert_user_book_attribute(attribute))
-    return attributes
+    return [convert_user_book_attribute(attribute) for attribute in attribute_result]
