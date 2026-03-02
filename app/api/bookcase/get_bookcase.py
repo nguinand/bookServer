@@ -35,7 +35,7 @@ async def bookcase_by_id(
 
 
 @router.get(
-    "/bookcases_by_user_id/{user_id}",
+    "/bookcases_by_user_id/",
     response_model=List[BookcaseModel],
     status_code=status.HTTP_200_OK,
 )

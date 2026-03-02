@@ -27,10 +27,7 @@ async def books_by_title(
     session: Session = Depends(db_manager.get_db),
 ) -> List[BookModel]:
     books_result = get_books_by_title(title, session, limit, offset)
-    books = []
-    for book in books_result:
-        books.append(convert_book_to_model(book))
-    return books
+    return [convert_book_to_model(book) for book in books_result]
 
 
 @router.get(
