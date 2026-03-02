@@ -34,7 +34,7 @@ async def update_bookcase(
     if updated_bookcase:
         return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content={f"Updated bookcase - {bookcase_replacement.name}"},
+            content={"detail": f"Updated bookcase - {bookcase_replacement.name}"},
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,

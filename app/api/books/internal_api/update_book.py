@@ -29,7 +29,7 @@ async def update_book(
     if books_result:
         return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content={f"Updated book - {book_model.volume_info.title}"},
+            content={"detail": f"Updated book - {book_model.volume_info.title}"},
         )
 
     raise HTTPException(
