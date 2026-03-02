@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.api.bookcase.router import router as bookcase_route
 from app.api.books.router import router as book_route
 from app.api.user_book_attributes.router import router as user_book_attributes
 from app.db.db_conn import DatabaseOperationError
@@ -15,6 +16,7 @@ app = FastAPI()
 
 app.include_router(book_route, prefix="/api")
 app.include_router(user_book_attributes, prefix="/api")
+app.include_router(bookcase_route, prefix="/api")
 
 
 @app.exception_handler(DatabaseOperationError)

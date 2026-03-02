@@ -55,7 +55,7 @@ def get_user_book_attribute_by_book_id(
     return session.scalars(stmt).all()  # type: ignore
 
 
-def update_user_book_attribute(
+def update_user_book_attribute_entry(
     book_attribute_replacement: UserBookAttributesModel, session: Session
 ) -> bool:
     if book_attribute_replacement.id is None:

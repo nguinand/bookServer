@@ -14,12 +14,12 @@ repos:
 
 
 
-#repos:
-#  - repo: local
-#    hooks:
-#      - id: ty
-#        name: ty (uvx)
-#        entry: uvx ty check .
-#        language: system
-#        pass_filenames: false
+repos:
+ - repo: local
+   hooks:
+     - id: ty
+       name: ty
+       entry: ty check app/
+       language: system
+       pass_filenames: false
 

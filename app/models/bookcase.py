@@ -7,7 +7,8 @@ from app.models.book import BookModel
 
 class BookcaseModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int = Field(
+    id: int | None = Field(
+        default=None,
         gt=0,
         description="The id of the bookcase. Most likely from the database",
         examples=[99],

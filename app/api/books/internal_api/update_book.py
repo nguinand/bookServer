@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette import status
 from starlette.responses import JSONResponse
@@ -20,19 +20,19 @@ async def update_book(
         books_result = update_book_by_model(
             book_replacement=book_model, session=session
         )
-        if books_result:
-            status_code = status.HTTP_200_OK
-            content = {f"Updated book - {book_model.volume_info.title}"}
-        else:
-            status_code = status.HTTP_204_NO_CONTENT
-            content = {f"Book not updated - {book_model.volume_info.title}"}
-        return JSONResponse(status_code=status_code, content=content)
-
     except ValueError as e:
         logger.error(e)
-        return JSONResponse(
-            status_code=422,
-            content={
-                "book_id is required to update database entry for a book.": str(e)
-            },
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
         )
+
+    if books_result:
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"detail": f"Updated book - {book_model.volume_info.title}"},
+        )
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Book not found - {book_model.volume_info.title}",
+    )
