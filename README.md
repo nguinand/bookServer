@@ -1,82 +1,140 @@
 # bookServer
 
-FastAPI service for managing a user's book library and for querying the Google Books API.
+FastAPI service for managing a user's book library and querying Google Books.
+
+## Tech Stack
+- Python 3.12+ (CI runs on 3.13)
+- FastAPI
+- SQLAlchemy + MySQL (`mysqlclient`)
+- Alembic migrations
+- Ruff, Ty, pytest
 
 ## Features
-- External search endpoints for Google Books (by name, ISBN, or generic search)
-- Internal database CRUD endpoints for books
-- SQLAlchemy ORM with MySQL
-- Alembic migrations
+- External Google Books search endpoints
+- Internal database CRUD operations
 
-## Requirements
+## Prerequisites
 - Python 3.12+
-- MySQL
+- MySQL server
+- `uv`
+- System libraries required by `mysqlclient`
 
-## Setup
-Dependencies are defined in `pyproject.toml`.
+## Quick Start
+1. Install dependencies.
 
-Example install options:
 ```bash
-# If you use uv
-uv sync
-
-# Or with pip
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
+uv sync --dev
 ```
 
-## Environment variables
-These are read at runtime (see `app/db/db_conn.py` and `app/api/books/external_api/__init__.py`):
+2. Create a `.env` in the project root.
 
-```
-DATABASE_USERNAME=...
-DATABASE_PASSWORD=...
-DATABASE_URL=localhost:3306
-DATABASE_NAME=...
-GOOGLE_BOOKS_API_URL=https://www.googleapis.com/books/v1/volumes
-GOOGLE_BOOKS_API_KEY=...
-```
-
-Note: `GOOGLE_BOOKS_API_URL` must include the `http://` or `https://` scheme.
-
-## Migrations
 ```bash
-alembic upgrade head
+PYTHONPATH=.
+export DATABASE_URL="127.0.0.1"
+export DATABASE_NAME="books_server"
+export DATABASE_USERNAME="your_username"
+export DATABASE_PASSWORD="your_password"
+export DATABASE_CONNECTION_STRING="mysql+mysqldb://your_username:your_password@127.0.0.1/books_server"
+export GOOGLE_BOOKS_API_URL="https://www.googleapis.com/books/v1/volumes"
+export GOOGLE_BOOKS_API_KEY="your_google_books_api_key"
 ```
 
-To create a new migration:
+3. Load environment variables.
+
 ```bash
-alembic revision --autogenerate -m "your message"
+source .env
 ```
 
-## Run the app
+4. Run database migrations.
+
 ```bash
-uvicorn app.main:app --reload
+uv run alembic upgrade heads
 ```
 
-API docs:
+5. Start the API server.
+
+```bash
+uv run uvicorn app.main:app --reload
+```
+
+## API Docs
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
 
-## API Endpoints (high level)
-Base prefix: `/api`
+## Route Overview
+All routes are mounted under `/api`.
 
-### External (Google Books)
-- `GET /api/books/name/` (query params: `book_name`, `max_results`, `start_index`)
-- `GET /api/books/books_by_isbn/` (query params: `isbn`, `max_results`, `start_index`)
-- `GET /api/books/generic/` (query params: `search_type`, `val`, `max_results`, `start_index`)
+### External Google Books
+| Method | Path | Query Params |
+|---|---|---|
+| GET | `/api/books/name/` | `book_name`, `max_results`, `start_index` |
+| GET | `/api/books/books_by_isbn/` | `isbn`, `max_results`, `start_index` |
+| GET | `/api/books/generic/` | `search_type` (`author`, `publisher`, `isbn`, `subject`), `val`, `max_results`, `start_index` |
 
-### Internal (Database)
-- `POST /api/database/create_book/`
-- `POST /api/database/update_book/`
-- `DELETE /api/database/delete_book/{book_id}`
-- `GET /api/database/books_by_title/{title}`
-- `GET /api/database/books_by_google_id/{google_id}`
-- `GET /api/database/books_by_book_id/{book_id}`
+### Internal Books (DB)
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/database/create_book/` | Body: `BookModel` |
+| POST | `/api/database/update_book/` | Body: `BookModel` |
+| DELETE | `/api/database/delete_book/{book_id}` | Deletes by `book_id` |
+| GET | `/api/database/books_by_title/` | Query: `title`, `limit`, `offset` |
+| GET | `/api/database/books_by_google_id/{google_id}` | Lookup by Google ID |
+| GET | `/api/database/books_by_book_id/{book_id}` | Lookup by DB `book_id` |
 
-## Tests and linting
+### Bookcases (DB)
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/database/create_bookcase/` | Body: `BookcaseModel` |
+| POST | `/api/database/update_bookcase/` | Body: `BookcaseModel` |
+| DELETE | `/api/database/delete_bookcase/{bookcase_id}` | Deletes by `bookcase_id` |
+| GET | `/api/database/bookcase_by_id/{bookcase_id}` | Single bookcase |
+| GET | `/api/database/bookcases_by_user_id/` | Query: `user_id`, `limit`, `offset` |
+
+### User Book Attributes (DB)
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/user_book_attributes/create_user_book_attribute/` | Body: `UserBookAttributesModel` |
+| POST | `/api/update_book_attribute` | Body: `UserBookAttributesModel` |
+| DELETE | `/api/user_book_attributes/delete_user_book_attribute/{attribute_id}` | Deletes by `attribute_id` |
+| GET | `/api/user_book_attributes/book_attribute_by_id/{attribute_id}` | Single attribute |
+| GET | `/api/user_book_attributes/book_attribute_by_user_id/` | Query: `user_id`, `limit`, `offset` |
+| GET | `/api/user_book_attributes/book_attribute_by_book_id/` | Query: `book_id` |
+
+## Development Commands
+Run these from the project root.
+
 ```bash
-pytest
-ruff .
+uv run ruff format --check app/
+uv run ruff check app/
+uv run ty check app/
+uv run pytest -q
 ```
+
+## Pre-commit
+```bash
+uv run pre-commit install
+uv run pre-commit run --all-files
+```
+
+## Migrations
+Create a migration:
+
+```bash
+uv run alembic revision --autogenerate -m "describe change"
+```
+
+Apply migrations:
+
+```bash
+uv run alembic upgrade heads
+```
+
+Current revision:
+
+```bash
+uv run alembic current
+```
+
+## Notes
+- Keep secrets out of version control.
+- `DATABASE_CONNECTION_STRING` is required by Alembic.
