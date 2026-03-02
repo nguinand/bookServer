@@ -48,15 +48,13 @@ def get_bookcases_by_user_id(
     return session.scalars(stmt).all()  # type: ignore
 
 
-def update_bookcase(
-    bookcase_replacement: BookcaseModel, session: Session
-) -> None | Bookcase:
+def update_bookcase(bookcase_replacement: BookcaseModel, session: Session) -> bool:
     if bookcase_replacement.id is None:
         raise ValueError("bookcase_replacement must have an id")
 
     bookcase_record = get_bookcase_by_id(bookcase_replacement.id, session)
     if not bookcase_record:
-        return None
+        return False
 
     bookcase_record.name = bookcase_replacement.name
     bookcase_record.created_at = bookcase_replacement.created_at
@@ -75,7 +73,7 @@ def update_bookcase(
 
     db_manager.commit_or_raise(session)
     session.refresh(bookcase_record)
-    return bookcase_record
+    return True
 
 
 def delete_bookcase_by_id(bookcase_id: int, session: Session) -> bool:
