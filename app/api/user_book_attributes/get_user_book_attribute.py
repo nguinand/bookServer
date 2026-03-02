@@ -44,9 +44,14 @@ async def user_book_attribute_by_id(
     status_code=status.HTTP_200_OK,
 )
 async def user_book_attribute_by_user_id(
-    user_id: int, session: Session = Depends(db_manager.get_db)
+    user_id: int,
+    limit: int = 100,
+    offset: int = 0,
+    session: Session = Depends(db_manager.get_db),
 ) -> List[UserBookAttributesModel]:
-    attribute_result = get_user_book_attribute_by_user_id(user_id, session)
+    attribute_result = get_user_book_attribute_by_user_id(
+        user_id, session, limit, offset
+    )
     attributes = []
     for attribute in attribute_result:
         attributes.append(convert_user_book_attribute(attribute))
