@@ -38,7 +38,7 @@ async def user_book_attribute_by_id(
 
 
 @router.get(
-    "/book_attribute_by_user_id/{user_id}",
+    "/book_attribute_by_user_id/",
     tags=["User Book Attributes"],
     response_model=List[UserBookAttributesModel],
     status_code=status.HTTP_200_OK,
