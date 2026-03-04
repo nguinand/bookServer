@@ -25,7 +25,7 @@ def get_user_by_id(user_id: int, session: Session) -> None | User:
     return session.get(User, user_id)
 
 
-def get_users_by_email(email: str, session: Session) -> None | list[User]:
+def get_users_by_email(email: str, session: Session) -> None | User:
     stmt = select(User).where(User.email == email)
     return session.scalars(stmt).one_or_none()
 
