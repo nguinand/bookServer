@@ -1,8 +1,8 @@
 import uvicorn
+from uuid import uuid4
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.bookcase.router import router as bookcase_route
 from app.api.books.router import router as book_route
@@ -23,9 +23,21 @@ app.include_router(user_router, prefix=prefix)
 
 
 @app.exception_handler(DatabaseOperationError)
-async def sqlalchemy_error_handler(request: Request, exc: SQLAlchemyError):
-    logger.exception("Database error")
-    return JSONResponse(status_code=500, content={"detail": "Database error"})
+async def sqlalchemy_error_handler(request: Request, exc: DatabaseOperationError):
+    error_id = str(uuid4())
+    logger.exception(
+        "Database error [error_id=%s] method=%s path=%s",
+        error_id,
+        request.method,
+        request.url.path,
+    )
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "A database error occurred. Please try again later.",
+            "error_id": error_id,
+        },
+    )
 
 
 @app.get("/")
