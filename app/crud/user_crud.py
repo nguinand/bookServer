@@ -7,16 +7,32 @@ from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.user import UserModel
 from app.utils.logger import get_logger
+from passlib.context import CryptContext
 
 logger = get_logger(__name__)
 
 
-def create_user(user_model: UserModel, session: Session) -> User:
+def create_user(user_model: UserModel, password: str, session: Session) -> User:
     user_data = User(**user_model.model_dump(by_alias=True, exclude_unset=True))
+    user_data.password_hash = hash_password(password)
     session.add(user_data)
     db_manager.commit_or_raise(session)
     session.refresh(user_data)
     return user_data
+
+
+def hash_password(password: str) -> str:
+    password_context = CryptContext(schemes=["argon2"], deprecated="auto")
+    return password_context.hash(password)
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    password_context = CryptContext(schemes=["argon2"], deprecated="auto")
+    try:
+        return password_context.verify(plain_password, hashed_password)
+    except ValueError:
+        logger.error("malformed argon2 hash.")
+        return False
 
 
 def get_user_by_id(user_id: int, session: Session) -> None | User:
@@ -47,7 +63,6 @@ def update_user(user_replacement: UserModel, session: Session) -> None | User:
     user_record.last_name = user_replacement.last_name
     user_record.username = user_replacement.username
     user_record.email = user_replacement.email
-    user_record.password_hash = user_replacement.password_hash
     user_record.role = user_replacement.role
     user_record.last_login = user_replacement.last_login
 

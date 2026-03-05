@@ -17,9 +17,6 @@ class UserModel(BaseModel):
     email: EmailStr = Field(
         description="The email address of the user", examples=["jdoe@gmail.com"]
     )
-    password_hash: str = Field(
-        description="The hashed password", examples=["qwerascvatgwerdy132412t3546r"]
-    )  # I put random text here in the example.
     role: Literal["user", "admin"] = Field(
         default="user", description="The role of the user", examples=["user", "admin"]
     )
@@ -39,3 +36,8 @@ class UserModel(BaseModel):
         description="The time the user last logged in",
         examples=[datetime(2020, 1, 1)],
     )
+
+
+class CreateUserRequest(BaseModel):
+    user_model: UserModel
+    password: str
