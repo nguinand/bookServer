@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from starlette import status
 from starlette.responses import JSONResponse
 
 from app.crud.book_crud import update_book_by_model
@@ -23,7 +22,7 @@ async def update_book(
     except ValueError as e:
         logger.error(e)
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e)
         )
 
     if books_result:

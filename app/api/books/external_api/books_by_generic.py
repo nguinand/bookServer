@@ -2,10 +2,9 @@ from enum import Enum
 from typing import List
 
 import httpx
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-from starlette import status
 
 from app.api.books.external_api import BooksRequestError, api_key, book_api_request
 from app.models.book import BookModel
@@ -56,7 +55,7 @@ async def get_books_by_generic(
             except (ValidationError, TypeError) as e:
                 logger.error(f"Validation error building BookModel: {str(e)}")
                 return JSONResponse(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                     content={"error": "Validation error", "detail": str(e)},
                 )
         return books

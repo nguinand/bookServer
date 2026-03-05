@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from starlette import status
+from fastapi import status
 
 from app.crud.bookcase_crud import (
     convert_bookcase,
