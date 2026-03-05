@@ -7,16 +7,19 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.api.bookcase.router import router as bookcase_route
 from app.api.books.router import router as book_route
 from app.api.user_book_attributes.router import router as user_book_attributes
+from app.api.users.router import router as user_router
 from app.db.db_conn import DatabaseOperationError
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
+prefix = "/api"
 
 app = FastAPI()
 
-app.include_router(book_route, prefix="/api")
-app.include_router(user_book_attributes, prefix="/api")
-app.include_router(bookcase_route, prefix="/api")
+app.include_router(book_route, prefix=prefix)
+app.include_router(user_book_attributes, prefix=prefix)
+app.include_router(bookcase_route, prefix=prefix)
+app.include_router(user_router, prefix=prefix)
 
 
 @app.exception_handler(DatabaseOperationError)
