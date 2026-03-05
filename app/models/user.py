@@ -6,7 +6,9 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 class UserModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int = Field(description="The id of the user", examples=[1234], gt=0)
+    id: int | None = Field(
+        default=None, description="The id of the user", examples=[1234], gt=0
+    )
     first_name: str = Field(
         description="The first name of the user", examples=["John", "Jane"]
     )
