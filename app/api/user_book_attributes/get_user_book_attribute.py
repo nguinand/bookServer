@@ -1,8 +1,7 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from starlette import status
 
 from app.crud.user_book_attributes_crud import (
     convert_user_book_attribute,

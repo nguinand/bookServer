@@ -1,8 +1,7 @@
 from sqlite3 import DatabaseError
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from starlette import status
 
 from app.crud.user_book_attributes_crud import create_user_book_attribute
 from app.db.db_conn import db_manager

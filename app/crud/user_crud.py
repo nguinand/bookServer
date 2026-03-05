@@ -12,9 +12,7 @@ logger = get_logger(__name__)
 
 
 def create_user(user_model: UserModel, session: Session) -> User:
-    user_data = User(
-        **user_model.model_dump(by_alias=True, exclude_unset=True)
-    )  # verify this
+    user_data = User(**user_model.model_dump(by_alias=True, exclude_unset=True))
     session.add(user_data)
     db_manager.commit_or_raise(session)
     session.refresh(user_data)
@@ -25,7 +23,7 @@ def get_user_by_id(user_id: int, session: Session) -> None | User:
     return session.get(User, user_id)
 
 
-def get_users_by_email(email: str, session: Session) -> None | list[User]:
+def get_users_by_email(email: str, session: Session) -> None | User:
     stmt = select(User).where(User.email == email)
     return session.scalars(stmt).one_or_none()
 

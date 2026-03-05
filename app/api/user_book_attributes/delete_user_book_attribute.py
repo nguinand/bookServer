@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from starlette import status
 from starlette.responses import JSONResponse
 
 from app.crud.user_book_attributes_crud import delete_user_book_attribute_by_id
