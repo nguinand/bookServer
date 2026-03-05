@@ -12,9 +12,7 @@ logger = get_logger(__name__)
 
 
 def create_user(user_model: UserModel, session: Session) -> User:
-    user_data = User(
-        **user_model.model_dump(by_alias=True, exclude_unset=True)
-    )  # verify this
+    user_data = User(**user_model.model_dump(by_alias=True, exclude_unset=True))
     session.add(user_data)
     db_manager.commit_or_raise(session)
     session.refresh(user_data)
