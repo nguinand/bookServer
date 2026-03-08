@@ -6,13 +6,16 @@ from app.crud.user_status_crud import get_user_status_by_id
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.user import UserModel
+from app.utils.authentication import PasswordHandler
 from app.utils.logger import get_logger
+# from passlib.context import CryptContext
 
 logger = get_logger(__name__)
 
 
-def create_user(user_model: UserModel, session: Session) -> User:
+def create_user(user_model: UserModel, password: str, session: Session) -> User:
     user_data = User(**user_model.model_dump(by_alias=True, exclude_unset=True))
+    user_data.password_hash = PasswordHandler.hash_password(password)
     session.add(user_data)
     db_manager.commit_or_raise(session)
     session.refresh(user_data)
@@ -47,7 +50,6 @@ def update_user(user_replacement: UserModel, session: Session) -> None | User:
     user_record.last_name = user_replacement.last_name
     user_record.username = user_replacement.username
     user_record.email = user_replacement.email
-    user_record.password_hash = user_replacement.password_hash
     user_record.role = user_replacement.role
     user_record.last_login = user_replacement.last_login
 

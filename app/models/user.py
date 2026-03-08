@@ -1,7 +1,27 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StrictBool
+
+
+class UserPasswordRequest(BaseModel):
+    user_id: int = Field(description="The id of the user", gt=0, examples=[1234])
+    password: str = Field(
+        description="The plaintext password", examples=["Apple"], min_length=7
+    )
+
+
+class UserPasswordResponse(BaseModel):
+    user_id: int = Field(description="The id of the user", gt=0, examples=[1234])
+    valid: StrictBool = Field(
+        description="Whether or not the password operation was performed and correct.",
+        examples=[True, False],
+    )
+    details: str = Field(
+        "",
+        description="A custom response message.",
+        examples=["Password authenticated!", "Password updated!"],
+    )
 
 
 class UserModel(BaseModel):
@@ -17,9 +37,6 @@ class UserModel(BaseModel):
     email: EmailStr = Field(
         description="The email address of the user", examples=["jdoe@gmail.com"]
     )
-    password_hash: str = Field(
-        description="The hashed password", examples=["qwerascvatgwerdy132412t3546r"]
-    )  # I put random text here in the example.
     role: Literal["user", "admin"] = Field(
         default="user", description="The role of the user", examples=["user", "admin"]
     )
@@ -38,4 +55,11 @@ class UserModel(BaseModel):
         datetime.now(),
         description="The time the user last logged in",
         examples=[datetime(2020, 1, 1)],
+    )
+
+
+class CreateUserRequest(BaseModel):
+    user_model: UserModel = Field(description="The user pydantic model")
+    password: str = Field(
+        description="Plaintext password.", examples=["Apple"], min_length=7
     )
