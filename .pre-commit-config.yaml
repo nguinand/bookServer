@@ -19,7 +19,7 @@ repos:
    hooks:
      - id: ty
        name: ty
-       entry: ty check app/
+       entry: uv run ty check app/
        language: system
        pass_filenames: false
 
