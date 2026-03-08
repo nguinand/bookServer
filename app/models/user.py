@@ -6,7 +6,9 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, StrictBool
 
 class UserPasswordRequest(BaseModel):
     user_id: int = Field(description="The id of the user", gt=0, examples=[1234])
-    password: str = Field(description="The plaintext password", examples=["Apple"])
+    password: str = Field(
+        description="The plaintext password", examples=["Apple"], min_length=7
+    )
 
 
 class UserPasswordResponse(BaseModel):
