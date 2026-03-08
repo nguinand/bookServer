@@ -1,7 +1,20 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StrictBool
+
+
+class UserPasswordRequest(BaseModel):
+    user_id: int = Field(description="The id of the user", gt=0, examples=[1234])
+    password: str = Field(description="The plaintext password", examples=["Apple"])
+
+
+class UserPasswordResponse(BaseModel):
+    user_id: int = Field(description="The id of the user", gt=0, examples=[1234])
+    valid: StrictBool = Field(
+        description="Whether or not the password was valid and correct.",
+        examples=[True, False],
+    )
 
 
 class UserModel(BaseModel):
