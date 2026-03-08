@@ -17,7 +17,9 @@ class Authenticator(BaseModel):
     def verify_password(self, session: Session) -> bool:
         pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
         hashed_password = self._get_user_hashed_password(session)
-        return pwd_context.verify(self.password, hashed_password)
+        if hashed_password:
+            return pwd_context.verify(self.password, hashed_password)
+        return False
 
     def _get_user_hashed_password(self, session: Session) -> None | str:
         stmt = select(User.password_hash).where(User.id == self.id)
