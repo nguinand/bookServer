@@ -17,11 +17,11 @@ router = APIRouter(prefix="/authenticate", tags=["users-password"])
     status_code=status.HTTP_200_OK,
 )
 async def authenticate_user(
-    userPasswordRequest: UserPasswordRequest,
+    user_password_request: UserPasswordRequest,
     session: Session = Depends(db_manager.get_db),
 ) -> UserPasswordResponse:
-    user_id = userPasswordRequest.user_id
-    password = userPasswordRequest.password
+    user_id = user_password_request.user_id
+    password = user_password_request.password
     authenticator = Authenticator(id=user_id, password=password)
-    verfied_password = authenticator.verify_password(session=session)
-    return UserPasswordResponse(user_id=user_id, valid=verfied_password)
+    verified_password = authenticator.verify_password(session=session)
+    return UserPasswordResponse(user_id=user_id, valid=verified_password)
