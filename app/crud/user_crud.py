@@ -6,24 +6,20 @@ from app.crud.user_status_crud import get_user_status_by_id
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.user import UserModel
+from app.utils.authentication import PasswordHandler
 from app.utils.logger import get_logger
-from passlib.context import CryptContext
+# from passlib.context import CryptContext
 
 logger = get_logger(__name__)
 
 
 def create_user(user_model: UserModel, password: str, session: Session) -> User:
     user_data = User(**user_model.model_dump(by_alias=True, exclude_unset=True))
-    user_data.password_hash = hash_password(password)
+    user_data.password_hash = PasswordHandler.hash_password(password)
     session.add(user_data)
     db_manager.commit_or_raise(session)
     session.refresh(user_data)
     return user_data
-
-
-def hash_password(password: str) -> str:
-    password_context = CryptContext(schemes=["argon2"], deprecated="auto")
-    return password_context.hash(password)
 
 
 def get_user_by_id(user_id: int, session: Session) -> None | User:
