@@ -12,8 +12,13 @@ class UserPasswordRequest(BaseModel):
 class UserPasswordResponse(BaseModel):
     user_id: int = Field(description="The id of the user", gt=0, examples=[1234])
     valid: StrictBool = Field(
-        description="Whether or not the password was valid and correct.",
+        description="Whether or not the password operation was performed and correct.",
         examples=[True, False],
+    )
+    details: str = Field(
+        "",
+        description="A custom response message.",
+        examples=["Password authenticated!", "Password updated!"],
     )
 
 
