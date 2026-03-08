@@ -11,15 +11,3 @@ repos:
       # Format code (ruff formatter)
       - id: ruff-format
         name: ruff-format
-
-
-
-repos:
- - repo: local
-   hooks:
-     - id: ty
-       name: ty
-       entry: uv run ty check app/
-       language: system
-       pass_filenames: false
-
