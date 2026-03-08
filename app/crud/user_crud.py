@@ -26,15 +26,6 @@ def hash_password(password: str) -> str:
     return password_context.hash(password)
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    password_context = CryptContext(schemes=["argon2"], deprecated="auto")
-    try:
-        return password_context.verify(plain_password, hashed_password)
-    except ValueError:
-        logger.error("malformed argon2 hash.")
-        return False
-
-
 def get_user_by_id(user_id: int, session: Session) -> None | User:
     return session.get(User, user_id)
 
