@@ -57,5 +57,7 @@ class UserModel(BaseModel):
 
 
 class CreateUserRequest(BaseModel):
-    user_model: UserModel
-    password: str
+    user_model: UserModel = Field(description="The user pydantic model")
+    password: str = Field(
+        description="Plaintext password.", examples=["Apple"], min_length=7
+    )
