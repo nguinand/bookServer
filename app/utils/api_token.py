@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -37,8 +38,15 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = int(payload.get("sub")) # type: ignore
+        payload: dict[str, Any] = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
+        )
+        subject = payload.get("sub")
+        if not isinstance(subject, str):
+            raise ValueError("Token subject is missing or invalid.")
+        user_id = int(subject)
     except ExpiredSignatureError:
         logger.error("JWT authentication failed because the token expired.")
         raise credentials_exception

@@ -1,4 +1,5 @@
 from pathlib import Path
+from collections.abc import Iterator, Sequence
 from typing import Any, Generator
 
 from dotenv import load_dotenv
@@ -21,7 +22,7 @@ class DatabaseOperationError(Exception):
 
 def batch_results(
     result: ChunkedIteratorResult, batch_size: int = 500
-) -> Generator[list[Any], None, None]:
+) -> Iterator[Sequence[Any]]:
     while True:
         batch = result.fetchmany(batch_size)
         if not batch:
