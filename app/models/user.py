@@ -4,23 +4,71 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, StrictBool
 
 
-class UserPasswordRequest(BaseModel):
-    user_id: int = Field(description="The id of the user", gt=0, examples=[1234])
+class UserLoginRequest(BaseModel):
+    username: str = Field(
+        description="The username for the account.",
+        examples=["jonydoe"],
+        min_length=1,
+    )
     password: str = Field(
-        description="The plaintext password", examples=["Apple"], min_length=7
+        description="The plaintext password for the account.",
+        examples=["Apple"],
+        min_length=7,
     )
 
 
-class UserPasswordResponse(BaseModel):
-    user_id: int = Field(description="The id of the user", gt=0, examples=[1234])
-    valid: StrictBool = Field(
-        description="Whether or not the password operation was performed and correct.",
-        examples=[True, False],
+class AuthenticationStatusResponse(BaseModel):
+    user_id: int = Field(
+        description="The authenticated user id.", gt=0, examples=[1234]
+    )
+    username: str = Field(
+        description="The authenticated username.",
+        examples=["jonydoe"],
+    )
+    authenticated: StrictBool = Field(
+        description="Whether the user was successfully authenticated.",
+        examples=[True],
     )
     details: str = Field(
-        "",
-        description="A custom response message.",
-        examples=["Password authenticated!", "Password updated!"],
+        description="A summary of the authentication result.",
+        examples=["User authenticated."],
+    )
+
+
+class TokenResponse(BaseModel):
+    access_token: str = Field(
+        description="JWT access token",
+        examples=["eyJhbGciOiJI..."],
+    )
+    token_type: str = Field(
+        default="bearer",
+        description="Token type",
+        examples=["bearer"],
+    )
+
+
+class PasswordUpdateRequest(BaseModel):
+    current_password: str = Field(
+        description="The user's current plaintext password.",
+        examples=["old_password"],
+        min_length=7,
+    )
+    new_password: str = Field(
+        description="The new plaintext password to store.",
+        examples=["new_password"],
+        min_length=7,
+    )
+
+
+class PasswordUpdateResponse(BaseModel):
+    user_id: int = Field(description="The updated user id.", gt=0, examples=[1234])
+    updated: StrictBool = Field(
+        description="Whether the password update succeeded.",
+        examples=[True],
+    )
+    details: str = Field(
+        description="A summary of the password update result.",
+        examples=["Password updated."],
     )
 
 

@@ -1,11 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from app.api.bookcase.create_bookcase import router as create_bookcase
 from app.api.bookcase.delete_bookcase import router as delete_bookcase
 from app.api.bookcase.get_bookcase import router as get_bookcase
 from app.api.bookcase.update_bookcase import router as update_bookcase
+from app.utils.api_token import get_current_user
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 router.include_router(create_bookcase)
 router.include_router(get_bookcase)

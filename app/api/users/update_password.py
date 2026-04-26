@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.crud.user_crud import get_user_by_id
-from app.db.db_conn import db_manager
 
-from app.models.user import UserPasswordRequest, UserPasswordResponse
+from app.db.db_conn import db_manager
+from app.db.db_models.user import User
+from app.models.user import PasswordUpdateRequest, PasswordUpdateResponse
+from app.utils.api_token import get_current_user
 from app.utils.authentication import PasswordHandler
 from app.utils.logger import get_logger
 
@@ -14,27 +15,35 @@ router = APIRouter(prefix="/authenticate", tags=["users-password"])
 
 @router.post(
     "/update_user_password/",
-    response_model=UserPasswordResponse,
+    response_model=PasswordUpdateResponse,
     status_code=status.HTTP_200_OK,
 )
 async def update_password(
-    user_password_request: UserPasswordRequest,
+    password_update_request: PasswordUpdateRequest,
     session: Session = Depends(db_manager.get_db),
-) -> UserPasswordResponse:
-    user_id = user_password_request.user_id
-    password = user_password_request.password
-    user_record = get_user_by_id(user_id=user_id, session=session)
-    details = "Password not updated"
-    if user_record:
-        authenticator = PasswordHandler(id=user_id, password=password)
-        hashed_password = authenticator.hash_password(password=password)
-        password_updated = authenticator.update_password(
-            password_hash=hashed_password, user=user_record, session=session
+    current_user: User = Depends(get_current_user),
+) -> PasswordUpdateResponse:
+    authenticator = PasswordHandler(
+        id=current_user.id, password=password_update_request.current_password
+    )
+    if not authenticator.verify_password(session=session):
+        logger.error(
+            "Password update denied because the current password was invalid. "
+            f"user_id={current_user.id}",
         )
-        if password_updated:
-            details = f"Password updated for {user_record.email}"
-        return UserPasswordResponse(
-            user_id=user_id, valid=password_updated, details=details
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials.",
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return UserPasswordResponse(user_id=user_id, valid=False, details=details)
+    authenticator.update_password(
+        password_hash=authenticator.hash_password(password_update_request.new_password),
+        user=current_user,
+        session=session,
+    )
+    return PasswordUpdateResponse(
+        user_id=current_user.id,
+        updated=True,
+        details="Password updated.",
+    )

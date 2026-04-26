@@ -26,10 +26,8 @@ app.include_router(user_router, prefix=prefix)
 async def sqlalchemy_error_handler(request: Request, exc: DatabaseOperationError):
     error_id = str(uuid4())
     logger.exception(
-        "Database error [error_id=%s] method=%s path=%s",
-        error_id,
-        request.method,
-        request.url.path,
+        f"Database error [error_id={error_id}] "
+        f"method={request.method} path={request.url.path}",
     )
     return JSONResponse(
         status_code=500,

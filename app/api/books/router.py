@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from app.api.books.external_api.books_by_generic import router as books_by_generic
 from app.api.books.external_api.books_by_isbn import router as books_by_isbn
@@ -7,8 +7,9 @@ from app.api.books.internal_api.create_book import router as create_book
 from app.api.books.internal_api.delete_book import router as delete_book
 from app.api.books.internal_api.get_book import router as get_books
 from app.api.books.internal_api.update_book import router as update_book
+from app.utils.api_token import get_current_user
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 router.include_router(books_by_name)
 router.include_router(books_by_isbn)
