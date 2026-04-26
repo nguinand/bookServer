@@ -37,6 +37,7 @@ export DATABASE_PASSWORD="your_password"
 export DATABASE_CONNECTION_STRING="mysql+mysqldb://your_username:your_password@127.0.0.1/books_server"
 export GOOGLE_BOOKS_API_URL="https://www.googleapis.com/books/v1/volumes"
 export GOOGLE_BOOKS_API_KEY="your_google_books_api_key"
+export SECRET_KEY="your_jwt_signing_secret"
 ```
 
 3. Load environment variables.
@@ -63,6 +64,24 @@ uv run uvicorn app.main:app --reload
 
 ## Route Overview
 All routes are mounted under `/api`.
+
+Authentication rules:
+
+- `POST /api/database/create_user/` is public for account creation.
+- `POST /api/authenticate/authenticate_user/` is public for credential validation.
+- `POST /api/authenticate/token/` is the public login endpoint and returns the
+  bearer token for valid credentials.
+- Every other `/api` route requires `Authorization: Bearer <token>`.
+- User-owned routes only allow the authenticated owner or an authenticated
+  admin to access or mutate the resource.
+
+### Authentication
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/database/create_user/` | Public account creation. Body: `CreateUserRequest` |
+| POST | `/api/authenticate/authenticate_user/` | Public credential check. Body: `UserLoginRequest` |
+| POST | `/api/authenticate/token/` | Public login. Body: `UserLoginRequest`; returns `TokenResponse` |
+| POST | `/api/authenticate/update_user_password/` | Requires bearer token. Body: `PasswordUpdateRequest` |
 
 ### External Google Books
 | Method | Path | Query Params |

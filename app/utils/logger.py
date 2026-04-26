@@ -17,8 +17,9 @@ def get_logger(name: str = "app") -> logging.Logger:
 
         handler = logging.StreamHandler(sys.stdout)
         formatter = logging.Formatter(
-            "[%(asctime)s] [%(levelname)s] %(name)s: %(message)s",
+            "[{asctime}] [{levelname}] {name}: {message}",
             datefmt="%Y-%m-%d %H:%M:%S",
+            style="{",
         )
         handler.setFormatter(formatter)
         logger.addHandler(handler)

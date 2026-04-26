@@ -55,6 +55,24 @@ def get_user_book_attribute_by_book_id(
     return session.scalars(stmt).all()  # type: ignore
 
 
+def get_user_book_attribute_by_user_and_book_id(
+    user_id: int,
+    book_id: int,
+    session: Session,
+    limit: int = 100,
+    offset: int = 0,
+) -> List[UserBookAttributes]:
+    stmt = (
+        select(UserBookAttributes)
+        .where(UserBookAttributes.user_id == user_id)
+        .where(UserBookAttributes.book_id == book_id)
+        .order_by(UserBookAttributes.id)
+        .limit(limit)
+        .offset(offset)
+    )
+    return session.scalars(stmt).all()  # type: ignore
+
+
 def update_user_book_attribute_entry(
     book_attribute_replacement: UserBookAttributesModel, session: Session
 ) -> bool:
