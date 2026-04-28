@@ -7,7 +7,7 @@ from sqlalchemy import ChunkedIteratorResult, create_engine
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.utils.error_log_operation import ErrorLogOperation
+from app.utils.error_logger import ErrorLogOperation
 from app.utils.get_env import get_env_val_or_raise
 from app.utils.logger import get_logger
 
