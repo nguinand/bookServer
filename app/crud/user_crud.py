@@ -7,7 +7,7 @@ from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.user import UserModel
 from app.utils.authentication import PasswordHandler
-from app.utils.error_logger import ErrorLogOperation
+from app.utils.error_log_enums import ErrorLogOperation
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)

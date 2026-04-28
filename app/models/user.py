@@ -111,3 +111,7 @@ class CreateUserRequest(BaseModel):
     password: str = Field(
         description="Plaintext password.", examples=["Apple"], min_length=7
     )
+
+
+class UpdateUserRequest(BaseModel):
+    user_model: UserModel = Field(description="The replacement user pydantic model")

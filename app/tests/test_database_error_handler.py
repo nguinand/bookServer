@@ -16,7 +16,7 @@ os.environ.setdefault("SECRET_KEY", "test-secret")
 
 from app import main
 from app.db.db_conn import DatabaseOperationError
-from app.utils.error_logger import ErrorLogOperation
+from app.utils.error_log_enums import ErrorLogOperation
 
 
 class DuplicateEmailError(Exception):

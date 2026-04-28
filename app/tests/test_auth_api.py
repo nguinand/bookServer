@@ -18,6 +18,7 @@ from app.api.users import authenticate_user as authenticate_user_routes
 from app.api.users import create_user as create_user_routes
 from app.api.users import get_user as get_user_routes
 from app.api.users import update_password as update_password_routes
+from app.api.users import update_user as update_user_routes
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.main import app
@@ -246,6 +247,138 @@ def test_admin_can_delete_other_user(
 
     assert response.status_code == 200
     assert response.json() == {"user_id": 2, "deleted": True}
+
+
+def test_update_user_allows_owner_update(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    current_user = make_user(user_id=1, username="owner", email="owner@example.com")
+    updated_user = make_user(
+        user_id=1,
+        username="updated_owner",
+        email="updated@example.com",
+    )
+    monkeypatch.setattr(
+        api_token_module,
+        "get_user_by_id",
+        lambda user_id, session: current_user if user_id == 1 else None,
+    )
+    monkeypatch.setattr(
+        update_user_routes,
+        "update_user",
+        lambda user_replacement, session: updated_user,
+    )
+
+    response = client.put(
+        "/api/database/update_user/",
+        headers=auth_header(1),
+        json={
+            "user_model": {
+                "id": 1,
+                "first_name": "Updated",
+                "last_name": "Owner",
+                "username": "updated_owner",
+                "email": "updated@example.com",
+                "role": "user",
+            }
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["id"] == 1
+    assert response.json()["username"] == "updated_owner"
+    assert response.json()["email"] == "updated@example.com"
+
+
+def test_update_user_returns_404_when_user_is_missing(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    current_user = make_user(user_id=1, username="owner", email="owner@example.com")
+    monkeypatch.setattr(
+        api_token_module,
+        "get_user_by_id",
+        lambda user_id, session: current_user if user_id == 1 else None,
+    )
+    monkeypatch.setattr(
+        update_user_routes,
+        "update_user",
+        lambda user_replacement, session: None,
+    )
+
+    response = client.put(
+        "/api/database/update_user/",
+        headers=auth_header(1),
+        json={
+            "user_model": {
+                "id": 1,
+                "first_name": "Updated",
+                "last_name": "Owner",
+                "username": "updated_owner",
+                "email": "updated@example.com",
+                "role": "user",
+            }
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "User not found."
+
+
+def test_update_user_rejects_missing_user_id(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    current_user = make_user(user_id=1, username="owner", email="owner@example.com")
+    monkeypatch.setattr(
+        api_token_module,
+        "get_user_by_id",
+        lambda user_id, session: current_user if user_id == 1 else None,
+    )
+
+    response = client.put(
+        "/api/database/update_user/",
+        headers=auth_header(1),
+        json={
+            "user_model": {
+                "first_name": "Updated",
+                "last_name": "Owner",
+                "username": "updated_owner",
+                "email": "updated@example.com",
+                "role": "user",
+            }
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "User ID is required."
+
+
+def test_update_user_rejects_non_owner_update(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    current_user = make_user(user_id=1, username="owner", email="owner@example.com")
+    monkeypatch.setattr(
+        api_token_module,
+        "get_user_by_id",
+        lambda user_id, session: current_user if user_id == 1 else None,
+    )
+
+    response = client.put(
+        "/api/database/update_user/",
+        headers=auth_header(1),
+        json={
+            "user_model": {
+                "id": 2,
+                "first_name": "Target",
+                "last_name": "User",
+                "username": "target_user",
+                "email": "target@example.com",
+                "role": "user",
+            }
+        },
+    )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "You do not have access to this resource."
 
 
 def test_update_password_succeeds_for_authenticated_user(

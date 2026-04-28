@@ -1,18 +1,11 @@
-from enum import StrEnum
-
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.db.db_conn import db_manager
 from app.db.db_models.error_log import ErrorLog
+from app.utils.error_log_enums import ErrorLogOperation
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
-
-
-class ErrorLogOperation(StrEnum):
-    CREATE_USER = "create_user"
-    UPDATE_USER = "update_user"
-    DELETE_USER = "delete_user"
 
 
 class ErrorLogRecorder(BaseModel):
