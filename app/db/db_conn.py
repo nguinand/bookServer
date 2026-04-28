@@ -1,5 +1,5 @@
-from pathlib import Path
 from collections.abc import Iterator, Sequence
+from pathlib import Path
 from typing import Any, Generator
 
 from dotenv import load_dotenv
@@ -7,6 +7,7 @@ from sqlalchemy import ChunkedIteratorResult, create_engine
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
+from app.utils.error_log_operation import ErrorLogOperation
 from app.utils.get_env import get_env_val_or_raise
 from app.utils.logger import get_logger
 
@@ -17,7 +18,13 @@ load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env", overrid
 
 
 class DatabaseOperationError(Exception):
-    pass
+    def __init__(
+        self,
+        error: BaseException | str,
+        operation: ErrorLogOperation | str | None = None,
+    ) -> None:
+        super().__init__(error)
+        self.operation = operation
 
 
 def batch_results(
@@ -61,13 +68,16 @@ class DatabaseManager:
             session.close()
 
     @staticmethod
-    def commit_or_raise(session: Session) -> None:
+    def commit_or_raise(
+        session: Session,
+        operation: ErrorLogOperation | str | None = None,
+    ) -> None:
         try:
             session.commit()
         except (IntegrityError, SQLAlchemyError) as e:
             session.rollback()
             logger.error(e)
-            raise DatabaseOperationError(e) from e
+            raise DatabaseOperationError(e, operation=operation) from e
 
 
 # Singleton instance
