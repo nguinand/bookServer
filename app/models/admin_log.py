@@ -16,13 +16,13 @@ class AdminEventType(str, Enum):
 class AdminLogsModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(desription="Admin Log ID", examples=[1, 2, 5], gt=0)
+    id: int = Field(description="Admin Log ID", examples=[1, 2, 5], gt=0)
     event_type: AdminEventType = Field(
         description="Admin event type",
         examples=["create", "update", "delete", "login", "logout", "modify"],
     )
     event_description: str = Field(
-        description="Admin event description", example="Modified user status"
+        description="Admin event description", examples=["Modified user status"]
     )
     created_at: datetime = Field(
         datetime.now(),
