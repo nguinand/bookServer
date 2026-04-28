@@ -7,8 +7,8 @@ from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.user import UserModel
 from app.utils.authentication import PasswordHandler
+from app.utils.error_log_operation import ErrorLogOperation
 from app.utils.logger import get_logger
-# from passlib.context import CryptContext
 
 logger = get_logger(__name__)
 
@@ -17,7 +17,7 @@ def create_user(user_model: UserModel, password: str, session: Session) -> User:
     user_data = User(**user_model.model_dump(by_alias=True, exclude_unset=True))
     user_data.password_hash = PasswordHandler.hash_password(password)
     session.add(user_data)
-    db_manager.commit_or_raise(session)
+    db_manager.commit_or_raise(session, operation=ErrorLogOperation.CREATE_USER)
     session.refresh(user_data)
     return user_data
 
@@ -38,9 +38,7 @@ def get_users_by_username(username: str, session: Session) -> None | User:
 
 def update_user(user_replacement: UserModel, session: Session) -> None | User:
     if user_replacement.id is None:
-        raise ValueError(
-            f"Cannot replace user without an ID. {user_replacement.id} - {user_replacement.email}"
-        )
+        raise ValueError("Cannot replace user without an ID.")
 
     user_record = get_user_by_id(user_replacement.id, session)
     if not user_record:
@@ -66,7 +64,7 @@ def update_user(user_replacement: UserModel, session: Session) -> None | User:
 
     user_record.bookcases = user_record.bookcases
 
-    db_manager.commit_or_raise(session)
+    db_manager.commit_or_raise(session, operation=ErrorLogOperation.UPDATE_USER)
     return user_record
 
 
@@ -76,7 +74,7 @@ def delete_user(user_id: int, session: Session) -> bool:
         return False
 
     session.delete(user)
-    db_manager.commit_or_raise(session)
+    db_manager.commit_or_raise(session, operation=ErrorLogOperation.DELETE_USER)
     return True
 
 
