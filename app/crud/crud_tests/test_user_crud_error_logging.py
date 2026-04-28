@@ -12,7 +12,7 @@ os.environ.setdefault("DATABASE_NAME", "test")
 from app.crud import user_crud as crud
 from app.db.db_models.user import User
 from app.models.user import UserModel
-from app.utils.error_logger import ErrorLogOperation
+from app.utils.error_log_enums import ErrorLogOperation
 
 
 def make_user_model(user_id: int | None = 1) -> UserModel:
