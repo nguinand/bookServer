@@ -12,6 +12,7 @@ from .book_sale_info import BookSaleInfo
 from .book_identifier import BookIdentifier
 from .user_status import UserStatus
 from .admin_logs import AdminLogs
+from .error_log import ErrorLog
 from .user_book_attributes import UserBookAttributes
 from .bookcase_books import bookcase_books
 from .user_book_state import UserBookState
