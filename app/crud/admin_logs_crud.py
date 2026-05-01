@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.db.db_conn import db_manager
@@ -15,6 +18,31 @@ def create_admin_logs(admin_log_model: AdminLogsModel, session: Session) -> Admi
 
 def get_admin_logs_by_id(admin_log_id: int, session: Session) -> AdminLogs | None:
     return session.get(AdminLogs, admin_log_id)
+
+
+def get_admin_logs(
+    start_time: datetime,
+    end_time: datetime,
+    limit: int,
+    offset: int,
+    session: Session,
+) -> tuple[list[AdminLogs], int]:
+    filters = (
+        AdminLogs.created_at >= start_time,
+        AdminLogs.created_at <= end_time,
+    )
+    logs_stmt = (
+        select(AdminLogs)
+        .where(*filters)
+        .order_by(AdminLogs.created_at.desc(), AdminLogs.id.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+    total_stmt = select(func.count()).select_from(AdminLogs).where(*filters)
+
+    admin_logs = list(session.scalars(logs_stmt).all())
+    total = session.scalar(total_stmt)
+    return admin_logs, total or 0
 
 
 def update_admin_logs(
@@ -47,5 +75,5 @@ def delete_admin_logs(admin_log_id: int, session: Session) -> bool:
     return True
 
 
-def convert_admin_logs(admin_logs_model: AdminLogsModel) -> AdminLogsModel:
+def convert_admin_logs(admin_logs_model: AdminLogs) -> AdminLogsModel:
     return AdminLogsModel.model_validate(admin_logs_model)
