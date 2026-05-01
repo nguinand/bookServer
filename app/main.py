@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from app.api.admin_logs.router import router as admin_logs_route
 from app.api.bookcase.router import router as bookcase_route
 from app.api.books.router import router as book_route
 from app.api.user_book_attributes.router import router as user_book_attributes
@@ -22,6 +23,7 @@ app.include_router(book_route, prefix=prefix)
 app.include_router(user_book_attributes, prefix=prefix)
 app.include_router(bookcase_route, prefix=prefix)
 app.include_router(user_router, prefix=prefix)
+app.include_router(admin_logs_route, prefix=prefix)
 
 
 def get_database_error_details(exc: DatabaseOperationError) -> tuple[str, str]:

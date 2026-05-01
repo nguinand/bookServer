@@ -27,7 +27,6 @@ from app.utils.api_token import create_access_token
 
 
 def make_user(
-    *,
     user_id: int = 1,
     username: str = "owner",
     email: str = "owner@example.com",

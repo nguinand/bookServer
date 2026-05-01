@@ -74,6 +74,7 @@ Authentication rules:
 - Every other `/api` route requires `Authorization: Bearer <token>`.
 - User-owned routes only allow the authenticated owner or an authenticated
   admin to access or mutate the resource.
+- Admin log routes require an authenticated admin user.
 
 ### Authentication
 | Method | Path | Notes |
@@ -118,6 +119,11 @@ Authentication rules:
 | GET | `/api/user_book_attributes/book_attribute_by_id/{attribute_id}` | Single attribute |
 | GET | `/api/user_book_attributes/book_attribute_by_user_id/` | Query: `user_id`, `limit`, `offset` |
 | GET | `/api/user_book_attributes/book_attribute_by_book_id/` | Query: `book_id` |
+
+### Admin Logs (DB)
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/database/get_admin_logs/` | Admin-only. Body: `GetAdminLogsRequest`; returns paginated `GetAdminLogsResponse` |
 
 ## Development Commands
 Run these from the project root.
