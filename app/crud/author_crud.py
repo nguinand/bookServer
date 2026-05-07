@@ -50,12 +50,17 @@ def update_author(author_replacement: AuthorModel, session: Session) -> None | A
 
     author_record.name = author_replacement.name
     author_record.bio = author_replacement.bio
-    author_record.books = [
-        get_book_by_book_id(book.book_id, session)
-        for book in author_replacement.books
-        if book.book_id is not None
-    ]
-    author_record.books = author_replacement.books
+    book_records = []
+    for book_model in author_replacement.books:
+        if book_model.book_id is None:
+            continue
+
+        book_record = get_book_by_book_id(book_model.book_id, session)
+        if book_record is None:
+            raise ValueError(f"Book not found with ID - {book_model.book_id}")
+        book_records.append(book_record)
+
+    author_record.books = book_records
     db_manager.commit_or_raise(session)
 
     return author_record
