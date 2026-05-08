@@ -132,3 +132,17 @@ def test_delete_user_book_state_by_id_not_found(
     session.delete.assert_not_called()
     session.commit.assert_not_called()
     assert result is False
+
+
+def test_get_user_book_state_by_user_and_book_returns_one_record(
+    session: MagicMock,
+) -> None:
+    record = UserBookState(user_id=1, book_id=2)
+    scalar_result = session.scalars.return_value
+    scalar_result.one_or_none.return_value = record
+
+    result = crud.get_user_book_state_by_user_and_book(1, 2, session)
+
+    session.scalars.assert_called_once()
+    scalar_result.one_or_none.assert_called_once()
+    assert result is record

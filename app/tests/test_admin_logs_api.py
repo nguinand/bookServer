@@ -118,7 +118,7 @@ def test_get_admin_logs_returns_paginated_logs_for_admin(
     monkeypatch.setattr(admin_logs_routes, "get_admin_logs", fake_get_admin_logs)
 
     response = client.post(
-        "/api/database/get_admin_logs/",
+        "/api/admin_logs/get_admin_logs/",
         headers=auth_header(1),
         json=admin_logs_payload(),
     )
@@ -163,7 +163,7 @@ def test_get_admin_logs_rejects_non_admin_user(
     monkeypatch.setattr(admin_logs_routes, "get_admin_logs", get_admin_logs_mock)
 
     response = client.post(
-        "/api/database/get_admin_logs/",
+        "/api/admin_logs/get_admin_logs/",
         headers=auth_header(1),
         json=admin_logs_payload(),
     )
@@ -175,7 +175,7 @@ def test_get_admin_logs_rejects_non_admin_user(
 
 def test_get_admin_logs_requires_authentication(client: TestClient) -> None:
     response = client.post(
-        "/api/database/get_admin_logs/",
+        "/api/admin_logs/get_admin_logs/",
         json=admin_logs_payload(),
     )
 
@@ -196,7 +196,7 @@ def test_get_admin_logs_rejects_invalid_time_frame(
     monkeypatch.setattr(admin_logs_routes, "get_admin_logs", get_admin_logs_mock)
 
     response = client.post(
-        "/api/database/get_admin_logs/",
+        "/api/admin_logs/get_admin_logs/",
         headers=auth_header(1),
         json={
             "start_time": END_TIME.isoformat(),

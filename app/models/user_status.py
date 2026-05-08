@@ -4,8 +4,8 @@ from pydantic import BaseModel, ConfigDict, Field
 class UserStatusModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(
-        0,
+    id: int | None = Field(
+        None,
         description="The id of user status. Most likely comes from database",
         examples=[12],
         gt=0,
