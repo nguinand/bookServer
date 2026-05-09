@@ -1,7 +1,7 @@
 from typing import List
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.crud.model_conversions import convert_book_to_model
 from app.crud.shared_queries import get_book_by_book_id
@@ -44,6 +44,18 @@ def get_bookcases_by_user_id(
         .order_by(Bookcase.id)
         .limit(limit)
         .offset(offset)
+    )
+    return session.scalars(stmt).all()  # type: ignore
+
+
+def get_bookcases_with_books_by_user_id(
+    user_id: int, session: Session
+) -> List[Bookcase]:
+    stmt = (
+        select(Bookcase)
+        .options(selectinload(Bookcase.books).selectinload(Book.genres))
+        .where(Bookcase.user_id == user_id)
+        .order_by(Bookcase.id)
     )
     return session.scalars(stmt).all()  # type: ignore
 
