@@ -133,11 +133,7 @@ def mock_google_books(
     payload: dict[str, Any],
     captured_params: list[dict[str, Any]],
 ) -> None:
-    async def fake_book_api_request(client, params, logger):
-        captured_params.append(params)
-        return FakeGoogleBooksResponse(payload)
-
-    monkeypatch.setattr(route_module, "book_api_request", fake_book_api_request)
+    mock_google_books_pages(route_module, monkeypatch, [payload], captured_params)
 
 
 def mock_google_books_pages(
