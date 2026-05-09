@@ -11,7 +11,7 @@ from app.models.admin_log import GetAdminLogsRequest, GetAdminLogsResponse
 from app.utils.api_token import get_current_user
 from app.utils.authorization import ensure_current_user_is_admin
 
-router = APIRouter(prefix="/database", tags=["admin-logs"])
+router = APIRouter()
 
 
 @router.post(

@@ -38,16 +38,14 @@ def get_user_book_states_by_user_id(
 
 
 def get_user_book_state_by_user_and_book(
-    user_id: int, book_id: int, session: Session, limit: int = 100, offset: int = 0
+    user_id: int, book_id: int, session: Session
 ) -> UserBookState | None:
     stmt = (
         select(UserBookState)
         .where(UserBookState.user_id == user_id, UserBookState.book_id == book_id)
         .order_by(UserBookState.id)
-        .limit(limit)
-        .offset(offset)
     )
-    return session.scalars(stmt).all()  # type: ignore
+    return session.scalars(stmt).one_or_none()
 
 
 def update_user_book_state(

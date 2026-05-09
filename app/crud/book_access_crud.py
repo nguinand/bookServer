@@ -6,10 +6,13 @@ from app.db.db_models import BookAccess
 from app.models.access_info import AccessInfoModel, FormatInfoModel
 
 
-def create_access_info(access_info: AccessInfoModel, session: Session) -> BookAccess:
-    access_info_data = BookAccess(**access_info.to_orm_dict())
+def create_access_info(
+    access_info: AccessInfoModel, book_id: int, session: Session
+) -> BookAccess:
+    access_info_data = BookAccess(book_id=book_id, **access_info.to_orm_dict())
     session.add(access_info_data)
     db_manager.commit_or_raise(session)
+    session.refresh(access_info_data)
     return access_info_data
 
 
@@ -18,7 +21,9 @@ def get_access_info_by_id(access_info_id: int, session: Session) -> BookAccess |
 
 
 def get_access_info_by_book_id(book_id: int, session: Session) -> BookAccess | None:
-    return session.scalars(select(BookAccess).where(BookAccess.book_id == book_id))  # type: ignore
+    return session.scalars(
+        select(BookAccess).where(BookAccess.book_id == book_id)
+    ).one_or_none()
 
 
 def update_access_info(

@@ -80,3 +80,25 @@ class AccessInfoModel(BaseModel):
             "pdf_token_link": self.pdf.acsTokenLink if self.pdf else None,
             "web_reader_link": self.web_reader_link,
         }
+
+
+class CreateAccessInfoRequest(BaseModel):
+    book_id: int = Field(
+        description="The local database book id for this access info.",
+        examples=[1234],
+        gt=0,
+    )
+    access_info: AccessInfoModel = Field(
+        description="Google Books accessInfo payload to attach to the book.",
+    )
+
+
+class UpdateAccessInfoRequest(BaseModel):
+    access_info_id: int = Field(
+        description="The local database access info id to update.",
+        examples=[1234],
+        gt=0,
+    )
+    access_info: AccessInfoModel = Field(
+        description="Replacement Google Books accessInfo payload.",
+    )

@@ -16,7 +16,12 @@ class AdminEventType(str, Enum):
 class AdminLogsModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(description="Admin Log ID", examples=[1, 2, 5], gt=0)
+    id: int | None = Field(
+        None,
+        description="Admin Log ID",
+        examples=[1, 2, 5],
+        gt=0,
+    )
     event_type: AdminEventType = Field(
         description="Admin event type",
         examples=["create", "update", "delete", "login", "logout", "modify"],

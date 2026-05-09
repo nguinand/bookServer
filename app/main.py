@@ -7,9 +7,15 @@ from fastapi.responses import JSONResponse
 
 from app.api.admin_logs.router import router as admin_logs_route
 from app.api.author.router import router as author_route
+from app.api.avatar.router import router as avatar_route
+from app.api.book_access.router import router as book_access_route
+from app.api.book_sale_info.router import router as book_sale_info_route
 from app.api.bookcase.router import router as bookcase_route
 from app.api.books.router import router as book_route
+from app.api.genre.router import router as genre_route
 from app.api.user_book_attributes.router import router as user_book_attributes
+from app.api.user_book_state.router import router as user_book_state_route
+from app.api.user_status.router import router as user_status_route
 from app.api.users.router import router as user_router
 from app.db.db_conn import DatabaseOperationError
 from app.utils.error_logger import ErrorLogRecorder
@@ -26,6 +32,12 @@ app.include_router(bookcase_route, prefix=prefix)
 app.include_router(user_router, prefix=prefix)
 app.include_router(admin_logs_route, prefix=prefix)
 app.include_router(author_route, prefix=prefix)
+app.include_router(genre_route, prefix=prefix)
+app.include_router(avatar_route, prefix=prefix)
+app.include_router(user_status_route, prefix=prefix)
+app.include_router(user_book_state_route, prefix=prefix)
+app.include_router(book_access_route, prefix=prefix)
+app.include_router(book_sale_info_route, prefix=prefix)
 
 
 def get_database_error_details(exc: DatabaseOperationError) -> tuple[str, str]:
