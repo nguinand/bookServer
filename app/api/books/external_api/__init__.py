@@ -29,6 +29,6 @@ async def book_api_request(client, params, logger):
             status_code=502,
             error={
                 "error": "Upstream request to Google Books endpoint failed",
-                "detail": str(e),
+                "detail": "A network error occurred while contacting the upstream service.",
             },
         )

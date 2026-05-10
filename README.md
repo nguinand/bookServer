@@ -90,6 +90,9 @@ Authentication rules:
 | GET | `/api/books/name/` | `book_name`, `max_results`, `start_index` |
 | GET | `/api/books/books_by_isbn/` | `isbn`, `max_results`, `start_index` |
 | GET | `/api/books/generic/` | `search_type` (`author`, `publisher`, `isbn`, `subject`), `val`, `max_results`, `start_index` |
+| GET | `/api/books/recommendations/by_author/` | `author`, `max_results`, `start_index`; fills up to `max_results` after deduplication when more Google Books pages are available |
+| GET | `/api/books/recommendations/by_genre/` | `genre_name`, `max_results`, `start_index`; fills up to `max_results` after deduplication when more Google Books pages are available |
+| GET | `/api/books/recommendations/by_bookshelf_genre/` | `max_results`, `start_index`; uses the authenticated user's most frequent bookshelf genre, or `bestsellers` when no genre data exists; fills up to `max_results` after deduplication and owned-book filtering when more Google Books pages are available |
 
 ### Internal Books (DB)
 | Method | Path | Notes |
