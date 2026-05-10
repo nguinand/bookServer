@@ -1,5 +1,3 @@
-from collections import Counter
-
 import httpx
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
@@ -7,9 +5,11 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.api.books.external_api import BooksRequestError, api_key, book_api_request
-from app.crud.bookcase_crud import get_bookcases_with_books_and_genres_by_user_id
+from app.crud.bookcase_crud import (
+    get_bookcase_google_books_ids_by_user_id,
+    get_most_common_bookcase_genre_by_user_id,
+)
 from app.db.db_conn import db_manager
-from app.db.db_models.bookcase import Bookcase
 from app.db.db_models.user import User
 from app.models.book import BookModel
 from app.utils.api_token import get_current_user
@@ -18,30 +18,6 @@ from app.utils.logger import get_logger
 logger = get_logger(__name__)
 router = APIRouter(prefix="/books/recommendations", tags=["books-external"])
 GENERIC_FALLBACK_QUERY = "bestsellers"
-
-
-def get_top_bookshelf_genre(bookcases: list[Bookcase]) -> tuple[str | None, set[str]]:
-    genre_counts: Counter[str] = Counter()
-    owned_google_books_ids: set[str] = set()
-
-    for bookcase in bookcases:
-        for book in bookcase.books:
-            if book.google_books_id:
-                owned_google_books_ids.add(book.google_books_id)
-
-            for genre in book.genres:
-                genre_name = genre.name.strip()
-                if genre_name:
-                    genre_counts[genre_name] += 1
-
-    if not genre_counts:
-        return None, owned_google_books_ids
-
-    highest_count = max(genre_counts.values())
-    top_genre = sorted(
-        genre for genre, count in genre_counts.items() if count == highest_count
-    )[0]
-    return top_genre, owned_google_books_ids
 
 
 @router.get(
@@ -56,11 +32,14 @@ async def get_book_recommendations_by_bookshelf_genre(
     current_user: User = Depends(get_current_user),
 ) -> list[BookModel] | JSONResponse:
     """Recommend books using the most common genre in the current user's bookcases."""
-    bookcases = get_bookcases_with_books_and_genres_by_user_id(
+    top_genre = get_most_common_bookcase_genre_by_user_id(
         user_id=current_user.id,
         session=session,
     )
-    top_genre, owned_google_books_ids = get_top_bookshelf_genre(bookcases)
+    owned_google_books_ids = get_bookcase_google_books_ids_by_user_id(
+        user_id=current_user.id,
+        session=session,
+    )
     query = f"subject:{top_genre}" if top_genre else GENERIC_FALLBACK_QUERY
     async with httpx.AsyncClient() as client:
         books: list[BookModel] = []

@@ -25,9 +25,6 @@ from app.api.books.external_api.recommendations import (
     book_recommendations_by_genre as genre_routes,
 )
 from app.db.db_conn import db_manager
-from app.db.db_models.book import Book
-from app.db.db_models.bookcase import Bookcase
-from app.db.db_models.genre import Genre
 from app.db.db_models.user import User
 from app.main import app
 from app.utils import api_token as api_token_module
@@ -99,32 +96,6 @@ def google_item(google_books_id: str, title: str = "Recommended Book") -> dict:
         "saleInfo": None,
         "accessInfo": {},
     }
-
-
-def make_book(
-    book_id: int, google_books_id: str, title: str, genre_names: list[str]
-) -> Book:
-    book = Book(
-        book_id=book_id,
-        google_books_id=google_books_id,
-        title=title,
-    )
-    book.genres = [
-        Genre(id=index + 1, name=genre_name)
-        for index, genre_name in enumerate(genre_names)
-    ]
-    return book
-
-
-def make_bookcase(bookcase_id: int, user_id: int, books: list[Book]) -> Bookcase:
-    bookcase = Bookcase(
-        id=bookcase_id,
-        name=f"Bookcase {bookcase_id}",
-        created_at=NOW,
-        user_id=user_id,
-    )
-    bookcase.books = books
-    return bookcase
 
 
 def mock_google_books(
@@ -229,20 +200,15 @@ def test_bookshelf_recommendations_use_most_frequent_genre(
 ) -> None:
     authenticate(monkeypatch)
     captured_params: list[dict[str, Any]] = []
-    bookcases = [
-        make_bookcase(
-            bookcase_id=1,
-            user_id=1,
-            books=[
-                make_book(1, "owned-1", "A", ["Fantasy"]),
-                make_book(2, "owned-2", "B", ["Fantasy", "Mystery"]),
-            ],
-        )
-    ]
     monkeypatch.setattr(
         bookshelf_routes,
-        "get_bookcases_with_books_and_genres_by_user_id",
-        lambda user_id, session: bookcases,
+        "get_most_common_bookcase_genre_by_user_id",
+        lambda user_id, session: "Fantasy",
+    )
+    monkeypatch.setattr(
+        bookshelf_routes,
+        "get_bookcase_google_books_ids_by_user_id",
+        lambda user_id, session: {"owned-1", "owned-2"},
     )
     mock_google_books(
         bookshelf_routes,
@@ -262,25 +228,20 @@ def test_bookshelf_recommendations_use_most_frequent_genre(
     assert session is not None
 
 
-def test_bookshelf_recommendations_break_ties_alphabetically(
+def test_bookshelf_recommendations_use_alphabetical_tie_breaker_from_crud(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     authenticate(monkeypatch)
     captured_params: list[dict[str, Any]] = []
-    bookcases = [
-        make_bookcase(
-            bookcase_id=1,
-            user_id=1,
-            books=[
-                make_book(1, "owned-1", "A", ["Mystery"]),
-                make_book(2, "owned-2", "B", ["Adventure"]),
-            ],
-        )
-    ]
     monkeypatch.setattr(
         bookshelf_routes,
-        "get_bookcases_with_books_and_genres_by_user_id",
-        lambda user_id, session: bookcases,
+        "get_most_common_bookcase_genre_by_user_id",
+        lambda user_id, session: "Adventure",
+    )
+    monkeypatch.setattr(
+        bookshelf_routes,
+        "get_bookcase_google_books_ids_by_user_id",
+        lambda user_id, session: {"owned-1", "owned-2"},
     )
     mock_google_books(
         bookshelf_routes,
@@ -305,8 +266,13 @@ def test_bookshelf_recommendations_fall_back_to_bestsellers_without_genres(
     captured_params: list[dict[str, Any]] = []
     monkeypatch.setattr(
         bookshelf_routes,
-        "get_bookcases_with_books_and_genres_by_user_id",
-        lambda user_id, session: [],
+        "get_most_common_bookcase_genre_by_user_id",
+        lambda user_id, session: None,
+    )
+    monkeypatch.setattr(
+        bookshelf_routes,
+        "get_bookcase_google_books_ids_by_user_id",
+        lambda user_id, session: set(),
     )
     mock_google_books(
         bookshelf_routes,
@@ -330,17 +296,15 @@ def test_bookshelf_recommendations_exclude_owned_books_and_deduplicate_results(
 ) -> None:
     authenticate(monkeypatch)
     captured_params: list[dict[str, Any]] = []
-    bookcases = [
-        make_bookcase(
-            bookcase_id=1,
-            user_id=1,
-            books=[make_book(1, "owned-1", "Owned", ["Fantasy"])],
-        )
-    ]
     monkeypatch.setattr(
         bookshelf_routes,
-        "get_bookcases_with_books_and_genres_by_user_id",
-        lambda user_id, session: bookcases,
+        "get_most_common_bookcase_genre_by_user_id",
+        lambda user_id, session: "Fantasy",
+    )
+    monkeypatch.setattr(
+        bookshelf_routes,
+        "get_bookcase_google_books_ids_by_user_id",
+        lambda user_id, session: {"owned-1"},
     )
     mock_google_books(
         bookshelf_routes,
@@ -422,17 +386,15 @@ def test_bookshelf_recommendations_fetch_next_page_to_fill_max_results(
 ) -> None:
     authenticate(monkeypatch)
     captured_params: list[dict[str, Any]] = []
-    bookcases = [
-        make_bookcase(
-            bookcase_id=1,
-            user_id=1,
-            books=[make_book(1, "owned-1", "Owned", ["Fantasy"])],
-        )
-    ]
     monkeypatch.setattr(
         bookshelf_routes,
-        "get_bookcases_with_books_and_genres_by_user_id",
-        lambda user_id, session: bookcases,
+        "get_most_common_bookcase_genre_by_user_id",
+        lambda user_id, session: "Fantasy",
+    )
+    monkeypatch.setattr(
+        bookshelf_routes,
+        "get_bookcase_google_books_ids_by_user_id",
+        lambda user_id, session: {"owned-1"},
     )
     mock_google_books_pages(
         bookshelf_routes,
