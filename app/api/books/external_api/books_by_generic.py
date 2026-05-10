@@ -56,6 +56,9 @@ async def get_books_by_generic(
                 logger.error(f"Validation error building BookModel: {str(e)}")
                 return JSONResponse(
                     status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                    content={"error": "Validation error", "detail": str(e)},
+                    content={
+                        "error": "Validation error",
+                        "detail": "BookModel cant not be instantiated.",
+                    },
                 )
         return books

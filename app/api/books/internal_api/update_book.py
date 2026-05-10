@@ -22,7 +22,8 @@ async def update_book(
     except ValueError as e:
         logger.error(e)
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="book_id is required to update a book.",
         )
 
     if books_result:
