@@ -48,7 +48,7 @@ def get_bookcases_by_user_id(
     return session.scalars(stmt).all()  # type: ignore
 
 
-def get_bookcases_with_books_by_user_id(
+def get_bookcases_with_books_and_genres_by_user_id(
     user_id: int, session: Session
 ) -> List[Bookcase]:
     stmt = (

@@ -241,7 +241,7 @@ def test_bookshelf_recommendations_use_most_frequent_genre(
     ]
     monkeypatch.setattr(
         bookshelf_routes,
-        "get_bookcases_with_books_by_user_id",
+        "get_bookcases_with_books_and_genres_by_user_id",
         lambda user_id, session: bookcases,
     )
     mock_google_books(
@@ -279,7 +279,7 @@ def test_bookshelf_recommendations_break_ties_alphabetically(
     ]
     monkeypatch.setattr(
         bookshelf_routes,
-        "get_bookcases_with_books_by_user_id",
+        "get_bookcases_with_books_and_genres_by_user_id",
         lambda user_id, session: bookcases,
     )
     mock_google_books(
@@ -305,7 +305,7 @@ def test_bookshelf_recommendations_fall_back_to_bestsellers_without_genres(
     captured_params: list[dict[str, Any]] = []
     monkeypatch.setattr(
         bookshelf_routes,
-        "get_bookcases_with_books_by_user_id",
+        "get_bookcases_with_books_and_genres_by_user_id",
         lambda user_id, session: [],
     )
     mock_google_books(
@@ -339,7 +339,7 @@ def test_bookshelf_recommendations_exclude_owned_books_and_deduplicate_results(
     ]
     monkeypatch.setattr(
         bookshelf_routes,
-        "get_bookcases_with_books_by_user_id",
+        "get_bookcases_with_books_and_genres_by_user_id",
         lambda user_id, session: bookcases,
     )
     mock_google_books(
@@ -431,7 +431,7 @@ def test_bookshelf_recommendations_fetch_next_page_to_fill_max_results(
     ]
     monkeypatch.setattr(
         bookshelf_routes,
-        "get_bookcases_with_books_by_user_id",
+        "get_bookcases_with_books_and_genres_by_user_id",
         lambda user_id, session: bookcases,
     )
     mock_google_books_pages(

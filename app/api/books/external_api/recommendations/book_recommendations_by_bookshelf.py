@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.api.books.external_api import BooksRequestError, api_key, book_api_request
-from app.crud.bookcase_crud import get_bookcases_with_books_by_user_id
+from app.crud.bookcase_crud import get_bookcases_with_books_and_genres_by_user_id
 from app.db.db_conn import db_manager
 from app.db.db_models.bookcase import Bookcase
 from app.db.db_models.user import User
@@ -56,7 +56,7 @@ async def get_book_recommendations_by_bookshelf_genre(
     current_user: User = Depends(get_current_user),
 ) -> list[BookModel] | JSONResponse:
     """Recommend books using the most common genre in the current user's bookcases."""
-    bookcases = get_bookcases_with_books_by_user_id(
+    bookcases = get_bookcases_with_books_and_genres_by_user_id(
         user_id=current_user.id,
         session=session,
     )
