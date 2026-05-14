@@ -158,3 +158,7 @@ cython_debug/
 # vs-code
 .python-version
 .vscode/
+
+# Local-only project notes / scratch
+proj_requirements/
+frontend/CLAUDE.md
