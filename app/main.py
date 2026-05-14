@@ -3,6 +3,7 @@ from uuid import uuid4
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.admin_logs.router import router as admin_logs_route
@@ -19,12 +20,23 @@ from app.api.user_status.router import router as user_status_route
 from app.api.users.router import router as user_router
 from app.db.db_conn import DatabaseOperationError
 from app.utils.error_logger import ErrorLogRecorder
+from app.utils.get_env import get_env_val_or_raise
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 prefix = "/api"
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        f"https://{get_env_val_or_raise('FRONTEND_ENDPOINT')}:{get_env_val_or_raise('FRONTEND_PORT')})"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(book_route, prefix=prefix)
 app.include_router(user_book_attributes, prefix=prefix)
@@ -77,4 +89,9 @@ def read_root():
 
 if __name__ == "__main__":
     load_dotenv()
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run(
+        "main:app",
+        host=get_env_val_or_raise("BACKEND_ENDPOINT"),
+        port=int(get_env_val_or_raise("BACKEND_PORT")),
+        reload=True,
+    )
