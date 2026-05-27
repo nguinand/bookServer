@@ -1,135 +1,203 @@
 # bookServer
 
-FastAPI service for managing a user's book library and querying Google Books.
+`bookServer` is a FastAPI backend for managing a personal book library, storing
+library data in MySQL, and querying Google Books for search and recommendations.
+The repo also includes a SvelteKit frontend under `frontend/`.
 
-## Tech Stack
-- Python 3.12+ (CI runs on 3.13)
-- FastAPI
-- SQLAlchemy + MySQL (`mysqlclient`)
-- Alembic migrations
-- Ruff, Ty, pytest
+## Stack
 
-## Features
-- External Google Books search endpoints
-- Internal database CRUD operations
+- Backend: Python 3.12+, FastAPI, SQLAlchemy, MySQL, Alembic
+- Auth: JWT bearer tokens with `python-jose`, Passlib Argon2 password hashing
+- External API: Google Books through HTTPX
+- Validation/tooling: Pydantic v2, Ruff, Ty, pytest, pre-commit
+- Frontend: SvelteKit, Svelte 5, TypeScript, Vite, Tailwind/Skeleton
+- Package tools: `uv` for Python, npm for the frontend
 
-## Prerequisites
-- Python 3.12+
-- MySQL server
-- `uv`
-- System libraries required by `mysqlclient`
+## Repository Map
 
-## Quick Start
-1. Install dependencies.
+| Path | Purpose |
+| --- | --- |
+| `app/main.py` | FastAPI app, router registration, CORS, DB error handler |
+| `app/api/` | Route handlers by domain |
+| `app/models/` | Pydantic request/response models |
+| `app/crud/` | Database operations and conversion helpers |
+| `app/db/db_models/` | SQLAlchemy ORM models and association tables |
+| `app/utils/` | Auth, authorization, env, logging, error recording |
+| `alembic/` | Database migrations |
+| `frontend/` | SvelteKit client |
+| `AGENTS.md` | Codex startup guide |
+| `ARCHITECHTURE.md` | Backend architecture notes |
+| `RULES.md` | Project rules and constraints |
+| `TASK_TEMPLATE.md` | Ad hoc task brief template |
+
+## Backend Setup
+
+Install dependencies:
 
 ```bash
 uv sync --dev
 ```
 
-2. Create a `.env` in the project root.
+Create a root `.env` with these variables:
 
-```bash
-PYTHONPATH=.
-export DATABASE_URL="127.0.0.1"
-export DATABASE_NAME="books_server"
-export DATABASE_USERNAME="your_username"
-export DATABASE_PASSWORD="your_password"
-export DATABASE_CONNECTION_STRING="mysql+mysqldb://your_username:your_password@127.0.0.1/books_server"
-export GOOGLE_BOOKS_API_URL="https://www.googleapis.com/books/v1/volumes"
-export GOOGLE_BOOKS_API_KEY="your_google_books_api_key"
-export SECRET_KEY="your_jwt_signing_secret"
+```text
+PYTHONPATH
+DATABASE_URL
+DATABASE_NAME
+DATABASE_USERNAME
+DATABASE_PASSWORD
+DATABASE_CONNECTION_STRING
+GOOGLE_BOOKS_API_URL
+GOOGLE_BOOKS_API_KEY
+SECRET_KEY
+FRONTEND_ENDPOINT
+FRONTEND_PORT
+BACKEND_ENDPOINT
+BACKEND_PORT
 ```
 
-3. Load environment variables.
+Load env vars:
 
 ```bash
 source .env
 ```
 
-4. Run database migrations.
+Apply migrations:
 
 ```bash
 uv run alembic upgrade heads
 ```
 
-5. Start the API server.
+Start the backend:
 
 ```bash
 uv run uvicorn app.main:app --reload
 ```
 
-## API Docs
+API docs:
+
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
 
+## Frontend Setup
+
+Install dependencies:
+
+```bash
+npm --prefix frontend install
+```
+
+Create `frontend/.env` with this variable:
+
+```text
+PUBLIC_API_BASE_URL
+```
+
+Start the frontend:
+
+```bash
+npm --prefix frontend run dev
+```
+
+## Authentication
+
+Public endpoints:
+
+- `POST /api/database/create_user/`
+- `POST /api/authenticate/authenticate_user/`
+- `POST /api/authenticate/token/`
+
+All other application routes should be treated as bearer-token protected unless
+the route code explicitly says otherwise. Protected requests use:
+
+```text
+Authorization: Bearer <token>
+```
+
+Login uses JSON, not OAuth2 form encoding:
+
+```json
+{
+  "username": "user",
+  "password": "password"
+}
+```
+
 ## Route Overview
-All routes are mounted under `/api`.
 
-Authentication rules:
+All application routes are mounted under `/api`.
 
-- `POST /api/database/create_user/` is public for account creation.
-- `POST /api/authenticate/authenticate_user/` is public for credential validation.
-- `POST /api/authenticate/token/` is the public login endpoint and returns the
-  bearer token for valid credentials.
-- Every other `/api` route requires `Authorization: Bearer <token>`.
-- User-owned routes only allow the authenticated owner or an authenticated
-  admin to access or mutate the resource.
-- Admin log routes require an authenticated admin user.
+### Auth And Users
 
-### Authentication
-| Method | Path | Notes |
-|---|---|---|
-| POST | `/api/database/create_user/` | Public account creation. Body: `CreateUserRequest` |
-| POST | `/api/authenticate/authenticate_user/` | Public credential check. Body: `UserLoginRequest` |
-| POST | `/api/authenticate/token/` | Public login. Body: `UserLoginRequest`; returns `TokenResponse` |
-| POST | `/api/authenticate/update_user_password/` | Requires bearer token. Body: `PasswordUpdateRequest` |
+| Method | Path |
+| --- | --- |
+| POST | `/api/database/create_user/` |
+| POST | `/api/authenticate/authenticate_user/` |
+| POST | `/api/authenticate/token/` |
+| POST | `/api/authenticate/update_user_password/` |
+| GET | `/api/database/user_by_id/{user_id}` |
+| GET | `/api/database/users_by_email/{email}` |
+| GET | `/api/database/users_by_username/{username}` |
+| PUT | `/api/database/update_user/` |
+| DELETE | `/api/database/delete_user/{user_id}` |
 
-### External Google Books
-| Method | Path | Query Params |
-|---|---|---|
-| GET | `/api/books/name/` | `book_name`, `max_results`, `start_index` |
-| GET | `/api/books/books_by_isbn/` | `isbn`, `max_results`, `start_index` |
-| GET | `/api/books/generic/` | `search_type` (`author`, `publisher`, `isbn`, `subject`), `val`, `max_results`, `start_index` |
-| GET | `/api/books/recommendations/by_author/` | `author`, `max_results`, `start_index`; fills up to `max_results` after deduplication when more Google Books pages are available |
-| GET | `/api/books/recommendations/by_genre/` | `genre_name`, `max_results`, `start_index`; fills up to `max_results` after deduplication when more Google Books pages are available |
-| GET | `/api/books/recommendations/by_bookshelf_genre/` | `max_results`, `start_index`; uses the authenticated user's most frequent bookshelf genre, or `bestsellers` when no genre data exists; fills up to `max_results` after deduplication and owned-book filtering when more Google Books pages are available |
+### Books And Google Books
 
-### Internal Books (DB)
-| Method | Path | Notes |
-|---|---|---|
-| POST | `/api/database/create_book/` | Body: `BookModel` |
-| POST | `/api/database/update_book/` | Body: `BookModel` |
-| DELETE | `/api/database/delete_book/{book_id}` | Deletes by `book_id` |
-| GET | `/api/database/books_by_title/` | Query: `title`, `limit`, `offset` |
-| GET | `/api/database/books_by_google_id/{google_id}` | Lookup by Google ID |
-| GET | `/api/database/books_by_book_id/{book_id}` | Lookup by DB `book_id` |
+| Method | Path |
+| --- | --- |
+| GET | `/api/books/name/` |
+| GET | `/api/books/books_by_isbn/` |
+| GET | `/api/books/generic/` |
+| GET | `/api/books/recommendations/by_author/` |
+| GET | `/api/books/recommendations/by_genre/` |
+| GET | `/api/books/recommendations/by_bookshelf_genre/` |
+| POST | `/api/database/create_book/` |
+| POST | `/api/database/update_book/` |
+| DELETE | `/api/database/delete_book/{book_id}` |
+| GET | `/api/database/books_by_title/` |
+| GET | `/api/database/books_by_google_id/{google_id}` |
+| GET | `/api/database/books_by_book_id/{book_id}` |
 
-### Bookcases (DB)
-| Method | Path | Notes |
-|---|---|---|
-| POST | `/api/database/create_bookcase/` | Body: `BookcaseModel` |
-| POST | `/api/database/update_bookcase/` | Body: `BookcaseModel` |
-| DELETE | `/api/database/delete_bookcase/{bookcase_id}` | Deletes by `bookcase_id` |
-| GET | `/api/database/bookcase_by_id/{bookcase_id}` | Single bookcase |
-| GET | `/api/database/bookcases_by_user_id/` | Query: `user_id`, `limit`, `offset` |
+### Library State
 
-### User Book Attributes (DB)
-| Method | Path | Notes |
-|---|---|---|
-| POST | `/api/user_book_attributes/create_user_book_attribute/` | Body: `UserBookAttributesModel` |
-| POST | `/api/update_book_attribute` | Body: `UserBookAttributesModel` |
-| DELETE | `/api/user_book_attributes/delete_user_book_attribute/{attribute_id}` | Deletes by `attribute_id` |
-| GET | `/api/user_book_attributes/book_attribute_by_id/{attribute_id}` | Single attribute |
-| GET | `/api/user_book_attributes/book_attribute_by_user_id/` | Query: `user_id`, `limit`, `offset` |
-| GET | `/api/user_book_attributes/book_attribute_by_book_id/` | Query: `book_id` |
+| Method | Path |
+| --- | --- |
+| POST | `/api/database/create_bookcase/` |
+| POST | `/api/database/update_bookcase/` |
+| DELETE | `/api/database/delete_bookcase/{bookcase_id}` |
+| GET | `/api/database/bookcase_by_id/{bookcase_id}` |
+| GET | `/api/database/bookcases_by_user_id/` |
+| POST | `/api/user_book_attributes/create_user_book_attribute/` |
+| POST | `/api/update_book_attribute` |
+| DELETE | `/api/user_book_attributes/delete_user_book_attribute/{attribute_id}` |
+| GET | `/api/user_book_attributes/book_attribute_by_id/{attribute_id}` |
+| GET | `/api/user_book_attributes/book_attribute_by_user_id/` |
+| GET | `/api/user_book_attributes/book_attribute_by_book_id/` |
+| GET | `/api/user_book_attributes/book_attribute_by_book_and_user_id/` |
+| POST | `/api/user_book_state/create_user_book_state/` |
+| PUT | `/api/user_book_state/update_user_book_state/` |
+| DELETE | `/api/user_book_state/delete_user_book_state_by_id/{user_book_state_id}` |
+| GET | `/api/user_book_state/get_user_book_state_by_id/{user_book_state_id}` |
+| POST | `/api/user_book_state/get_user_book_states_by_user_id/` |
+| POST | `/api/user_book_state/get_user_book_state_by_user_and_book/` |
 
-### Admin Logs (DB)
-| Method | Path | Notes |
-|---|---|---|
-| POST | `/api/database/get_admin_logs/` | Admin-only. Body: `GetAdminLogsRequest`; returns paginated `GetAdminLogsResponse` |
+### Supporting Resources
+
+| Domain | Routes |
+| --- | --- |
+| Authors | `/api/author/...` |
+| Genres | `/api/genre/...` |
+| Avatars | `/api/avatar/...` |
+| User status | `/api/user_status/...` |
+| Book access | `/api/book_access/...` |
+| Book sale info | `/api/book_sale_info/...` |
+| Admin logs | `/api/admin_logs/...` |
+
+Admin log routes require an authenticated admin user.
 
 ## Development Commands
-Run these from the project root.
+
+Run backend checks from the repo root:
 
 ```bash
 uv run ruff format --check app/
@@ -138,13 +206,21 @@ uv run ty check app/
 uv run pytest -q
 ```
 
-## Pre-commit
+Run frontend checks:
+
+```bash
+npm --prefix frontend run check
+```
+
+Pre-commit:
+
 ```bash
 uv run pre-commit install
 uv run pre-commit run --all-files
 ```
 
 ## Migrations
+
 Create a migration:
 
 ```bash
@@ -164,5 +240,9 @@ uv run alembic current
 ```
 
 ## Notes
+
 - Keep secrets out of version control.
 - `DATABASE_CONNECTION_STRING` is required by Alembic.
+- Use `AGENTS.md`, `ARCHITECHTURE.md`, and `RULES.md` for Codex and backend
+  workflow context, including the global `grill-me` planning skill.
+- Use `frontend/AGENTS.md` for frontend-specific guidance.

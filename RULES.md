@@ -232,6 +232,8 @@ uv run alembic upgrade heads
 - Must keep refactors separate from behavior changes when practical.
 - Must explain API, schema, dependency, and security-relevant changes clearly in
   review.
+- Should use the global `grill-me` skill when the user asks to use `grill-me`,
+  be grilled, be interviewed, or to stress-test a plan or design.
 - Should include validation results in review notes for non-trivial changes.
 - Should avoid unrelated formatting churn.
 - Must Not merge undocumented breaking changes.
@@ -243,7 +245,6 @@ uv run alembic upgrade heads
   - `README.md`
   - `ARCHITECHTURE.md`
   - `AGENTS.md`
-  - `SKILL.md`
   - `RULES.md`
 - If schema changes, update:
   - `schema_audit.md`
@@ -255,7 +256,6 @@ uv run alembic upgrade heads
     materially
 - If repo workflow expectations change, update:
   - `AGENTS.md`
-  - `SKILL.md`
   - `RULES.md`
 
 ## Exceptions Process

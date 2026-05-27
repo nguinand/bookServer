@@ -19,7 +19,13 @@ and has its own `frontend/AGENTS.md`.
 - `ARCHITECHTURE.md` for the longer architecture summary. Keep the current file
   spelling unless the user explicitly asks to rename it.
 - `RULES.md` for detailed code review rules and project restrictions.
-- `SKILL.md` for the compact backend workflow reference.
+
+## Planning Interviews
+
+When the user asks to use `grill-me`, be grilled, be interviewed, or to
+stress-test a plan or design, use the global `grill-me` skill. Inspect the
+codebase for discoverable answers first, ask one question at a time, include
+your recommended answer, and resolve dependent decisions before implementation.
 
 ## Runtime Stack
 
@@ -226,5 +232,5 @@ Do not hardcode real values in code, migrations, tests, or docs.
 - Do not alter `pyproject.toml` or add dependencies without explicit approval.
 - Do not commit changes unless the user explicitly asks.
 - Do not remove or rewrite user changes in a dirty worktree.
-- Update `README.md`, `ARCHITECHTURE.md`, `RULES.md`, `SKILL.md`, and this file
-  when stack, API behavior, schema, or workflow expectations change.
+- Update `README.md`, `ARCHITECHTURE.md`, `RULES.md`, and this file when stack,
+  API behavior, schema, or workflow expectations change.

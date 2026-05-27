@@ -328,5 +328,5 @@ generated TypeScript config uses JSONC-style comments.
 - `requests`, `inquirer`, and `mypy` are declared in `pyproject.toml`, but the
   active backend path primarily uses HTTPX for outbound HTTP and Ty for type
   checking.
-- The root `AGENTS.md`, `RULES.md`, and `SKILL.md` are the Codex-facing
-  operating docs that sit alongside this architecture document.
+- The root `AGENTS.md` and `RULES.md` are the Codex-facing operating docs that
+  sit alongside this architecture document.
