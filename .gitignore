@@ -160,5 +160,4 @@ cython_debug/
 .vscode/
 
 # Local-only project notes / scratch
-proj_requirements/
-frontend/CLAUDE.md
+.codex
