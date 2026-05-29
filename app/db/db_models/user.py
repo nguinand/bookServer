@@ -50,3 +50,11 @@ class User(Base):
     book_states = relationship(
         "UserBookState", back_populates="user", cascade="all, delete-orphan"
     )
+
+    login_status = relationship(
+        "LoginStatus",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        uselist=False,
+    )
