@@ -13,6 +13,8 @@ os.environ.setdefault("DATABASE_NAME", "test")
 os.environ.setdefault("GOOGLE_BOOKS_API_URL", "https://example.com/books")
 os.environ.setdefault("GOOGLE_BOOKS_API_KEY", "test-key")
 os.environ.setdefault("SECRET_KEY", "test-secret")
+os.environ.setdefault("FRONTEND_ENDPOINT", "localhost")
+os.environ.setdefault("FRONTEND_PORT", "test")
 
 from app.api.admin_logs import get_admin_logs as admin_logs_routes
 from app.db.db_conn import db_manager
