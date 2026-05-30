@@ -197,7 +197,10 @@ Examples:
 ## Testing Standards
 
 - Must add or update tests for behavior changes.
-- Must run lint, type-check, and relevant tests before merging a change.
+- Validation is user-owned by default. Codex must not run `pytest`, `ruff`, or
+  `ty` unless the user explicitly asks for validation.
+- Must report the recommended lint, type-check, and relevant test commands for
+  the user to run before merging a change.
 - Should place tests near the affected domain when practical.
 - Should add regression coverage for bug fixes.
 - Must Not treat the GitHub Actions pytest job as sufficient proof of test
