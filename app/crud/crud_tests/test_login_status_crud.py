@@ -245,6 +245,50 @@ def test_unlock_login_status_by_user_id_resets_existing_row(
     assert existing.locked_at is None
 
 
+def test_unlock_login_status_by_user_id_returns_none_when_missing(
+    monkeypatch: pytest.MonkeyPatch, session: MagicMock
+) -> None:
+    lookup_mock = Mock(return_value=None)
+    monkeypatch.setattr(crud, "get_login_status_by_user_id", lookup_mock)
+
+    unlocked = crud.unlock_login_status_by_user_id(1, session)
+
+    lookup_mock.assert_called_once_with(1, session)
+    session.commit.assert_not_called()
+    session.refresh.assert_not_called()
+    assert unlocked is None
+
+
+def test_unlock_login_status_by_username_resets_existing_row(
+    monkeypatch: pytest.MonkeyPatch, session: MagicMock
+) -> None:
+    failed_at = datetime(2026, 5, 28, 12, 0, 0)
+    user = make_user(user_id=7, username="locked_user")
+    existing = make_login_status(
+        user_id=7,
+        failed_login_attempts=4,
+        last_failed_login_attempt_at=failed_at,
+        locked=True,
+        locked_at=failed_at,
+    )
+    user_lookup_mock = Mock(return_value=user)
+    status_lookup_mock = Mock(return_value=existing)
+    monkeypatch.setattr(crud, "get_users_by_username", user_lookup_mock)
+    monkeypatch.setattr(crud, "get_login_status_by_user_id", status_lookup_mock)
+
+    unlocked = crud.unlock_login_status_by_username("locked_user", session)
+
+    user_lookup_mock.assert_called_once_with("locked_user", session)
+    status_lookup_mock.assert_called_once_with(7, session)
+    session.commit.assert_called_once()
+    session.refresh.assert_called_once_with(existing)
+    assert unlocked is existing
+    assert existing.failed_login_attempts == 0
+    assert existing.last_failed_login_attempt_at is None
+    assert existing.locked is False
+    assert existing.locked_at is None
+
+
 def test_unlock_login_status_by_username_raises_when_user_is_missing(
     monkeypatch: pytest.MonkeyPatch, session: MagicMock
 ) -> None:
