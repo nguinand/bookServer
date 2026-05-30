@@ -20,6 +20,11 @@ router = APIRouter(prefix="/authenticate", tags=["users-password"])
     "/authenticate_user/",
     response_model=AuthenticationStatusResponse,
     status_code=status.HTTP_200_OK,
+    description=(
+        "Validate username and password credentials without issuing a JWT. "
+        "This endpoint confirms credentials only and is not sufficient to "
+        "establish an authenticated app session."
+    ),
 )
 async def authenticate_user(
     user_login_request: UserLoginRequest,
@@ -53,6 +58,11 @@ async def authenticate_user(
     "/token/",
     response_model=TokenResponse,
     status_code=status.HTTP_200_OK,
+    description=(
+        "Authenticate username and password credentials for login and issue a "
+        "JWT bearer token. Clients use the returned token in the Authorization "
+        "header for protected routes."
+    ),
 )
 async def authenticate_for_token(
     user_login_request: UserLoginRequest,
