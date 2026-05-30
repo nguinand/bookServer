@@ -48,9 +48,12 @@ class PasswordHandler(BaseModel):
 
     def get_authenticated_user(self, session: Session) -> User | None:
         user = self.get_user(session)
-        if user and self._password_context().verify(self.password, user.password_hash):
+        if user and self.verify_password_for_user(user):
             return user
         return None
+
+    def verify_password_for_user(self, user: User) -> bool:
+        return self._password_context().verify(self.password, user.password_hash)
 
     def verify_password(self, session: Session) -> bool:
         return self.get_authenticated_user(session) is not None

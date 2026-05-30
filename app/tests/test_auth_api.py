@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timedelta
 from typing import Generator
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,6 +13,8 @@ os.environ.setdefault("DATABASE_NAME", "test")
 os.environ.setdefault("GOOGLE_BOOKS_API_URL", "https://example.com/books")
 os.environ.setdefault("GOOGLE_BOOKS_API_KEY", "test-key")
 os.environ.setdefault("SECRET_KEY", "test-secret")
+os.environ.setdefault("FRONTEND_ENDPOINT", "localhost")
+os.environ.setdefault("FRONTEND_PORT", "test")
 
 from app.api.users import authenticate_user as authenticate_user_routes
 from app.api.users import create_user as create_user_routes
@@ -20,10 +22,17 @@ from app.api.users import get_user as get_user_routes
 from app.api.users import update_password as update_password_routes
 from app.api.users import update_user as update_user_routes
 from app.db.db_conn import db_manager
+from app.db.db_models.login_status import LoginStatus
 from app.db.db_models.user import User
 from app.main import app
 from app.utils import api_token as api_token_module
 from app.utils.api_token import create_access_token
+
+
+AUTH_ENDPOINT_PATHS = (
+    "/api/authenticate/authenticate_user/",
+    "/api/authenticate/token/",
+)
 
 
 def make_user(
@@ -42,6 +51,17 @@ def make_user(
         role=role,
         created_at=datetime.now(),
         last_login=None,
+    )
+
+
+def make_login_status(user_id: int = 1, locked: bool = False) -> LoginStatus:
+    locked_at = datetime.now() if locked else None
+    return LoginStatus(
+        user_id=user_id,
+        failed_login_attempts=4 if locked else 1,
+        last_failed_login_attempt_at=datetime.now(),
+        locked=locked,
+        locked_at=locked_at,
     )
 
 
@@ -64,6 +84,53 @@ def client(session: MagicMock) -> Generator[TestClient, None, None]:
 def auth_header(user_id: int) -> dict[str, str]:
     token = create_access_token(subject=user_id)
     return {"Authorization": f"Bearer {token}"}
+
+
+def stub_auth_dependencies(
+    monkeypatch: pytest.MonkeyPatch,
+    user: User | None,
+    password_matches: bool = True,
+    login_status: LoginStatus | None = None,
+) -> tuple[Mock, Mock, Mock, Mock, Mock]:
+    get_user_mock = Mock(return_value=user)
+    verify_password_mock = Mock(return_value=password_matches)
+    get_status_mock = Mock(return_value=login_status)
+    record_failed_attempt_mock = Mock(return_value=login_status)
+    reset_login_status_mock = Mock(return_value=login_status)
+
+    monkeypatch.setattr(
+        authenticate_user_routes.PasswordHandler,
+        "get_user",
+        lambda self, session: get_user_mock(session),
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes.PasswordHandler,
+        "verify_password_for_user",
+        lambda self, user: verify_password_mock(user),
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes,
+        "get_login_status_by_user_id",
+        get_status_mock,
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes,
+        "record_failed_login_attempt",
+        record_failed_attempt_mock,
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes,
+        "reset_login_status_after_successful_login",
+        reset_login_status_mock,
+    )
+
+    return (
+        get_user_mock,
+        verify_password_mock,
+        get_status_mock,
+        record_failed_attempt_mock,
+        reset_login_status_mock,
+    )
 
 
 def test_create_user_is_public(
@@ -95,13 +162,20 @@ def test_create_user_is_public(
 
 
 def test_token_endpoint_returns_bearer_token(
-    client: TestClient, monkeypatch: pytest.MonkeyPatch
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, session: MagicMock
 ) -> None:
     authenticated_user = make_user()
-    monkeypatch.setattr(
-        authenticate_user_routes.PasswordHandler,
-        "get_authenticated_user",
-        lambda self, session: authenticated_user,
+    (
+        _,
+        verify_password_mock,
+        get_status_mock,
+        record_failed_attempt_mock,
+        reset_login_status_mock,
+    ) = stub_auth_dependencies(
+        monkeypatch,
+        user=authenticated_user,
+        password_matches=True,
+        login_status=None,
     )
 
     response = client.post(
@@ -114,15 +188,27 @@ def test_token_endpoint_returns_bearer_token(
     assert body["token_type"] == "bearer"
     assert isinstance(body["access_token"], str)
     assert body["access_token"]
+    verify_password_mock.assert_called_once_with(authenticated_user)
+    get_status_mock.assert_called_once_with(1, session)
+    record_failed_attempt_mock.assert_not_called()
+    reset_login_status_mock.assert_not_called()
 
 
 def test_token_endpoint_rejects_invalid_credentials(
-    client: TestClient, monkeypatch: pytest.MonkeyPatch
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, session: MagicMock
 ) -> None:
-    monkeypatch.setattr(
-        authenticate_user_routes.PasswordHandler,
-        "get_authenticated_user",
-        lambda self, session: None,
+    authenticated_user = make_user()
+    (
+        _,
+        verify_password_mock,
+        get_status_mock,
+        record_failed_attempt_mock,
+        reset_login_status_mock,
+    ) = stub_auth_dependencies(
+        monkeypatch,
+        user=authenticated_user,
+        password_matches=False,
+        login_status=None,
     )
 
     response = client.post(
@@ -132,6 +218,167 @@ def test_token_endpoint_rejects_invalid_credentials(
 
     assert response.status_code == 401
     assert response.json()["detail"] == "Invalid credentials."
+    verify_password_mock.assert_called_once_with(authenticated_user)
+    get_status_mock.assert_called_once_with(1, session)
+    record_failed_attempt_mock.assert_called_once_with(1, session)
+    reset_login_status_mock.assert_not_called()
+
+
+def test_authenticate_user_endpoint_returns_authentication_status(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    authenticated_user = make_user()
+    stub_auth_dependencies(
+        monkeypatch,
+        user=authenticated_user,
+        password_matches=True,
+        login_status=None,
+    )
+
+    response = client.post(
+        "/api/authenticate/authenticate_user/",
+        json={"username": "owner", "password": "password1"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "user_id": 1,
+        "username": "owner",
+        "authenticated": True,
+        "details": "User authenticated.",
+    }
+
+
+@pytest.mark.parametrize("path", AUTH_ENDPOINT_PATHS)
+def test_authentication_endpoints_reject_unknown_username_without_lockout_write(
+    path: str,
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (
+        _,
+        verify_password_mock,
+        get_status_mock,
+        record_failed_attempt_mock,
+        reset_login_status_mock,
+    ) = stub_auth_dependencies(monkeypatch, user=None)
+
+    response = client.post(
+        path,
+        json={"username": "missing", "password": "password1"},
+    )
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid credentials."
+    verify_password_mock.assert_not_called()
+    get_status_mock.assert_not_called()
+    record_failed_attempt_mock.assert_not_called()
+    reset_login_status_mock.assert_not_called()
+
+
+@pytest.mark.parametrize("path", AUTH_ENDPOINT_PATHS)
+def test_authentication_endpoints_return_401_when_failed_attempt_locks_account(
+    path: str,
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    session: MagicMock,
+) -> None:
+    authenticated_user = make_user()
+    locked_status = make_login_status(locked=True)
+    (
+        _,
+        verify_password_mock,
+        get_status_mock,
+        record_failed_attempt_mock,
+        reset_login_status_mock,
+    ) = stub_auth_dependencies(
+        monkeypatch,
+        user=authenticated_user,
+        password_matches=False,
+        login_status=None,
+    )
+    record_failed_attempt_mock.return_value = locked_status
+
+    response = client.post(
+        path,
+        json={"username": "owner", "password": "wrongpass"},
+    )
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid credentials."
+    verify_password_mock.assert_called_once_with(authenticated_user)
+    get_status_mock.assert_called_once_with(1, session)
+    record_failed_attempt_mock.assert_called_once_with(1, session)
+    reset_login_status_mock.assert_not_called()
+
+
+@pytest.mark.parametrize("path", AUTH_ENDPOINT_PATHS)
+def test_authentication_endpoints_return_423_for_locked_account_without_password_check(
+    path: str,
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    session: MagicMock,
+) -> None:
+    authenticated_user = make_user()
+    locked_status = make_login_status(locked=True)
+    (
+        _,
+        verify_password_mock,
+        get_status_mock,
+        record_failed_attempt_mock,
+        reset_login_status_mock,
+    ) = stub_auth_dependencies(
+        monkeypatch,
+        user=authenticated_user,
+        password_matches=True,
+        login_status=locked_status,
+    )
+
+    response = client.post(
+        path,
+        json={"username": "owner", "password": "password1"},
+    )
+
+    assert response.status_code == 423
+    assert response.json()["detail"] == "Account is locked. Contact an admin."
+    verify_password_mock.assert_not_called()
+    get_status_mock.assert_called_once_with(1, session)
+    record_failed_attempt_mock.assert_not_called()
+    reset_login_status_mock.assert_not_called()
+
+
+@pytest.mark.parametrize("path", AUTH_ENDPOINT_PATHS)
+def test_authentication_endpoints_reset_existing_login_status_after_success(
+    path: str,
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    session: MagicMock,
+) -> None:
+    authenticated_user = make_user()
+    login_status = make_login_status(locked=False)
+    (
+        _,
+        verify_password_mock,
+        get_status_mock,
+        record_failed_attempt_mock,
+        reset_login_status_mock,
+    ) = stub_auth_dependencies(
+        monkeypatch,
+        user=authenticated_user,
+        password_matches=True,
+        login_status=login_status,
+    )
+
+    response = client.post(
+        path,
+        json={"username": "owner", "password": "password1"},
+    )
+
+    assert response.status_code == 200
+    verify_password_mock.assert_called_once_with(authenticated_user)
+    get_status_mock.assert_called_once_with(1, session)
+    record_failed_attempt_mock.assert_not_called()
+    reset_login_status_mock.assert_called_once_with(1, session)
 
 
 def test_books_routes_require_authentication(client: TestClient) -> None:
