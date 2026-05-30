@@ -6,6 +6,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.admin.router import router as admin_route
 from app.api.admin_logs.router import router as admin_logs_route
 from app.api.author.router import router as author_route
 from app.api.avatar.router import router as avatar_route
@@ -42,6 +43,7 @@ app.include_router(book_route, prefix=prefix)
 app.include_router(user_book_attributes, prefix=prefix)
 app.include_router(bookcase_route, prefix=prefix)
 app.include_router(user_router, prefix=prefix)
+app.include_router(admin_route, prefix=prefix)
 app.include_router(admin_logs_route, prefix=prefix)
 app.include_router(author_route, prefix=prefix)
 app.include_router(genre_route, prefix=prefix)
