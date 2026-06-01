@@ -15,6 +15,7 @@ from app.api.book_sale_info.router import router as book_sale_info_route
 from app.api.bookcase.router import router as bookcase_route
 from app.api.books.router import router as book_route
 from app.api.genre.router import router as genre_route
+from app.api.login_status.router import router as login_status_route
 from app.api.user_book_attributes.router import router as user_book_attributes
 from app.api.user_book_state.router import router as user_book_state_route
 from app.api.user_status.router import router as user_status_route
@@ -47,6 +48,7 @@ app.include_router(admin_route, prefix=prefix)
 app.include_router(admin_logs_route, prefix=prefix)
 app.include_router(author_route, prefix=prefix)
 app.include_router(genre_route, prefix=prefix)
+app.include_router(login_status_route, prefix=prefix)
 app.include_router(avatar_route, prefix=prefix)
 app.include_router(user_status_route, prefix=prefix)
 app.include_router(user_book_state_route, prefix=prefix)
