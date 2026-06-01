@@ -10,12 +10,12 @@ from app.api.user_book_state.get_user_book_state import router as get_user_book_
 from app.api.user_book_state.update_user_book_state import (
     router as update_user_book_state,
 )
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 
 router = APIRouter(
     prefix="/user_book_state",
     tags=["user-book-state"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(get_authenticated_user)],
 )
 
 router.include_router(create_user_book_state)

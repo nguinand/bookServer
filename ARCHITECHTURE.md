@@ -102,7 +102,7 @@ Public endpoints:
 Protected behavior:
 
 - Most other routes require `Authorization: Bearer <token>`.
-- `get_current_user()` in `app/utils/api_token.py` decodes the JWT, validates the
+- `get_authenticated_user()` in `app/utils/api_token.py` decodes the JWT, validates the
   `sub` claim, loads the user by ID, and returns a SQLAlchemy `User`.
 - `PasswordHandler` in `app/utils/authentication.py` verifies and hashes
   passwords with Argon2.

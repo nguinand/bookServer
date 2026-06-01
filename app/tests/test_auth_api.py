@@ -400,6 +400,30 @@ def test_expired_token_is_rejected(client: TestClient) -> None:
     assert response.json()["detail"] == "Could not validate credentials."
 
 
+def test_valid_token_for_locked_user_is_rejected(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, session: MagicMock
+) -> None:
+    current_user = make_user(user_id=1, username="owner", email="owner@example.com")
+    locked_status = make_login_status(user_id=1, locked=True)
+    get_status_mock = Mock(return_value=locked_status)
+    monkeypatch.setattr(
+        api_token_module,
+        "get_user_by_id",
+        lambda user_id, session: current_user if user_id == 1 else None,
+    )
+    monkeypatch.setattr(
+        api_token_module,
+        "get_login_status_by_user_id",
+        get_status_mock,
+    )
+
+    response = client.get("/api/database/user_by_id/1", headers=auth_header(1))
+
+    assert response.status_code == 423
+    assert response.json()["detail"] == "Account is locked. Contact an admin."
+    get_status_mock.assert_called_once_with(1, session)
+
+
 def test_user_route_allows_owner_access(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:

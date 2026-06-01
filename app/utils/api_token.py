@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import ExpiredSignatureError, JWTError, jwt
 from sqlalchemy.orm import Session
 
+from app.crud.login_status_crud import get_login_status_by_user_id
 from app.crud.user_crud import get_user_by_id
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
@@ -28,7 +29,7 @@ def create_access_token(subject: int, expires_delta: timedelta | None = None) ->
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def get_current_user(
+def get_authenticated_user(
     token: str = Depends(oauth2_scheme),
     session: Session = Depends(db_manager.get_db),
 ) -> User:
@@ -61,5 +62,12 @@ def get_current_user(
             f"user_id={user_id}",
         )
         raise credentials_exception
+
+    login_status = get_login_status_by_user_id(user.id, session)
+    if login_status is not None and login_status.locked is True:
+        raise HTTPException(
+            status_code=status.HTTP_423_LOCKED,
+            detail="Account is locked. Contact an admin.",
+        )
 
     return user

@@ -15,7 +15,7 @@ from app.models.login_status import (
     UnlockLoginStatusByUserIdRequest,
     UnlockLoginStatusByUsernameRequest,
 )
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 from app.utils.authorization import ensure_current_user_is_admin
 
 router = APIRouter()
@@ -33,7 +33,7 @@ router = APIRouter()
 async def unlock_user_account_by_id(
     unlock_request: UnlockLoginStatusByUserIdRequest,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> LoginStatusModel:
     ensure_current_user_is_admin(current_user, resource_name="unlock_user_account")
     unlocked_login_status = unlock_login_status_by_user_id(
@@ -72,7 +72,7 @@ async def unlock_user_account_by_id(
 async def unlock_user_account_by_username(
     unlock_request: UnlockLoginStatusByUsernameRequest,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> LoginStatusModel:
     ensure_current_user_is_admin(current_user, resource_name="unlock_user_account")
     try:

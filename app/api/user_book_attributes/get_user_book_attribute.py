@@ -13,7 +13,7 @@ from app.crud.user_book_attributes_crud import (
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.user_book_attributes import UserBookAttributesModel
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 from app.utils.authorization import ensure_current_user_matches_user_id
 from app.utils.logger import get_logger
 
@@ -32,7 +32,7 @@ router = APIRouter(prefix="/user_book_attributes", tags=["books-external"])
 async def user_book_attribute_by_id(
     attribute_id: int,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> UserBookAttributesModel:
     attribute_results = get_user_book_attribute_by_id(attribute_id, session)
     if attribute_results:
@@ -63,7 +63,7 @@ async def user_book_attribute_by_user_id(
     limit: int = 100,
     offset: int = 0,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> List[UserBookAttributesModel]:
     ensure_current_user_matches_user_id(
         current_user,
@@ -81,7 +81,7 @@ async def user_book_attribute_by_user_id(
     tags=["User Book Attributes"],
     response_model=List[UserBookAttributesModel],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(get_authenticated_user)],
 )
 async def user_book_attribute_by_book_id(
     book_id: int,
@@ -101,7 +101,7 @@ async def user_book_attribute_by_book_and_user_id(
     book_id: int,
     user_id: int,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> List[UserBookAttributesModel]:
     ensure_current_user_matches_user_id(
         current_user,
