@@ -5,7 +5,7 @@ from app.crud.login_status_crud import convert_login_status, create_login_status
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.login_status import LoginStatusModel
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 from app.utils.authorization import ensure_current_user_is_admin
 from app.utils.logger import get_logger
 
@@ -25,7 +25,7 @@ router = APIRouter()
 async def login_status_create(
     login_status_model: LoginStatusModel,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> LoginStatusModel:
     ensure_current_user_is_admin(current_user, resource_name="create_login_status")
     try:

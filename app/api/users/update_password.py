@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.user import PasswordUpdateRequest, PasswordUpdateResponse
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 from app.utils.authentication import PasswordHandler
 from app.utils.logger import get_logger
 
@@ -21,7 +21,7 @@ router = APIRouter(prefix="/authenticate", tags=["users-password"])
 async def update_password(
     password_update_request: PasswordUpdateRequest,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> PasswordUpdateResponse:
     authenticator = PasswordHandler(
         id=current_user.id, password=password_update_request.current_password

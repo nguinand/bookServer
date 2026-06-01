@@ -12,7 +12,7 @@ from app.crud.bookcase_crud import (
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.book import BookModel
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -29,7 +29,7 @@ async def get_book_recommendations_by_bookshelf_genre(
     max_results: int = 10,
     start_index: int = 0,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> list[BookModel] | JSONResponse:
     """Recommend books using the most common genre in the current user's bookcases."""
     top_genre = get_most_common_bookcase_genre_by_user_id(

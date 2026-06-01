@@ -5,7 +5,7 @@ from starlette.responses import JSONResponse
 from app.crud.bookcase_crud import delete_bookcase_by_id, get_bookcase_by_id
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 from app.utils.authorization import ensure_current_user_matches_user_id
 from app.utils.logger import get_logger
 
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/database", tags=["Bookcase"])
 async def delete_bookcase(
     bookcase_id: int,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> JSONResponse:
     existing_bookcase = get_bookcase_by_id(bookcase_id=bookcase_id, session=session)
     if existing_bookcase is not None:

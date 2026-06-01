@@ -16,9 +16,9 @@ from app.api.books.internal_api.create_book import router as create_book
 from app.api.books.internal_api.delete_book import router as delete_book
 from app.api.books.internal_api.get_book import router as get_books
 from app.api.books.internal_api.update_book import router as update_book
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 
-router = APIRouter(dependencies=[Depends(get_current_user)])
+router = APIRouter(dependencies=[Depends(get_authenticated_user)])
 
 router.include_router(books_by_name)
 router.include_router(books_by_isbn)

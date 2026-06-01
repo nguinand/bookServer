@@ -4,12 +4,12 @@ from app.api.author.create_author import router as create_author
 from app.api.author.delete_author import router as delete_author
 from app.api.author.get_author import router as get_author
 from app.api.author.update_author import router as update_author
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 
 router = APIRouter(
     prefix="/author",
     tags=["authors"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(get_authenticated_user)],
 )
 
 router.include_router(create_author)

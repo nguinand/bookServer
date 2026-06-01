@@ -5,7 +5,7 @@ from app.crud.user_crud import convert_user_to_model, update_user
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.user import UpdateUserRequest, UserModel
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 from app.utils.authorization import ensure_current_user_matches_user_id
 from app.utils.logger import get_logger
 
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/database", tags=["users-database"])
 async def user_update(
     user_request: UpdateUserRequest,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> UserModel:
     user_model = user_request.user_model
     if user_model.id is None:

@@ -12,7 +12,7 @@ from app.crud.bookcase_crud import (
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.bookcase import BookcaseModel
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 from app.utils.authorization import ensure_current_user_matches_user_id
 from app.utils.logger import get_logger
 
@@ -28,7 +28,7 @@ router = APIRouter(prefix="/database", tags=["Bookcase"])
 async def bookcase_by_id(
     bookcase_id: int,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> BookcaseModel:
     bookcase_data = get_bookcase_by_id(bookcase_id=bookcase_id, session=session)
     if bookcase_data:
@@ -58,7 +58,7 @@ async def bookcases_by_user_id(
     limit: int = 100,
     offset: int = 0,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> List[BookcaseModel]:
     ensure_current_user_matches_user_id(
         current_user,

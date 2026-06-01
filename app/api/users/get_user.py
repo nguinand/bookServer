@@ -10,7 +10,7 @@ from app.crud.user_crud import (
 from app.db.db_conn import db_manager
 from app.db.db_models.user import User
 from app.models.user import UserModel
-from app.utils.api_token import get_current_user
+from app.utils.api_token import get_authenticated_user
 from app.utils.authorization import (
     ensure_current_user_matches_email,
     ensure_current_user_matches_user_id,
@@ -28,7 +28,7 @@ router = APIRouter(prefix="/database", tags=["users-database"])
 async def user_by_email(
     email: str,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> UserModel:
     ensure_current_user_matches_email(
         current_user,
@@ -57,7 +57,7 @@ async def user_by_email(
 async def user_by_username(
     username: str,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> UserModel:
     ensure_current_user_matches_username(
         current_user,
@@ -84,7 +84,7 @@ async def user_by_username(
 async def user_by_id(
     user_id: int,
     session: Session = Depends(db_manager.get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_authenticated_user),
 ) -> UserModel:
     ensure_current_user_matches_user_id(
         current_user,
