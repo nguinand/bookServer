@@ -57,48 +57,6 @@ class LoginStatusModel(BaseModel):
         return self
 
 
-class CreateLoginStatusRequest(BaseModel):
-    login_status_model: LoginStatusModel = Field(
-        description="The login-status row to create.",
-        examples=[
-            {
-                "user_id": 1234,
-                "failed_login_attempts": 0,
-                "last_failed_login_attempt_at": None,
-                "locked": False,
-                "locked_at": None,
-            }
-        ],
-    )
-
-
-class UpdateLoginStatusRequest(BaseModel):
-    login_status_model: LoginStatusModel = Field(
-        description="The full replacement login-status row.",
-        examples=[
-            {
-                "user_id": 1234,
-                "failed_login_attempts": 2,
-                "last_failed_login_attempt_at": "2026-05-28T12:01:00",
-                "locked": False,
-                "locked_at": None,
-            }
-        ],
-    )
-
-
-class DeleteLoginStatusResponse(BaseModel):
-    user_id: int = Field(
-        description="The user id associated with the delete request.",
-        examples=[1234],
-        gt=0,
-    )
-    deleted: StrictBool = Field(
-        description="Whether a login-status row was deleted.",
-        examples=[True, False],
-    )
-
-
 class UnlockLoginStatusByUserIdRequest(BaseModel):
     user_id: int = Field(
         description="The user id for the account to unlock.",
