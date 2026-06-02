@@ -123,6 +123,24 @@ Login uses JSON, not OAuth2 form encoding:
 }
 ```
 
+Account lockout is tracked per existing username. Failed attempts for
+nonexistent usernames return `401 Invalid credentials.` and do not create
+login-status rows. User creation also does not create a login-status row.
+
+For existing users, the fourth failed password attempt within a rolling
+10-minute window stores the lockout state but still returns
+`401 Invalid credentials.` Requests after the account is locked return
+`423 Locked` with:
+
+```json
+{
+  "detail": "Account is locked. Contact an admin."
+}
+```
+
+Locked users are also rejected from protected routes even when they already
+have a valid JWT.
+
 ## Route Overview
 
 All application routes are mounted under `/api`.
@@ -140,6 +158,20 @@ All application routes are mounted under `/api`.
 | GET | `/api/database/users_by_username/{username}` |
 | PUT | `/api/database/update_user/` |
 | DELETE | `/api/database/delete_user/{user_id}` |
+
+### Login Status And Admin Unlock
+
+All login-status CRUD and admin unlock routes require an authenticated admin
+user.
+
+| Method | Path |
+| --- | --- |
+| POST | `/api/login_status/create_login_status/` |
+| GET | `/api/login_status/login_status_by_user_id/{user_id}` |
+| PUT | `/api/login_status/update_login_status/` |
+| DELETE | `/api/login_status/delete_login_status/{user_id}` |
+| POST | `/api/admin/unlock_user_account_by_id/` |
+| POST | `/api/admin/unlock_user_account_by_username/` |
 
 ### Books And Google Books
 
@@ -192,6 +224,8 @@ All application routes are mounted under `/api`.
 | Book access | `/api/book_access/...` |
 | Book sale info | `/api/book_sale_info/...` |
 | Admin logs | `/api/admin_logs/...` |
+| Login status | `/api/login_status/...` |
+| Admin actions | `/api/admin/...` |
 
 Admin log routes require an authenticated admin user.
 

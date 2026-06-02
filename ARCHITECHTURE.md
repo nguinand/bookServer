@@ -77,6 +77,8 @@ All application routes are mounted under `/api`.
 | Bookcases | `app/api/bookcase/router.py` | User-owned bookcase CRUD |
 | User book attributes | `app/api/user_book_attributes/router.py` | Per-user ratings and review metadata |
 | User book state | `app/api/user_book_state/router.py` | Reading status, progress, and user/book lookup |
+| Login status | `app/api/login_status/router.py` | Admin-only account lockout state CRUD |
+| Admin | `app/api/admin/router.py` | Admin-only account unlock actions |
 | Admin logs | `app/api/admin_logs/router.py` | Admin log CRUD and paginated log retrieval |
 | Authors | `app/api/author/router.py` | Author CRUD |
 | Genres | `app/api/genre/router.py` | Genre CRUD |
@@ -87,7 +89,8 @@ All application routes are mounted under `/api`.
 
 The API currently uses operation-style route names such as
 `/database/create_user/`, `/database/update_book/`,
-`/books/recommendations/by_author/`, and `/admin_logs/get_admin_logs_by_id/{id}`.
+`/books/recommendations/by_author/`, `/admin/unlock_user_account_by_id/`,
+and `/admin_logs/get_admin_logs_by_id/{id}`.
 
 ## Authentication And Authorization
 
@@ -104,15 +107,34 @@ Protected behavior:
 - Most other routes require `Authorization: Bearer <token>`.
 - `get_authenticated_user()` in `app/utils/api_token.py` decodes the JWT, validates the
   `sub` claim, loads the user by ID, and returns a SQLAlchemy `User`.
+- Locked users are rejected during JWT user resolution with `423 Locked` and
+  `Account is locked. Contact an admin.`, even when the JWT is otherwise valid.
 - `PasswordHandler` in `app/utils/authentication.py` verifies and hashes
   passwords with Argon2.
 - Owner/admin authorization helpers live in `app/utils/authorization.py`.
 - Admin override is represented by `current_user.role == "admin"`.
 
+Login lockout behavior is shared by `POST /api/authenticate/authenticate_user/`
+and `POST /api/authenticate/token/`. Failed attempts for nonexistent usernames
+return `401 Invalid credentials.` and do not create login-status rows. Existing
+users are locked on the fourth failed password attempt within a rolling
+10-minute window; that lock-causing attempt still returns
+`401 Invalid credentials.`, and later attempts return `423 Locked` with
+`Account is locked. Contact an admin.` Successful login resets an existing
+login-status row but does not create one when the row is missing. User creation
+does not create login-status rows.
+
 Some domains apply auth at the aggregate router level, including books, author,
 genre, avatar, user status, user book state, book access, and book sale info.
 Other domains enforce auth or admin access inside individual route handlers
 because they need resource-specific owner checks.
+
+All login-status CRUD routes under `/api/login_status/...` are admin-only. The
+admin unlock routes under `/api/admin/unlock_user_account_by_id/` and
+`/api/admin/unlock_user_account_by_username/` are also admin-only, reset the
+login-status state to unlocked defaults, and write admin log entries for
+successful unlocks. Failed login attempts and lock events are not written to
+admin logs.
 
 ## Database Access
 
@@ -146,6 +168,7 @@ includes:
 - `BookAccess`
 - `BookSaleInfo`
 - `BookIdentifier`
+- `LoginStatus`
 - `AdminLogs`
 - `ErrorLog`
 
@@ -158,7 +181,14 @@ Relationship tables include:
 Books are the central resource and connect to authors, genres, sale metadata,
 access metadata, identifiers, bookcases, ratings/reviews, and reading state.
 Users own bookcases, ratings/reviews, and reading-state records, and can have an
-avatar and status.
+avatar, status, and one login-status row.
+
+`LoginStatus` stores account lockout state in the `login_status` table. The
+`user_id` column is both the primary key and a foreign key to `users.id` with
+cascading delete behavior. The table also stores `failed_login_attempts`,
+`last_failed_login_attempt_at`, `locked`, and `locked_at`. Rows are created only
+when failed login state needs to be stored for an existing user or when an admin
+creates one through the admin-only login-status CRUD API.
 
 ## Pydantic Contracts
 
@@ -172,6 +202,7 @@ Important model groups:
   `access_info.py`: Google Books and stored-book contracts.
 - `bookcase.py`, `user_book_attributes.py`, `user_book_state.py`: user-owned
   library state.
+- `login_status.py`: login-status records and admin unlock request bodies.
 - `admin_log.py`: admin event contracts and paginated log responses.
 - Supporting resources: author, genre, avatar, user status.
 

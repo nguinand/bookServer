@@ -18,7 +18,7 @@ or hunting through Svelte/Skeleton docs.
 | Styling          | **Tailwind CSS** (per Skeleton pin)     | Skeleton drives the theme; raw Tailwind for the gap. |
 | Forms/validation | **Zod**                                 | Schemas mirror backend Pydantic models.              |
 | Tests            | **Vitest** (unit) + **Playwright** (e2e) | MSW for mocking the API in tests.                   |
-| Pkg manager      | **pnpm**                                | Use `pnpm`, not `npm`/`yarn`, in commands.           |
+| Pkg manager      | **npm**                                 | Use `npm`, not `pnpm`/`yarn`, in commands.           |
 
 Backend is FastAPI 0.115+ / Pydantic 2 / Python 3.12 / MySQL — see `../pyproject.toml`.
 
@@ -362,7 +362,7 @@ export const load: PageServerLoad = async ({ url, fetch, locals }) => {
 Skeleton v3 is **framework-agnostic core + framework-specific components**. For Svelte we install both packages:
 
 ```bash
-pnpm add @skeletonlabs/skeleton @skeletonlabs/skeleton-svelte
+npm install @skeletonlabs/skeleton @skeletonlabs/skeleton-svelte
 ```
 
 ### Setup essentials
@@ -606,12 +606,12 @@ Use `use:enhance` from `$app/forms` — keeps progressive enhancement (works wit
 
 ## 11. Testing
 
-- **Unit / component:** Vitest. Test pure utility functions in `$lib/utils/` and component behavior. Run with `pnpm test:unit`.
-- **End-to-end:** Playwright. Tests live in `tests/`. Run with `pnpm test:e2e`.
+- **Unit / component:** Vitest. Test pure utility functions in `$lib/utils/` and component behavior. Run with `npm run test:unit` when that script exists.
+- **End-to-end:** Playwright. Tests live in `tests/`. Run with `npm run test:e2e` when that script exists.
 - **API mocking:** [MSW](https://mswjs.io/) (`msw` package) — intercept the backend at the network level for both unit and e2e tests. Keep one set of fixtures in `tests/fixtures/` keyed by endpoint path.
-- **Type checking:** `pnpm check` runs `svelte-check` — must pass before commit.
+- **Type checking:** `npm run check` runs `svelte-check` — must pass before commit.
 
-Run a single Playwright test: `pnpm exec playwright test tests/login.spec.ts --headed`.
+Run a single Playwright test: `npx playwright test tests/login.spec.ts --headed`.
 
 ---
 
@@ -619,20 +619,19 @@ Run a single Playwright test: `pnpm exec playwright test tests/login.spec.ts --h
 
 ```bash
 # One-time install
-pnpm install
+npm install
 
 # Run frontend (port 5173)
-pnpm dev
+npm run dev
 
 # Run backend in another terminal (port 8000)
 cd .. && uv run uvicorn app.main:app --reload
 
-# Type check + lint
-pnpm check
-pnpm lint
+# Type check
+npm run check
 
 # Build for production
-pnpm build && pnpm preview
+npm run build && npm run preview
 ```
 
 **You must run both servers** — SvelteKit at 5173, FastAPI at 8000. The frontend talks to the backend over HTTP; there's no in-process integration.
