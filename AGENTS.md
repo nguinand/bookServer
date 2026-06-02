@@ -40,6 +40,31 @@ your recommended answer, and resolve dependent decisions before implementation.
 - Password hashing through Passlib Argon2.
 - Tooling: `uv`, Ruff, Ty, pytest, pre-commit.
 
+## Backend Docker
+
+- Docker support is for the backend only. Do not containerize the frontend
+  unless the user explicitly expands the scope.
+- The production image uses Python 3.13 slim, installs dependencies from
+  `uv.lock` with frozen resolution, sets `PYTHONPATH=/app`, and runs as the
+  non-root `bookserver_user`.
+- Runtime configuration is injected through environment variables. Do not copy,
+  commit, or document real `.env` values.
+- The container entrypoint runs `alembic upgrade heads` before Uvicorn and
+  retries migrations up to 30 times with a 5-second delay.
+- The default Uvicorn runtime is `app.main:app` on `0.0.0.0:8000` with one
+  worker, no reload, one backend replica, and no Docker healthcheck.
+- Docker Compose is backend-only. It builds from the local `Dockerfile`, reads
+  the root `.env` with `env_file`, publishes `8000:8000`, and uses
+  `restart: unless-stopped`.
+- Do not add a Compose database service, `depends_on`, or a healthcheck. The
+  database is external and must already exist.
+- For local WSL development only, when the backend container needs to reach
+  services bound to the WSL host, document `network_mode: host` as a local
+  Compose adjustment in place of `ports`. Do not treat host networking as the
+  default EC2 or deployment configuration.
+- EC2 deployments need their own non-committed `.env` file beside
+  `docker-compose.yml` or equivalent environment injection.
+
 ## Backend Layout
 
 | Path | Role |
