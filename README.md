@@ -38,7 +38,8 @@ Install dependencies:
 uv sync --dev
 ```
 
-Create a root `.env` with these variables:
+Create a root `.env` with these variables. This file is required for local
+development and must remain uncommitted.
 
 ```text
 PYTHONPATH
@@ -78,6 +79,90 @@ API docs:
 
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
+
+## Backend Docker
+
+The Docker setup builds and runs the FastAPI backend only. It does not
+containerize the frontend, and Docker Compose does not define a MySQL service.
+The backend container connects to an external database through runtime
+environment variables.
+
+The production image uses Python 3.13 slim, installs dependencies from
+`uv.lock` with frozen resolution, runs as the non-root `bookserver_user`, sets
+`PYTHONPATH=/app`, and exposes container port `8000`. The container entrypoint
+runs `alembic upgrade heads` before starting Uvicorn, retrying migrations up to
+30 times with a 5-second delay. Uvicorn starts `app.main:app` on `0.0.0.0:8000`
+with one worker and no reload.
+
+Build the backend image:
+
+```bash
+docker build -t bookserver-api .
+```
+
+Run the backend image locally:
+
+```bash
+docker run --rm --env-file .env -p 8000:8000 bookserver-api
+```
+
+The root `.env` file is required for local Docker runs, but it is excluded from
+the Docker build context and must not be committed. The Docker runtime expects
+these environment variable names:
+
+```text
+DATABASE_URL
+DATABASE_NAME
+DATABASE_USERNAME
+DATABASE_PASSWORD
+DATABASE_CONNECTION_STRING
+GOOGLE_BOOKS_API_URL
+GOOGLE_BOOKS_API_KEY
+SECRET_KEY
+FRONTEND_ENDPOINT
+FRONTEND_PORT
+BACKEND_ENDPOINT
+BACKEND_PORT
+```
+
+Build the Compose service:
+
+```bash
+docker compose build
+```
+
+Start the Compose service:
+
+```bash
+docker compose up
+```
+
+The default `docker-compose.yml` defines one backend service, builds from the
+local `Dockerfile`, loads the root `.env` with `env_file`, publishes
+`8000:8000`, and uses `restart: unless-stopped`. It intentionally does not add
+a database service, `depends_on`, or a healthcheck.
+
+For local development on WSL, use host networking only when the backend
+container needs to reach services bound to the WSL host. Treat this as a
+local-only Compose adjustment, not as the default deployment configuration. In
+that case, add `network_mode: host` in place of `ports`:
+
+```yaml
+services:
+  bookserver_backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    network_mode: host
+    restart: unless-stopped
+```
+
+For EC2 or git-based deployments, provision a separate uncommitted `.env` file
+beside `docker-compose.yml` or inject the same environment variables through
+the deployment platform. The external database must already exist, and the
+configured database user must have permission to run Alembic migrations.
 
 ## Frontend Setup
 
