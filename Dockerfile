@@ -36,8 +36,8 @@ WORKDIR /app
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libmariadb3 \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system app \
-    && useradd --system --create-home --gid app app
+    && groupadd --system bookserver_user \
+    && useradd --system --create-home --gid bookserver_user bookserver_user
 
 COPY --from=builder /opt/venv /opt/venv
 COPY app ./app
@@ -46,9 +46,9 @@ COPY alembic.ini ./alembic.ini
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
-    && chown -R app:app /app /opt/venv
+    && chown -R bookserver_user:bookserver_user /app /opt/venv
 
-USER app
+USER bookserver_user
 
 EXPOSE 8000
 
