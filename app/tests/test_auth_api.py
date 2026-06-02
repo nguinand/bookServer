@@ -21,6 +21,7 @@ from app.api.users import create_user as create_user_routes
 from app.api.users import get_user as get_user_routes
 from app.api.users import update_password as update_password_routes
 from app.api.users import update_user as update_user_routes
+from app.crud import login_status_crud as login_status_crud_module
 from app.db.db_conn import db_manager
 from app.db.db_models.login_status import LoginStatus
 from app.db.db_models.user import User
@@ -348,6 +349,182 @@ def test_authentication_endpoints_return_423_for_locked_account_without_password
 
 
 @pytest.mark.parametrize("path", AUTH_ENDPOINT_PATHS)
+def test_authentication_endpoints_return_401_until_request_after_lockout(
+    path: str,
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    session: MagicMock,
+) -> None:
+    authenticated_user = make_user()
+    login_status_state: dict[str, LoginStatus | None] = {"status": None}
+    get_user_mock = Mock(return_value=authenticated_user)
+    verify_password_mock = Mock(return_value=False)
+    get_status_mock = Mock(
+        side_effect=lambda _user_id, _session: login_status_state["status"]
+    )
+
+    def record_failed_attempt(user_id: int, _session: MagicMock) -> LoginStatus:
+        attempted_at = datetime(2026, 5, 28, 12, 0, 0)
+        login_status = login_status_state["status"]
+        if login_status is None:
+            login_status = LoginStatus(
+                user_id=user_id,
+                failed_login_attempts=0,
+                last_failed_login_attempt_at=None,
+                locked=False,
+                locked_at=None,
+            )
+            login_status_state["status"] = login_status
+
+        login_status.failed_login_attempts += 1
+        login_status.last_failed_login_attempt_at = attempted_at
+        if login_status.failed_login_attempts >= 4:
+            login_status.failed_login_attempts = 4
+            login_status.locked = True
+            login_status.locked_at = attempted_at
+        return login_status
+
+    record_failed_attempt_mock = Mock(side_effect=record_failed_attempt)
+    reset_login_status_mock = Mock()
+    monkeypatch.setattr(
+        authenticate_user_routes.PasswordHandler,
+        "get_user",
+        lambda self, session: get_user_mock(session),
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes.PasswordHandler,
+        "verify_password_for_user",
+        lambda self, user: verify_password_mock(user),
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes,
+        "get_login_status_by_user_id",
+        get_status_mock,
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes,
+        "record_failed_login_attempt",
+        record_failed_attempt_mock,
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes,
+        "reset_login_status_after_successful_login",
+        reset_login_status_mock,
+    )
+
+    responses = [
+        client.post(path, json={"username": "owner", "password": "wrongpass"})
+        for _ in range(5)
+    ]
+
+    assert [response.status_code for response in responses] == [
+        401,
+        401,
+        401,
+        401,
+        423,
+    ]
+    assert [response.json()["detail"] for response in responses] == [
+        "Invalid credentials.",
+        "Invalid credentials.",
+        "Invalid credentials.",
+        "Invalid credentials.",
+        "Account is locked. Contact an admin.",
+    ]
+    assert login_status_state["status"] is not None
+    assert login_status_state["status"].failed_login_attempts == 4
+    assert login_status_state["status"].locked is True
+    assert get_status_mock.call_count == 5
+    assert verify_password_mock.call_count == 4
+    assert record_failed_attempt_mock.call_count == 4
+    reset_login_status_mock.assert_not_called()
+
+
+@pytest.mark.parametrize("path", AUTH_ENDPOINT_PATHS)
+def test_authentication_endpoints_reset_stale_failed_attempt_window(
+    path: str,
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    session: MagicMock,
+) -> None:
+    authenticated_user = make_user()
+    failed_at = datetime(2026, 5, 28, 12, 11, 0)
+    stale_status = LoginStatus(
+        user_id=1,
+        failed_login_attempts=3,
+        last_failed_login_attempt_at=failed_at - timedelta(minutes=11),
+        locked=False,
+        locked_at=None,
+    )
+    get_user_mock = Mock(return_value=authenticated_user)
+    verify_password_mock = Mock(return_value=False)
+    get_status_mock = Mock(return_value=stale_status)
+    record_failed_attempt_mock = Mock(
+        side_effect=lambda user_id, active_session: (
+            login_status_crud_module.record_failed_login_attempt(
+                user_id,
+                active_session,
+                failed_at,
+            )
+        )
+    )
+    reset_login_status_mock = Mock()
+    monkeypatch.setattr(
+        authenticate_user_routes.PasswordHandler,
+        "get_user",
+        lambda self, active_session: get_user_mock(active_session),
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes.PasswordHandler,
+        "verify_password_for_user",
+        lambda self, user: verify_password_mock(user),
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes,
+        "get_login_status_by_user_id",
+        get_status_mock,
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes,
+        "record_failed_login_attempt",
+        record_failed_attempt_mock,
+    )
+    monkeypatch.setattr(
+        authenticate_user_routes,
+        "reset_login_status_after_successful_login",
+        reset_login_status_mock,
+    )
+    monkeypatch.setattr(
+        login_status_crud_module,
+        "get_user_by_id",
+        Mock(return_value=authenticated_user),
+    )
+    monkeypatch.setattr(
+        login_status_crud_module,
+        "get_login_status_by_user_id",
+        Mock(return_value=stale_status),
+    )
+
+    response = client.post(
+        path,
+        json={"username": "owner", "password": "wrongpass"},
+    )
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid credentials."
+    verify_password_mock.assert_called_once_with(authenticated_user)
+    get_status_mock.assert_called_once_with(1, session)
+    record_failed_attempt_mock.assert_called_once_with(1, session)
+    reset_login_status_mock.assert_not_called()
+    session.commit.assert_called_once()
+    session.refresh.assert_called_once_with(stale_status)
+    assert stale_status.failed_login_attempts == 1
+    assert stale_status.last_failed_login_attempt_at == failed_at
+    assert stale_status.locked is False
+    assert stale_status.locked_at is None
+
+
+@pytest.mark.parametrize("path", AUTH_ENDPOINT_PATHS)
 def test_authentication_endpoints_reset_existing_login_status_after_success(
     path: str,
     client: TestClient,
@@ -379,6 +556,39 @@ def test_authentication_endpoints_reset_existing_login_status_after_success(
     get_status_mock.assert_called_once_with(1, session)
     record_failed_attempt_mock.assert_not_called()
     reset_login_status_mock.assert_called_once_with(1, session)
+
+
+@pytest.mark.parametrize("path", AUTH_ENDPOINT_PATHS)
+def test_authentication_endpoints_do_not_create_login_status_after_success(
+    path: str,
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    session: MagicMock,
+) -> None:
+    authenticated_user = make_user()
+    (
+        _,
+        verify_password_mock,
+        get_status_mock,
+        record_failed_attempt_mock,
+        reset_login_status_mock,
+    ) = stub_auth_dependencies(
+        monkeypatch,
+        user=authenticated_user,
+        password_matches=True,
+        login_status=None,
+    )
+
+    response = client.post(
+        path,
+        json={"username": "owner", "password": "password1"},
+    )
+
+    assert response.status_code == 200
+    verify_password_mock.assert_called_once_with(authenticated_user)
+    get_status_mock.assert_called_once_with(1, session)
+    record_failed_attempt_mock.assert_not_called()
+    reset_login_status_mock.assert_not_called()
 
 
 def test_books_routes_require_authentication(client: TestClient) -> None:

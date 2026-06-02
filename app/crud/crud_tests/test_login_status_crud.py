@@ -245,6 +245,32 @@ def test_unlock_login_status_by_user_id_resets_existing_row(
     assert existing.locked_at is None
 
 
+def test_unlock_login_status_by_user_id_is_idempotent_for_unlocked_row(
+    monkeypatch: pytest.MonkeyPatch, session: MagicMock
+) -> None:
+    existing = make_login_status(
+        failed_login_attempts=0,
+        last_failed_login_attempt_at=None,
+        locked=False,
+        locked_at=None,
+    )
+    monkeypatch.setattr(
+        crud,
+        "get_login_status_by_user_id",
+        Mock(return_value=existing),
+    )
+
+    unlocked = crud.unlock_login_status_by_user_id(1, session)
+
+    session.commit.assert_called_once()
+    session.refresh.assert_called_once_with(existing)
+    assert unlocked is existing
+    assert existing.failed_login_attempts == 0
+    assert existing.last_failed_login_attempt_at is None
+    assert existing.locked is False
+    assert existing.locked_at is None
+
+
 def test_unlock_login_status_by_user_id_returns_none_when_missing(
     monkeypatch: pytest.MonkeyPatch, session: MagicMock
 ) -> None:
@@ -298,6 +324,24 @@ def test_unlock_login_status_by_username_raises_when_user_is_missing(
         crud.unlock_login_status_by_username("missing", session)
 
     session.commit.assert_not_called()
+
+
+def test_unlock_login_status_by_username_returns_none_when_status_is_missing(
+    monkeypatch: pytest.MonkeyPatch, session: MagicMock
+) -> None:
+    user = make_user(user_id=7, username="unlocked_user")
+    user_lookup_mock = Mock(return_value=user)
+    status_lookup_mock = Mock(return_value=None)
+    monkeypatch.setattr(crud, "get_users_by_username", user_lookup_mock)
+    monkeypatch.setattr(crud, "get_login_status_by_user_id", status_lookup_mock)
+
+    unlocked = crud.unlock_login_status_by_username("unlocked_user", session)
+
+    user_lookup_mock.assert_called_once_with("unlocked_user", session)
+    status_lookup_mock.assert_called_once_with(7, session)
+    session.commit.assert_not_called()
+    session.refresh.assert_not_called()
+    assert unlocked is None
 
 
 def test_reset_login_status_after_successful_login_does_not_create_missing_row(
