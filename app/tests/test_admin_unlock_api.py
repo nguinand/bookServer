@@ -269,7 +269,19 @@ def test_unlock_user_account_by_username_returns_404_when_login_status_is_missin
     create_admin_logs_mock.assert_not_called()
 
 
-def test_unlock_user_account_rejects_non_admin_user(
+@pytest.mark.parametrize(
+    ("path", "json_payload"),
+    [
+        ("/api/admin/unlock_user_account_by_id/", {"user_id": 7}),
+        (
+            "/api/admin/unlock_user_account_by_username/",
+            {"username": "locked_user"},
+        ),
+    ],
+)
+def test_unlock_user_account_routes_reject_non_admin_user(
+    path: str,
+    json_payload: dict[str, object],
     client: TestClient,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -279,29 +291,57 @@ def test_unlock_user_account_rejects_non_admin_user(
         email="regular@example.com",
         role="user",
     )
-    unlock_mock = Mock()
+    unlock_by_id_mock = Mock()
+    unlock_by_username_mock = Mock()
+    create_admin_logs_mock = Mock()
     stub_current_user(monkeypatch, current_user)
     monkeypatch.setattr(
         admin_unlock_routes,
         "unlock_login_status_by_user_id",
-        unlock_mock,
+        unlock_by_id_mock,
+    )
+    monkeypatch.setattr(
+        admin_unlock_routes,
+        "unlock_login_status_by_username",
+        unlock_by_username_mock,
+    )
+    monkeypatch.setattr(
+        admin_unlock_routes,
+        "create_admin_logs",
+        create_admin_logs_mock,
     )
 
     response = client.post(
-        "/api/admin/unlock_user_account_by_id/",
+        path,
         headers=auth_header(1),
-        json={"user_id": 7},
+        json=json_payload,
     )
 
     assert response.status_code == 403
     assert response.json()["detail"] == "You do not have access to this resource."
-    unlock_mock.assert_not_called()
+    unlock_by_id_mock.assert_not_called()
+    unlock_by_username_mock.assert_not_called()
+    create_admin_logs_mock.assert_not_called()
 
 
-def test_unlock_user_account_requires_authentication(client: TestClient) -> None:
+@pytest.mark.parametrize(
+    ("path", "json_payload"),
+    [
+        ("/api/admin/unlock_user_account_by_id/", {"user_id": 7}),
+        (
+            "/api/admin/unlock_user_account_by_username/",
+            {"username": "locked_user"},
+        ),
+    ],
+)
+def test_unlock_user_account_routes_require_authentication(
+    path: str,
+    json_payload: dict[str, object],
+    client: TestClient,
+) -> None:
     response = client.post(
-        "/api/admin/unlock_user_account_by_id/",
-        json={"user_id": 7},
+        path,
+        json=json_payload,
     )
 
     assert response.status_code == 401
