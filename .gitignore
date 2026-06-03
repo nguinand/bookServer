@@ -14,12 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-# Keep SvelteKit component source trackable despite the generic Python lib ignore.
-!frontend/src/lib/
-frontend/src/lib/*
-!frontend/src/lib/components/
-!frontend/src/lib/components/**
+/lib/
 lib64/
 parts/
 sdist/
