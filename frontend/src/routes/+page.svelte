@@ -51,38 +51,41 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: clamp(2.25rem, 8vw, 4.5rem);
+		gap: clamp(1.5rem, 11cqw, 4.5rem);
 		width: 100%;
 		height: 100%;
 	}
 
 	.app-title {
+		max-width: 78cqw;
 		color: #1f2937;
-		font-size: clamp(2.25rem, 6vw, 4.25rem);
+		font-size: clamp(1.5rem, 10cqw, 4.25rem);
 		font-weight: 700;
 		line-height: 1;
 		text-align: center;
+		text-wrap: balance;
 	}
 
 	.landing-actions {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1.25rem;
-		transform: translateY(clamp(0.75rem, 3vw, 1.5rem));
+		gap: clamp(0.75rem, 3.25cqw, 1.25rem);
+		transform: translateY(clamp(0.25rem, 3cqw, 1.5rem));
 	}
 
 	.landing-btn {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 14rem;
-		min-height: 3.5rem;
-		padding: 0.875rem 1.25rem;
+		width: clamp(8rem, 44cqw, 14rem);
+		max-width: 80cqw;
+		min-height: clamp(2.75rem, 10cqw, 3.5rem);
+		padding: clamp(0.625rem, 2.5cqw, 0.875rem) clamp(1rem, 4cqw, 1.25rem);
 		border: 3px solid #1f2937;
 		border-radius: 9999px;
 		color: #1f2937;
-		font-size: 1.125rem;
+		font-size: clamp(0.95rem, 3.3cqw, 1.125rem);
 		font-weight: 500;
 		text-decoration: none;
 		transition:

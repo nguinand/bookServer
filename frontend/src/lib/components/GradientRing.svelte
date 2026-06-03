@@ -45,11 +45,21 @@
 	}
 
 	.gradient-ring-frame {
-		--gradient-ring-size: clamp(26rem, 70vw, 42rem);
-		width: min(var(--gradient-ring-size), calc(100vw - 2rem), calc(100vh - 2rem));
+		--gradient-ring-size: min(
+			clamp(18rem, 70vmin, 42rem),
+			calc(100vw - 2rem),
+			calc(100vh - 2rem)
+		);
+		--gradient-ring-size: min(
+			clamp(18rem, 70vmin, 42rem),
+			calc(100vw - 2rem),
+			calc(100svh - 2rem)
+		);
+		width: var(--gradient-ring-size);
 		aspect-ratio: 1;
 		display: grid;
 		place-items: center;
+		container: gradient-ring / inline-size;
 	}
 
 	.gradient-ring {
@@ -66,7 +76,7 @@
 		);
 		display: grid;
 		place-items: center;
-		padding: clamp(1rem, 3vw, 1.5rem);
+		padding: clamp(0.75rem, 4cqw, 1.5rem);
 		transform-origin: center;
 		overflow: hidden;
 		animation: gradient-ring-spin 8s linear infinite;
