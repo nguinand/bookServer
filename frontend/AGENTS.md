@@ -636,6 +636,10 @@ Run a single Playwright test: `npx playwright test tests/login.spec.ts --headed`
 
 ## 12. Dev workflow
 
+Do not spend tokens manually reformatting frontend files. Leave formatting-only
+changes to Prettier, and run formatter commands only when the user explicitly
+asks for formatting.
+
 ```bash
 # One-time install
 npm install
@@ -648,6 +652,9 @@ cd .. && uv run uvicorn app.main:app --reload
 
 # Type check
 npm run check
+
+# Format frontend files
+npm run format
 
 # Build for production
 npm run build && npm run preview
