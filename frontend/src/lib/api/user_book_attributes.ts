@@ -16,7 +16,7 @@ export function makeUserBookAttributesApi(client: ApiClient) {
       client.post<DetailResponse>("/update_book_attribute", body),
 
     delete: (attribute_id: number) =>
-      client.delete<DeleteResponse<"attribute_id">>(
+      client.delete<DeleteResponse<"user_attribute_id">>(
         `/user_book_attributes/delete_user_book_attribute/${attribute_id}`,
       ),
 
