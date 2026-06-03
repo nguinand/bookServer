@@ -13,6 +13,14 @@ export interface UserModel {
   last_login: string | null;
 }
 
+export interface CreateUserModelInput {
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+  role: "user";
+}
+
 export interface UserLoginRequest {
   username: string;
   password: string;
@@ -31,7 +39,7 @@ export interface TokenResponse {
 }
 
 export interface CreateUserRequest {
-  user_model: UserModel;
+  user_model: CreateUserModelInput;
   password: string;
 }
 
