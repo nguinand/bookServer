@@ -10,15 +10,15 @@ or hunting through Svelte/Skeleton docs.
 
 ## 1. Tech stack
 
-| Layer            | Choice                                  | Notes                                                |
-| ---------------- | --------------------------------------- | ---------------------------------------------------- |
-| Framework        | **SvelteKit** (latest)                  | File-based routing, load functions, SSR.             |
-| Language         | **Svelte 5** + **TypeScript** (strict)  | Runes everywhere. No legacy `export let` / `$:`.     |
-| UI kit           | **Skeleton v3** (`@skeletonlabs/skeleton-svelte`) | Themed Tailwind components.                |
-| Styling          | **Tailwind CSS** (per Skeleton pin)     | Skeleton drives the theme; raw Tailwind for the gap. |
-| Forms/validation | **Zod**                                 | Schemas mirror backend Pydantic models.              |
-| Tests            | **Vitest** (unit) + **Playwright** (e2e) | MSW for mocking the API in tests.                   |
-| Pkg manager      | **npm**                                 | Use `npm`, not `pnpm`/`yarn`, in commands.           |
+| Layer            | Choice                                            | Notes                                                |
+| ---------------- | ------------------------------------------------- | ---------------------------------------------------- |
+| Framework        | **SvelteKit** (latest)                            | File-based routing, load functions, SSR.             |
+| Language         | **Svelte 5** + **TypeScript** (strict)            | Runes everywhere. No legacy `export let` / `$:`.     |
+| UI kit           | **Skeleton v3** (`@skeletonlabs/skeleton-svelte`) | Themed Tailwind components.                          |
+| Styling          | **Tailwind CSS** (per Skeleton pin)               | Skeleton drives the theme; raw Tailwind for the gap. |
+| Forms/validation | **Zod**                                           | Schemas mirror backend Pydantic models.              |
+| Tests            | **Vitest** (unit) + **Playwright** (e2e)          | MSW for mocking the API in tests.                    |
+| Pkg manager      | **npm**                                           | Use `npm`, not `pnpm`/`yarn`, in commands.           |
 
 Backend is FastAPI 0.115+ / Pydantic 2 / Python 3.12 / MySQL — see `../pyproject.toml`.
 
@@ -112,6 +112,7 @@ Server-side calls from SvelteKit `+page.server.ts` files do **not** hit CORS at 
 4. Subsequent requests attach `Authorization: Bearer <jwt>`.
 
 **Public endpoints (no token needed):**
+
 - `POST /api/database/create_user/`
 - `POST /api/authenticate/authenticate_user/` (validates creds, does not issue a token)
 - `POST /api/authenticate/token/` (issues token)
@@ -126,84 +127,84 @@ All paths prefixed with `/api`. `Req`/`Res` columns refer to TypeScript types in
 
 #### Auth — `/api/authenticate`, `/api/database/create_user`
 
-| Method | Path                                | Req                     | Res                                |
-| ------ | ----------------------------------- | ----------------------- | ---------------------------------- |
-| POST   | `/database/create_user/`            | `CreateUserRequest`     | `UserModel`                        |
-| POST   | `/authenticate/authenticate_user/`  | `UserLoginRequest`      | `AuthenticationStatusResponse`     |
-| POST   | `/authenticate/token/`              | `UserLoginRequest`      | `TokenResponse`                    |
-| POST   | `/authenticate/update_user_password/` | `PasswordUpdateRequest` | `PasswordUpdateResponse`         |
+| Method | Path                                  | Req                     | Res                            |
+| ------ | ------------------------------------- | ----------------------- | ------------------------------ |
+| POST   | `/database/create_user/`              | `CreateUserRequest`     | `UserModel`                    |
+| POST   | `/authenticate/authenticate_user/`    | `UserLoginRequest`      | `AuthenticationStatusResponse` |
+| POST   | `/authenticate/token/`                | `UserLoginRequest`      | `TokenResponse`                |
+| POST   | `/authenticate/update_user_password/` | `PasswordUpdateRequest` | `PasswordUpdateResponse`       |
 
 #### Users — `/api/database`
 
-| Method | Path                                | Params/Body                | Res         |
-| ------ | ----------------------------------- | -------------------------- | ----------- |
-| GET    | `/database/users_by_email/{email}`  | path: email                | `UserModel` |
-| GET    | `/database/users_by_username/{username}` | path: username        | `UserModel` |
-| GET    | `/database/user_by_id/{user_id}`    | path: user_id              | `UserModel` |
-| PUT    | `/database/update_user/`            | body: `UpdateUserRequest`  | `UserModel` |
-| DELETE | `/database/delete_user/{user_id}`   | path: user_id              | `{user_id, deleted}` |
+| Method | Path                                     | Params/Body               | Res                  |
+| ------ | ---------------------------------------- | ------------------------- | -------------------- |
+| GET    | `/database/users_by_email/{email}`       | path: email               | `UserModel`          |
+| GET    | `/database/users_by_username/{username}` | path: username            | `UserModel`          |
+| GET    | `/database/user_by_id/{user_id}`         | path: user_id             | `UserModel`          |
+| PUT    | `/database/update_user/`                 | body: `UpdateUserRequest` | `UserModel`          |
+| DELETE | `/database/delete_user/{user_id}`        | path: user_id             | `{user_id, deleted}` |
 
 #### Books — external (Google Books proxy) — `/api/books`
 
 All take `max_results` (default 10) and `start_index` (default 0) query params.
 
-| Method | Path                                              | Required query           | Res             |
-| ------ | ------------------------------------------------- | ------------------------ | --------------- |
-| GET    | `/books/name/`                                    | `book_name`              | `BookModel[]`   |
-| GET    | `/books/books_by_isbn/`                           | `isbn`                   | `BookModel[]`   |
-| GET    | `/books/generic/`                                 | `search_type`, `val`     | `BookModel[]`   |
-| GET    | `/books/recommendations/by_author/`               | `author`                 | `BookModel[]`   |
-| GET    | `/books/recommendations/by_genre/`                | `genre_name`             | `BookModel[]`   |
-| GET    | `/books/recommendations/by_bookshelf_genre/`      | (none beyond pagination) | `BookModel[]`   |
+| Method | Path                                         | Required query           | Res           |
+| ------ | -------------------------------------------- | ------------------------ | ------------- |
+| GET    | `/books/name/`                               | `book_name`              | `BookModel[]` |
+| GET    | `/books/books_by_isbn/`                      | `isbn`                   | `BookModel[]` |
+| GET    | `/books/generic/`                            | `search_type`, `val`     | `BookModel[]` |
+| GET    | `/books/recommendations/by_author/`          | `author`                 | `BookModel[]` |
+| GET    | `/books/recommendations/by_genre/`           | `genre_name`             | `BookModel[]` |
+| GET    | `/books/recommendations/by_bookshelf_genre/` | (none beyond pagination) | `BookModel[]` |
 
 `search_type` ∈ `"author" | "publisher" | "isbn" | "subject"`.
 
 #### Books — internal (DB) — `/api/database`
 
-| Method | Path                                       | Params/Body         | Res                  |
-| ------ | ------------------------------------------ | ------------------- | -------------------- |
-| POST   | `/database/create_book/`                   | body: `BookModel` (input uses backend aliases — see §3.5) | `BookModel` |
-| POST   | `/database/update_book/`                   | body: `BookModel`   | `{detail}`           |
-| DELETE | `/database/delete_book/{book_id}`          | path                | `{book_id, deleted}` |
-| GET    | `/database/books_by_title/`                | `title`, `limit`, `offset` | `BookModel[]` |
-| GET    | `/database/books_by_google_id/{google_id}` | path                | `BookModel`          |
-| GET    | `/database/books_by_book_id/{book_id}`     | path                | `BookModel`          |
+| Method | Path                                       | Params/Body                                               | Res                  |
+| ------ | ------------------------------------------ | --------------------------------------------------------- | -------------------- |
+| POST   | `/database/create_book/`                   | body: `BookModel` (input uses backend aliases — see §3.5) | `BookModel`          |
+| POST   | `/database/update_book/`                   | body: `BookModel`                                         | `{detail}`           |
+| DELETE | `/database/delete_book/{book_id}`          | path                                                      | `{book_id, deleted}` |
+| GET    | `/database/books_by_title/`                | `title`, `limit`, `offset`                                | `BookModel[]`        |
+| GET    | `/database/books_by_google_id/{google_id}` | path                                                      | `BookModel`          |
+| GET    | `/database/books_by_book_id/{book_id}`     | path                                                      | `BookModel`          |
 
 #### Bookcases — `/api/database`
 
-| Method | Path                                            | Body / Params       | Res                       |
-| ------ | ----------------------------------------------- | ------------------- | ------------------------- |
-| POST   | `/database/create_bookcase/`                    | `BookcaseModel`     | `BookcaseModel`           |
-| POST   | `/database/update_bookcase/`                    | `BookcaseModel`     | `{detail}`                |
-| DELETE | `/database/delete_bookcase/{bookcase_id}`       | path                | `{bookcase_id, deleted}`  |
-| GET    | `/database/bookcase_by_id/{bookcase_id}`        | path                | `BookcaseModel`           |
-| GET    | `/database/bookcases_by_user_id/`               | `user_id`, `limit`, `offset` | `BookcaseModel[]` |
+| Method | Path                                      | Body / Params                | Res                      |
+| ------ | ----------------------------------------- | ---------------------------- | ------------------------ |
+| POST   | `/database/create_bookcase/`              | `BookcaseModel`              | `BookcaseModel`          |
+| POST   | `/database/update_bookcase/`              | `BookcaseModel`              | `{detail}`               |
+| DELETE | `/database/delete_bookcase/{bookcase_id}` | path                         | `{bookcase_id, deleted}` |
+| GET    | `/database/bookcase_by_id/{bookcase_id}`  | path                         | `BookcaseModel`          |
+| GET    | `/database/bookcases_by_user_id/`         | `user_id`, `limit`, `offset` | `BookcaseModel[]`        |
 
 #### User book state — `/api/user_book_state`
 
 Tracks `reading_status` ∈ `"want_to_read" | "reading" | "completed" | "abandoned"`, plus `current_page` and `percent_complete` (0–100).
 
-| Method | Path                                                       | Body / Params                              | Res                            |
-| ------ | ---------------------------------------------------------- | ------------------------------------------ | ------------------------------ |
-| POST   | `/user_book_state/create_user_book_state/`                 | `UserBookStateModel`                       | `UserBookStateModel`           |
-| GET    | `/user_book_state/get_user_book_state_by_id/{id}`          | path                                       | `UserBookStateModel`           |
-| POST   | `/user_book_state/get_user_book_states_by_user_id/`        | `GetUserBookStatesByUserIdRequest`         | `UserBookStateModel[]`         |
-| POST   | `/user_book_state/get_user_book_state_by_user_and_book/`   | `GetUserBookStateByUserAndBookRequest`     | `UserBookStateModel`           |
-| POST   | `/user_book_state/update_user_book_state/`                 | `UserBookStateModel`                       | `UserBookStateModel`           |
-| DELETE | `/user_book_state/delete_user_book_state/{id}`             | path                                       | `{user_book_state_id, deleted}`|
+| Method | Path                                                     | Body / Params                          | Res                             |
+| ------ | -------------------------------------------------------- | -------------------------------------- | ------------------------------- |
+| POST   | `/user_book_state/create_user_book_state/`               | `UserBookStateModel`                   | `UserBookStateModel`            |
+| GET    | `/user_book_state/get_user_book_state_by_id/{id}`        | path                                   | `UserBookStateModel`            |
+| POST   | `/user_book_state/get_user_book_states_by_user_id/`      | `GetUserBookStatesByUserIdRequest`     | `UserBookStateModel[]`          |
+| POST   | `/user_book_state/get_user_book_state_by_user_and_book/` | `GetUserBookStateByUserAndBookRequest` | `UserBookStateModel`            |
+| POST   | `/user_book_state/update_user_book_state/`               | `UserBookStateModel`                   | `UserBookStateModel`            |
+| DELETE | `/user_book_state/delete_user_book_state/{id}`           | path                                   | `{user_book_state_id, deleted}` |
 
 #### User book attributes (rating / review) — `/api/user_book_attributes`
 
 `rating` is `0..9` (NOT `0..10` — backend uses `lt=10`).
 
-| Method | Path                                                     | Body / Params                | Res                          |
-| ------ | -------------------------------------------------------- | ---------------------------- | ---------------------------- |
-| POST   | `/user_book_attributes/create_user_book_attribute/`      | `UserBookAttributesModel`    | `UserBookAttributesModel`    |
-| POST   | `/user_book_attributes/update_book_attribute/`           | `UserBookAttributesModel`    | `UserBookAttributesModel`    |
-| DELETE | `/user_book_attributes/delete_user_book_attribute/{id}`  | path                         | `{attribute_id, deleted}`    |
-| GET    | `/user_book_attributes/book_attribute_by_id/{id}`        | path                         | `UserBookAttributesModel`    |
-| GET    | `/user_book_attributes/book_attribute_by_user_id/`       | `user_id`, `limit`, `offset` | `UserBookAttributesModel[]`  |
-| GET    | `/user_book_attributes/book_attribute_by_book_id/`       | `book_id`                    | `UserBookAttributesModel[]`  |
+| Method | Path                                                    | Body / Params                | Res                         |
+| ------ | ------------------------------------------------------- | ---------------------------- | --------------------------- |
+| POST   | `/user_book_attributes/create_user_book_attribute/`     | `UserBookAttributesModel`    | `UserBookAttributesModel`   |
+| POST   | `/user_book_attributes/update_book_attribute/`          | `UserBookAttributesModel`    | `UserBookAttributesModel`   |
+| DELETE | `/user_book_attributes/delete_user_book_attribute/{id}` | path                         | `{attribute_id, deleted}`   |
+| GET    | `/user_book_attributes/book_attribute_by_id/{id}`       | path                         | `UserBookAttributesModel`   |
+| GET    | `/user_book_attributes/book_attribute_by_user_id/`      | `user_id`, `limit`, `offset` | `UserBookAttributesModel[]` |
+| GET    | `/user_book_attributes/book_attribute_by_book_id/`      | `book_id`                    | `UserBookAttributesModel[]` |
 
 #### Other resource endpoints (CRUD shape — see backend routers for exact fields)
 
@@ -230,12 +231,12 @@ For TS response types use snake_case (matches what comes off the wire). For POST
 
 ### 3.6 Error contract
 
-| Status | Meaning                          | Frontend handling                              |
-| ------ | -------------------------------- | ---------------------------------------------- |
-| 401    | Missing / expired / bad JWT      | Clear cookie, redirect to `/login`             |
-| 403    | Auth'd but not owner / not admin | Show "not allowed" page; do not retry          |
-| 404    | Resource not found               | Use SvelteKit `error(404, ...)` from load fn   |
-| 422    | Pydantic validation failed       | Map `detail[].loc` → inline form field errors  |
+| Status | Meaning                          | Frontend handling                                  |
+| ------ | -------------------------------- | -------------------------------------------------- |
+| 401    | Missing / expired / bad JWT      | Clear cookie, redirect to `/login`                 |
+| 403    | Auth'd but not owner / not admin | Show "not allowed" page; do not retry              |
+| 404    | Resource not found               | Use SvelteKit `error(404, ...)` from load fn       |
+| 422    | Pydantic validation failed       | Map `detail[].loc` → inline form field errors      |
 | 500    | DB or internal error             | Show generic error; surface `error_id` for support |
 
 500 responses include an `error_id` UUID — display it (small, copyable) so the user can report it.
@@ -258,7 +259,7 @@ Book ─┬─< (m:n) Genre
 User has optional Avatar, optional UserStatus (tier).
 ```
 
-**Mental model:** a User owns Bookcases (named shelves); books land in Bookcases. Independent of shelves, each User↔Book pair can have a *reading state* (where they are in it) and *attributes* (what they thought of it). Genres and Authors are shared across the catalog.
+**Mental model:** a User owns Bookcases (named shelves); books land in Bookcases. Independent of shelves, each User↔Book pair can have a _reading state_ (where they are in it) and _attributes_ (what they thought of it). Genres and Authors are shared across the catalog.
 
 ---
 
@@ -314,15 +315,15 @@ URL ⇔ folder. `src/routes/books/[book_id]/+page.svelte` → `/books/123`. The 
 
 ### The route files
 
-| File              | Runs on        | Use for                                                   |
-| ----------------- | -------------- | --------------------------------------------------------- |
-| `+page.svelte`    | client + SSR   | The page UI                                               |
-| `+page.ts`        | server + client| Universal load — public data, no secrets, can return non-serializable |
-| `+page.server.ts` | server only    | Auth'd reads, form actions (`export const actions`), anything touching the JWT cookie |
-| `+layout.svelte`  | client + SSR   | Wraps the page (and children); render `{@render children()}` |
-| `+layout.server.ts` | server only  | Load data shared by all child routes (e.g., current user) |
-| `+server.ts`      | server only    | API endpoints owned by the frontend (rare here)           |
-| `+error.svelte`   | client + SSR   | Renders when a load throws                                |
+| File                | Runs on         | Use for                                                                               |
+| ------------------- | --------------- | ------------------------------------------------------------------------------------- |
+| `+page.svelte`      | client + SSR    | The page UI                                                                           |
+| `+page.ts`          | server + client | Universal load — public data, no secrets, can return non-serializable                 |
+| `+page.server.ts`   | server only     | Auth'd reads, form actions (`export const actions`), anything touching the JWT cookie |
+| `+layout.svelte`    | client + SSR    | Wraps the page (and children); render `{@render children()}`                          |
+| `+layout.server.ts` | server only     | Load data shared by all child routes (e.g., current user)                             |
+| `+server.ts`        | server only     | API endpoints owned by the frontend (rare here)                                       |
+| `+error.svelte`     | client + SSR    | Renders when a load throws                                                            |
 
 ### Auth pattern (the recommended flow)
 
@@ -337,11 +338,11 @@ Prefer `+page.server.ts` for any auth'd backend call. The SvelteKit-enhanced `fe
 
 ```ts
 // routes/books/search/+page.server.ts
-import type { PageServerLoad } from './$types';
-import { api } from '$lib/api';
+import type { PageServerLoad } from "./$types";
+import { api } from "$lib/api";
 
 export const load: PageServerLoad = async ({ url, fetch, locals }) => {
-  const q = url.searchParams.get('q') ?? '';
+  const q = url.searchParams.get("q") ?? "";
   if (!q) return { books: [], q };
   const books = await api(fetch, locals.jwt).books.searchByName(q);
   return { books, q };
@@ -370,11 +371,11 @@ npm install @skeletonlabs/skeleton @skeletonlabs/skeleton-svelte
 **`src/app.css`** — Tailwind layers + Skeleton imports + theme:
 
 ```css
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@import '@skeletonlabs/skeleton';
-@import '@skeletonlabs/skeleton/optional/presets';
-@import '@skeletonlabs/skeleton/themes/cerberus';  /* pick your theme */
+@import "@skeletonlabs/skeleton";
+@import "@skeletonlabs/skeleton/optional/presets";
+@import "@skeletonlabs/skeleton/themes/cerberus"; /* pick your theme */
 
 @source '../node_modules/@skeletonlabs/skeleton-svelte/dist';
 ```
@@ -382,7 +383,7 @@ npm install @skeletonlabs/skeleton @skeletonlabs/skeleton-svelte
 **`src/app.html`** — set `data-theme` on `<html>`:
 
 ```html
-<html lang="en" data-theme="cerberus">
+<html lang="en" data-theme="cerberus"></html>
 ```
 
 ### Component import path
@@ -415,10 +416,14 @@ One `data-theme` per page is enough. To support light/dark, toggle the `.dark` c
 ### `src/lib/api/client.ts`
 
 ```ts
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { PUBLIC_API_BASE_URL } from "$env/static/public";
 
 export class ApiError extends Error {
-  constructor(public status: number, message: string, public errorId?: string) {
+  constructor(
+    public status: number,
+    message: string,
+    public errorId?: string,
+  ) {
     super(message);
   }
 }
@@ -437,9 +442,9 @@ export function makeClient(fetch: Fetch, jwt?: string) {
       if (v !== undefined) url.searchParams.set(k, String(v));
     }
 
-    const headers: Record<string, string> = { Accept: 'application/json' };
+    const headers: Record<string, string> = { Accept: "application/json" };
     if (jwt) headers.Authorization = `Bearer ${jwt}`;
-    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    if (body !== undefined) headers["Content-Type"] = "application/json";
 
     const res = await fetch(url, {
       method,
@@ -449,7 +454,11 @@ export function makeClient(fetch: Fetch, jwt?: string) {
 
     if (!res.ok) {
       const payload = await res.json().catch(() => ({}));
-      throw new ApiError(res.status, payload.detail ?? res.statusText, payload.error_id);
+      throw new ApiError(
+        res.status,
+        payload.detail ?? res.statusText,
+        payload.error_id,
+      );
     }
     return res.status === 204 ? (undefined as T) : ((await res.json()) as T);
   }
@@ -457,12 +466,19 @@ export function makeClient(fetch: Fetch, jwt?: string) {
   return {
     auth: {
       login: (username: string, password: string) =>
-        request<TokenResponse>('POST', '/authenticate/token/', { username, password }),
+        request<TokenResponse>("POST", "/authenticate/token/", {
+          username,
+          password,
+        }),
       // ...
     },
     books: {
       searchByName: (book_name: string, max_results = 10, start_index = 0) =>
-        request<BookModel[]>('GET', '/books/name/', undefined, { book_name, max_results, start_index }),
+        request<BookModel[]>("GET", "/books/name/", undefined, {
+          book_name,
+          max_results,
+          start_index,
+        }),
       // ...
     },
     // ...one namespace per backend router
@@ -477,16 +493,16 @@ The client is created **per request** so it picks up the right JWT each time. In
 ### Error mapping in load functions
 
 ```ts
-import { error, redirect } from '@sveltejs/kit';
-import { ApiError } from '$lib/api/client';
+import { error, redirect } from "@sveltejs/kit";
+import { ApiError } from "$lib/api/client";
 
 try {
   return { book: await api.books.getById(id) };
 } catch (e) {
   if (e instanceof ApiError) {
-    if (e.status === 401) throw redirect(303, '/login');
-    if (e.status === 404) throw error(404, 'Book not found');
-    if (e.status === 403) throw error(403, 'Not allowed');
+    if (e.status === 401) throw redirect(303, "/login");
+    if (e.status === 404) throw error(404, "Book not found");
+    if (e.status === 403) throw error(403, "Not allowed");
   }
   throw e;
 }
@@ -507,7 +523,7 @@ The defaults are blunt and on purpose:
 Use a Svelte 5 reactive class — no `writable()`, no manual `subscribe`:
 
 ```ts
-import type { UserModel } from '$lib/types/user';
+import type { UserModel } from "$lib/types/user";
 
 class AuthStore {
   user = $state<UserModel | null>(null);
@@ -516,7 +532,7 @@ class AuthStore {
     return this.user !== null;
   }
   get isAdmin() {
-    return this.user?.role === 'admin';
+    return this.user?.role === "admin";
   }
 
   hydrate(user: UserModel | null) {
@@ -555,11 +571,11 @@ If you find yourself wanting another global store, ask whether the data could li
 
 ```ts
 // src/lib/schemas/login.ts
-import { z } from 'zod';
+import { z } from "zod";
 
 export const loginSchema = z.object({
   username: z.string().min(1),
-  password: z.string().min(7),  // matches backend UserLoginRequest min_length
+  password: z.string().min(7), // matches backend UserLoginRequest min_length
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 ```
@@ -568,10 +584,10 @@ export type LoginInput = z.infer<typeof loginSchema>;
 
 ```ts
 // src/routes/login/+page.server.ts
-import { fail, redirect } from '@sveltejs/kit';
-import { loginSchema } from '$lib/schemas/login';
-import { makeClient } from '$lib/api/client';
-import type { Actions } from './$types';
+import { fail, redirect } from "@sveltejs/kit";
+import { loginSchema } from "$lib/schemas/login";
+import { makeClient } from "$lib/api/client";
+import type { Actions } from "./$types";
 
 export const actions: Actions = {
   default: async ({ request, cookies, fetch }) => {
@@ -582,18 +598,21 @@ export const actions: Actions = {
     }
     try {
       const api = makeClient(fetch);
-      const { access_token } = await api.auth.login(parsed.data.username, parsed.data.password);
-      cookies.set('session_jwt', access_token, {
+      const { access_token } = await api.auth.login(
+        parsed.data.username,
+        parsed.data.password,
+      );
+      cookies.set("session_jwt", access_token, {
         httpOnly: true,
         secure: true,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60,  // 60 min — matches backend ACCESS_TOKEN_EXPIRE_MINUTES
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60, // 60 min — matches backend ACCESS_TOKEN_EXPIRE_MINUTES
       });
     } catch (e) {
-      return fail(401, { error: 'Invalid credentials.' });
+      return fail(401, { error: "Invalid credentials." });
     }
-    throw redirect(303, '/');
+    throw redirect(303, "/");
   },
 };
 ```
@@ -655,21 +674,21 @@ npm run build && npm run preview
 
 ## 14. Quick reference — when in doubt
 
-| You want to...                              | Go to...                                                        |
-| ------------------------------------------- | --------------------------------------------------------------- |
-| Call the backend                            | `$lib/api/<router>.ts` (add a method to the existing namespace) |
-| Add a new page                              | `src/routes/<path>/+page.svelte` + `+page.server.ts` for data   |
-| Share data across all pages                 | `src/routes/+layout.server.ts`                                  |
-| Add reactive state to a component           | `$state` — never `let` for anything that updates                |
-| Compute a value from state                  | `$derived` — never `$:` and never an `$effect` that assigns     |
-| Add a global store                          | Don't, unless it's the auth equivalent — re-read §9 first       |
-| Style a button / card / surface             | Skeleton component or Skeleton design token — not raw Tailwind colors |
-| Show a modal / drawer / toast               | `@skeletonlabs/skeleton-svelte` — don't build your own          |
-| Validate form input                         | Zod schema in `$lib/schemas/` mirroring the backend Pydantic model |
-| Handle a 401                                | Already handled centrally in `$lib/api/client.ts` — just `throw` |
-
+| You want to...                    | Go to...                                                              |
+| --------------------------------- | --------------------------------------------------------------------- |
+| Call the backend                  | `$lib/api/<router>.ts` (add a method to the existing namespace)       |
+| Add a new page                    | `src/routes/<path>/+page.svelte` + `+page.server.ts` for data         |
+| Share data across all pages       | `src/routes/+layout.server.ts`                                        |
+| Add reactive state to a component | `$state` — never `let` for anything that updates                      |
+| Compute a value from state        | `$derived` — never `$:` and never an `$effect` that assigns           |
+| Add a global store                | Don't, unless it's the auth equivalent — re-read §9 first             |
+| Style a button / card / surface   | Skeleton component or Skeleton design token — not raw Tailwind colors |
+| Show a modal / drawer / toast     | `@skeletonlabs/skeleton-svelte` — don't build your own                |
+| Validate form input               | Zod schema in `$lib/schemas/` mirroring the backend Pydantic model    |
+| Handle a 401                      | Already handled centrally in `$lib/api/client.ts` — just `throw`      |
 
 ## Website Theme
+
 Main color theme can be viewed in the image "color_pallete.png". Otherwise those values are:
 #256EFF
 #46237A
