@@ -12,6 +12,7 @@
 	};
 
 	let { state = 'open', children, onclosed }: Props = $props();
+	let isContentDisabled = $derived(state === 'closed' || state === 'closing');
 
 	function handleTransitionEnd(event: TransitionEvent) {
 		if (event.target !== event.currentTarget || event.propertyName !== 'transform') {
@@ -27,7 +28,7 @@
 <div class="gradient-ring-frame">
 	<div class="gradient-ring" data-state={state} ontransitionend={handleTransitionEnd}>
 		<div class="gradient-ring-inner">
-			<div class="gradient-ring-content" aria-hidden={state === 'closed' || state === 'closing'}>
+			<div class="gradient-ring-content" aria-hidden={isContentDisabled} inert={isContentDisabled}>
 				{#if children}
 					{@render children()}
 				{/if}
