@@ -20,7 +20,6 @@ class PriceModel(BaseModel):
     currencyCode: CurrencyCode | None = Field(
         None,
         description="Currency code following ISO 4217.",
-        alias="currencyCode",
         examples=["USD", "EUR", "GBP", "JPY", "INR"],
     )
 

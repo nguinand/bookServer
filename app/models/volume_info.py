@@ -100,7 +100,6 @@ class VolumeInfoModel(BaseModel):
     )
     industryIdentifiers: List[IndustryIdentifier] | None = Field(
         None,
-        alias="industryIdentifiers",
         description="Industry identifiers model of the book. ISBN 10 or 13",
         json_schema_extra={
             "examples": [{"type": IdentifierType.ISBN_10, "identifier": "1234567890"}]

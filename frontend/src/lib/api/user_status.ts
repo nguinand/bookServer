@@ -16,7 +16,7 @@ export function makeUserStatusApi(client: ApiClient) {
       client.put<UserStatusModel>("/user_status/update_user_status/", body),
 
     delete: (status_id: number) =>
-      client.delete<DeleteResponse<"user_status_id">>(
+      client.delete<DeleteResponse<"status_id">>(
         `/user_status/delete_user_status/${status_id}`,
       ),
   };

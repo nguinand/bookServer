@@ -1,7 +1,7 @@
 import type { IndustryIdentifier } from "./identifiers";
 
 export interface ImageLinksModel {
-  smallThumbnail: string | null;
+  smallThumbnail: string | null; // small_thumbnail
   thumbnail: string | null;
 }
 
@@ -10,15 +10,15 @@ export interface VolumeInfoModel {
   subtitle: string | null;
   authors: string[];
   publisher: string | null;
-  published_date: string | null;
+  publishedDate: string | null; // published_date
   description: string | null;
-  page_count: number | null;
+  pageCount: number | null; // page_count
   categories: string[];
-  average_rating: number | null;
-  ratings_count: number | null;
-  image_links: ImageLinksModel | null;
-  preview_link: string | null;
-  info_link: string | null;
+  averageRating: number | null; // average_rating
+  ratingsCount: number | null; // ratings_count
+  imageLinks: ImageLinksModel | null; // image_links
+  previewLink: string | null; // preview_link
+  infoLink: string | null; // info_link
   language: string | null;
   industryIdentifiers: IndustryIdentifier[] | null;
   maturity_rating: string | null;

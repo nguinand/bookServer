@@ -10,8 +10,8 @@ export interface BookSaleInfoModel {
   book_id: number | null;
   country: string | null;
   saleability: string | null;
-  is_ebook: boolean;
-  list_price: PriceModel | null;
-  retail_price: PriceModel | null;
-  buy_link: string | null;
+  isEbook: boolean; // is_ebook
+  listPrice: PriceModel | null; // list_price
+  retailPrice: PriceModel | null; // retail_price
+  buyLink: string | null; // buy_link
 }

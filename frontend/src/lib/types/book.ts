@@ -4,8 +4,8 @@ import type { VolumeInfoModel } from "./volume_info";
 
 export interface BookModel {
   book_id: number | null;
-  google_books_id: string;
-  volume_info: VolumeInfoModel;
-  sale_info: BookSaleInfoModel | null;
-  access_info: AccessInfoModel | null;
+  id: string; // google_books_id
+  volumeInfo: VolumeInfoModel; // volume_info
+  saleInfo: BookSaleInfoModel | null; // sale_info
+  accessInfo: AccessInfoModel | null; // access_info
 }

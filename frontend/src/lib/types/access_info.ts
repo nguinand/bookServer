@@ -7,10 +7,10 @@ export interface AccessInfoModel {
   country: string | null;
   viewability: string | null;
   embeddable: boolean;
-  public_domain: boolean;
+  publicDomain: boolean; // public_domain
   epub: FormatInfoModel | null;
   pdf: FormatInfoModel | null;
-  web_reader_link: string | null;
+  webReaderLink: string | null; // web_reader_link
 }
 
 export interface CreateAccessInfoRequest {
