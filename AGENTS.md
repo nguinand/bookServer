@@ -203,6 +203,10 @@ Validation is user-owned by default. Do not run `pytest`, `ruff`, or `ty`
 unless the user explicitly asks you to run validation. After code edits, report
 the recommended commands for the user to run instead.
 
+Do not spend tokens manually reformatting files. Leave formatting-only changes
+to the configured formatters, and run formatter commands only when the user
+explicitly asks for formatting.
+
 Common commands:
 
 ```bash
