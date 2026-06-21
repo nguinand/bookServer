@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Generator
 
 from dotenv import load_dotenv
-from sqlalchemy import ChunkedIteratorResult, create_engine
+from sqlalchemy import URL, ChunkedIteratorResult, create_engine
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -37,30 +37,35 @@ def batch_results(
         yield batch
 
 
-class DatabaseManager:
-    """
-    Class that handles the engine and session creation.
-    """
-
-    database_username = get_env_val_or_raise("DATABASE_USERNAME")
-    database_password = get_env_val_or_raise("DATABASE_PASSWORD")
-    database_url = get_env_val_or_raise("DATABASE_URL")
-    database_name = get_env_val_or_raise("DATABASE_NAME")
-
-    connection_string = f"mysql+mysqldb://{database_username}:{database_password}@{database_url}/{database_name}"
-    engine = create_engine(
-        connection_string, pool_pre_ping=True, echo=False, pool_recycle=3600
+def build_database_url() -> URL:
+    return URL.create(
+        drivername="mysql+mysqldb",
+        username=get_env_val_or_raise("DATABASE_USERNAME"),
+        password=get_env_val_or_raise("DATABASE_PASSWORD"),
+        host=get_env_val_or_raise("DATABASE_URL"),
+        database=get_env_val_or_raise("DATABASE_NAME"),
     )
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+class DatabaseManager:
+    def __init__(self):
+        self.connection_string = build_database_url()
+        self.engine = create_engine(
+            self.connection_string, pool_pre_ping=True, echo=False, pool_recycle=3600
+        )
+        self.session_factory = sessionmaker(
+            autocommit=False, autoflush=False, bind=self.engine
+        )
 
     @property
     def session(self) -> Session:
         """
         Provides a fresh SQLAlchemy session object.
         """
-        return self.SessionLocal()
+        return self.session_factory()
 
     def get_db(self) -> Session | Generator:
+        # FastAPI dependency injection
         session = self.session
         try:
             yield session
